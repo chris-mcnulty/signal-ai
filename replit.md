@@ -57,7 +57,7 @@ _Populate as you build — explicit user instructions worth remembering across s
 - After changing `lib/api-spec/openapi.yaml`, run codegen (`pnpm --filter @workspace/api-spec run codegen`) before touching server routes — Zod schema names are generated in PascalCase (e.g. `GetCaseStudyResponse`, `SubmitDraftBody`).
 - The seed script is skip-if-not-empty; to reseed, clear the `articles` table first.
 - `DRAFTS_API_KEY` (shared env var) is the API key external tools must send; rotating it in the Secrets tab immediately invalidates old keys
-- `POST /api/drafts/generate` is currently unauthenticated (intended for the in-app flow); gate it once site auth / editorial dashboard exists
+- `POST /api/drafts/generate` requires the same `DRAFTS_API_KEY` as the other draft endpoints and is rate limited (10 requests / 10 min per client IP, 429 with `Retry-After` when exceeded); switch to session auth once the editorial dashboard lands
 
 ## Pointers
 

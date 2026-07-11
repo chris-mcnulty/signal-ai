@@ -192,7 +192,7 @@ export const ListDraftsResponse = zod.array(ListDraftsResponseItem)
 
 
 /**
- * Generates an article draft from a topic or prompt using AI and saves it to the review queue as a pending-review draft.
+ * Generates an article draft from a topic or prompt using AI and saves it to the review queue as a pending-review draft. Requires an API key in the X-API-Key header. Rate limited per client; repeated rapid calls get a 429 response.
  * @summary Generate an article draft with AI
  */
 export const generateDraftBodyTopicMax = 500;

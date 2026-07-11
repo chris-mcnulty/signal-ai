@@ -124,7 +124,9 @@ curl "https://<base-url>/api/drafts?status=pending_review" \
 
 ### POST /drafts/generate — Generate a draft with AI
 
-Generates a full article draft from a topic using the site's built-in AI and saves it straight to the review queue (status `pending_review`, source `ai`). This powers the in-app "Draft with AI" flow; no API key is required currently.
+Generates a full article draft from a topic using the site's built-in AI and saves it straight to the review queue (status `pending_review`, source `ai`). This powers the in-app "Draft with AI" flow.
+
+Requires the same API key as the other draft endpoints (`X-API-Key` or `Authorization: Bearer`). Because AI generation is expensive, this endpoint is also rate limited: at most **10 requests per 10 minutes per client**. Exceeding the limit returns `429` with a `Retry-After` header (seconds) and a JSON error message.
 
 **Request body (JSON):**
 
@@ -134,11 +136,12 @@ Generates a full article draft from a topic using the site's built-in AI and sav
 | `category` | string | no | Preferred category |
 | `instructions` | string | no | Tone, angle, or length guidance (up to 2000 chars) |
 
-**Response:** `201 Created` with the stored draft (same shape as above). `502` if AI generation fails.
+**Response:** `201 Created` with the stored draft (same shape as above). Errors: `401` (missing/bad key), `429` (rate limited — retry after the `Retry-After` interval), `502` (AI generation failed).
 
 ```bash
 curl -X POST "https://<base-url>/api/drafts/generate" \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: $DRAFTS_API_KEY" \
   -d '{"topic": "The state of open-source AI models", "instructions": "Practical, ~700 words"}'
 ```
 

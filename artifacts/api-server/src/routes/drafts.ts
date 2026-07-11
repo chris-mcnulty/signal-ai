@@ -7,9 +7,14 @@ import {
   ListDraftsQueryParams,
 } from "@workspace/api-zod";
 import { apiKeyAuth } from "../middlewares/apiKeyAuth";
+import { rateLimit } from "../middlewares/rateLimit";
 import { generateArticleDraft } from "../lib/aiDrafting";
 
 const router: IRouter = Router();
+
+// AI generation is expensive: require the drafts API key and throttle
+// repeated calls (per client IP) so a leaked URL can't run up AI costs.
+const generateRateLimit = rateLimit({ windowMs: 10 * 60 * 1000, max: 10 });
 
 router.post("/drafts", apiKeyAuth, async (req, res) => {
   const parsed = SubmitDraftBody.safeParse(req.body);
@@ -57,7 +62,7 @@ router.get("/drafts", apiKeyAuth, async (req, res) => {
   res.json(drafts);
 });
 
-router.post("/drafts/generate", apiKeyAuth, async (req, res) => {
+router.post("/drafts/generate", apiKeyAuth, generateRateLimit, async (req, res) => {
   const parsed = GenerateDraftBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({
