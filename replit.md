@@ -1,6 +1,6 @@
-# [Project name]
+# SignalAI
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+SignalAI ("Separating the signal from the AI noise") is a publication covering commercial AI — use cases, news, opinion, and company case studies that earn SEO backlinks.
 
 ## Run & Operate
 
@@ -9,6 +9,7 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/scripts run seed-content` — seed articles + case studies (idempotent, skips if data exists)
 - Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
@@ -22,15 +23,25 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- DB schema: `lib/db/src/schema/` (`articles`, `case_studies`, `article_relations`)
+- API contract: `lib/api-spec/openapi.yaml` (source of truth; run codegen after edits)
+- JSON API routes: `artifacts/api-server/src/routes/content.ts` (`/api/articles`, `/api/case-studies`, `/api/case-studies/:slug`)
+- SEO/SSR pages: `artifacts/api-server/src/pages/` — server-rendered `/case-studies`, `/case-studies/:slug`, `/sitemap.xml`, `/robots.txt`
+- SEO helpers (JSON-LD builders, base URL): `artifacts/api-server/src/lib/seo.ts`, `src/lib/site.ts`
+- Static brand assets (logo, OG image): `artifacts/api-server/public/static/`, served at `/case-studies/static/`
+- Design mockups (Broadsheet/SignalGrid/WarmEditorial): `artifacts/mockup-sandbox/src/components/mockups/signalai-home/`
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Case-study pages are **server-rendered from the API server** (not the future React site) for technical SEO: static HTML, inline CSS, no JS, Article/Organization/Breadcrumb JSON-LD, canonical URLs. The api-server artifact claims the proxy paths `/case-studies`, `/sitemap.xml`, `/robots.txt` alongside `/api`.
+- A case study = a row in `articles` (category `case-study`) plus a 1:1 row in `case_studies` (company profile, metrics jsonb, quotes jsonb). Cross-links live in `article_relations`.
+- Canonical URLs derive from `REPLIT_DOMAINS` (prod) falling back to `REPLIT_DEV_DOMAIN`.
+- SSR visual style follows the "Broadsheet" mockup direction (newsprint cream, ink, red-orange accent, serif headlines).
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Public, SEO-optimized case-study pages at `/case-studies` and `/case-studies/<slug>`, listed in `/sitemap.xml`, with structured data for Google rich results.
+- JSON API for articles and case studies under `/api` for the future website/dashboard to consume (generated React Query hooks available in `@workspace/api-client-react`).
 
 ## User preferences
 
@@ -38,7 +49,8 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After changing `lib/api-spec/openapi.yaml`, run codegen before touching server routes — zod schema names are generated (e.g. `GetCaseStudyResponse`).
+- The seed script is skip-if-not-empty; to reseed, clear the `articles` table first.
 
 ## Pointers
 

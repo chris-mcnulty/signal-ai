@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: articles
+    description: Published articles
+  - name: case-studies
+    description: Company case studies
 paths:
   /healthz:
     get:
@@ -24,6 +28,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /articles:
+    get:
+      operationId: listArticles
+      tags: [articles]
+      summary: List published articles
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of articles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ArticleSummary"
+  /case-studies:
+    get:
+      operationId: listCaseStudies
+      tags: [case-studies]
+      summary: List company case studies
+      responses:
+        "200":
+          description: List of case studies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CaseStudySummary"
+  /case-studies/{slug}:
+    get:
+      operationId: getCaseStudy
+      tags: [case-studies]
+      summary: Get a case study by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Case study detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseStudyDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +95,172 @@ components:
           type: string
       required:
         - status
-
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    ArticleSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        dek:
+          type: string
+        category:
+          type: string
+        author:
+          type: string
+        readingMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - slug
+        - title
+        - dek
+        - category
+        - author
+        - readingMinutes
+        - publishedAt
+    CaseStudyCompany:
+      type: object
+      properties:
+        name:
+          type: string
+        website:
+          type: string
+        industry:
+          type: string
+        size:
+          type: string
+        headquarters:
+          type: string
+        summary:
+          type: string
+      required:
+        - name
+        - website
+        - industry
+        - size
+        - headquarters
+        - summary
+    CaseStudyMetric:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+        context:
+          type: string
+      required:
+        - label
+        - value
+        - context
+    CaseStudyQuote:
+      type: object
+      properties:
+        quote:
+          type: string
+        attribution:
+          type: string
+        role:
+          type: string
+      required:
+        - quote
+        - attribution
+        - role
+    CaseStudySummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        dek:
+          type: string
+        author:
+          type: string
+        readingMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        company:
+          $ref: "#/components/schemas/CaseStudyCompany"
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyMetric"
+      required:
+        - id
+        - slug
+        - title
+        - dek
+        - author
+        - readingMinutes
+        - publishedAt
+        - company
+        - metrics
+    CaseStudyDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        dek:
+          type: string
+        body:
+          type: string
+        author:
+          type: string
+        readingMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        company:
+          $ref: "#/components/schemas/CaseStudyCompany"
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyMetric"
+        quotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyQuote"
+        relatedArticles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArticleSummary"
+      required:
+        - id
+        - slug
+        - title
+        - dek
+        - body
+        - author
+        - readingMinutes
+        - publishedAt
+        - updatedAt
+        - company
+        - metrics
+        - quotes
+        - relatedArticles

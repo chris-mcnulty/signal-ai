@@ -2,6 +2,8 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
+import caseStudyPagesRouter from "./pages/caseStudyPages";
+import sitemapRouter from "./pages/sitemap";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
@@ -30,5 +32,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// Server-rendered, SEO-optimized public pages (proxied at root paths)
+app.use(caseStudyPagesRouter);
+app.use(sitemapRouter);
 
 export default app;

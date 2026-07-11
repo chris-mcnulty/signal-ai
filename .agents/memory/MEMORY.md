@@ -1,0 +1,1 @@
+- [SEO pages are SSR'd from the api-server](seo-ssr-pages.md) — /case-studies, /sitemap.xml, /robots.txt are api-server SSR routes claimed at the proxy; the future React site must not shadow them.

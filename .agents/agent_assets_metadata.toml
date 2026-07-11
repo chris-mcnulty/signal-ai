@@ -42,6 +42,18 @@ uri = "file://artifacts/mockup-sandbox/public/images/finance-models.png"
 type = "image"
 title = "Abstract financial charts and nodes"
 
+[[generated]]
+id = "RH4ZVk64NpB0dbRobnPQk"
+uri = "file://artifacts/api-server/public/static/signalai-logo.png"
+type = "image"
+title = "SignalAI logo mark"
+
+[[generated]]
+id = "GSWjxV1xqu4m9NQY7I3eI"
+uri = "file://artifacts/api-server/public/static/og-default.png"
+type = "image"
+title = "SignalAI social card"
+
 [[outputs]]
 id = "31ApRrXBSdQ3yudR4oGOj"
 uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_hero.jpg"
