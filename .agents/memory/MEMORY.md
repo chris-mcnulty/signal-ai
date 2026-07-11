@@ -4,3 +4,4 @@
 - [Env vars are committed to the repo](env-vars-in-replit-file.md) — shared/development env vars land in `.replit` (tracked); anything sensitive must be a Replit Secret.
 - [OG share card rendering](og-share-cards.md) — share images use satori+resvg with vendored fonts; keep @resvg/* external in esbuild; platforms cache images by URL.
 - [IndexNow notifier](indexnow-notifier.md) — new case studies auto-pinged via DB-polled IndexNow ledger; key file at /indexnow-key.txt is a claimed proxy path; publish flows need no extra wiring.
+- [SEO notifier tests & dev-DB state](seo-notifier-tests-db-state.md) — seo-tests assert exact call counts against the real dev DB; missing seo_notifications ledger rows cause false failures, backfill instead of editing code.

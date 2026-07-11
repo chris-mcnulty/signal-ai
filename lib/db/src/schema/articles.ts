@@ -19,6 +19,8 @@ export const articlesTable = pgTable(
     body: text("body").notNull(),
     category: text("category").notNull(),
     author: text("author").notNull(),
+    heroImageUrl: text("hero_image_url"),
+    sourceUrls: text("source_urls").array(),
     readingMinutes: integer("reading_minutes").notNull().default(5),
     publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })

@@ -54,6 +54,78 @@ uri = "file://artifacts/api-server/public/static/og-default.png"
 type = "image"
 title = "SignalAI social card"
 
+[[generated]]
+id = "ZJN67kU5qEUEDLM3SG9Pq"
+uri = "file://artifacts/api-server/public/static/news/openai-gpt-5-4.png"
+type = "image"
+title = "openai-gpt-5-4"
+
+[[generated]]
+id = "l2iJAqQlAdKdo6D5t9eCh"
+uri = "file://artifacts/api-server/public/static/news/openai-gpt-5-6.png"
+type = "image"
+title = "openai-gpt-5-6"
+
+[[generated]]
+id = "FmV__ERzrtgnMcBIp9fWB"
+uri = "file://artifacts/api-server/public/static/news/m365-copilot-agent-mode-excel.png"
+type = "image"
+title = "m365-copilot-agent-mode-excel"
+
+[[generated]]
+id = "d5OhO8Gm2UFoghdEZlD7c"
+uri = "file://artifacts/api-server/public/static/news/m365-copilot-wave-3.png"
+type = "image"
+title = "m365-copilot-wave-3"
+
+[[generated]]
+id = "foLgtoJ85ZMAzljPZLg2U"
+uri = "file://artifacts/api-server/public/static/news/hey-copilot-voice.png"
+type = "image"
+title = "hey-copilot-voice"
+
+[[generated]]
+id = "8XdQoD6LzvVdn3LEQfKuR"
+uri = "file://artifacts/api-server/public/static/news/copilot-cowork-ga.png"
+type = "image"
+title = "copilot-cowork-ga"
+
+[[generated]]
+id = "zJeW41CzAV3CfhEOYmRW6"
+uri = "file://artifacts/api-server/public/static/news/claude-cowork-govuk.png"
+type = "image"
+title = "claude-cowork-govuk"
+
+[[generated]]
+id = "gpmN_kOZ-9PT5r7yqu1UX"
+uri = "file://artifacts/api-server/public/static/news/anthropic-series-g.png"
+type = "image"
+title = "anthropic-series-g"
+
+[[generated]]
+id = "JcAeg4vWkwxAJFWL86V-G"
+uri = "file://artifacts/api-server/public/static/news/anthropic-series-h.png"
+type = "image"
+title = "anthropic-series-h"
+
+[[generated]]
+id = "SzyDHVD4DIO8r_4iHf5G3"
+uri = "file://artifacts/api-server/public/static/news/claude-opus-4-8.png"
+type = "image"
+title = "claude-opus-4-8"
+
+[[generated]]
+id = "uWqmSz5YW89UV1Gxc4GJi"
+uri = "file://artifacts/api-server/public/static/news/anthropic-s1-sonnet-5.png"
+type = "image"
+title = "anthropic-s1-sonnet-5"
+
+[[generated]]
+id = "PO9W-kuyY-A0xYbH9ICg9"
+uri = "file://artifacts/api-server/public/static/news/openai-frontier.png"
+type = "image"
+title = "openai-frontier"
+
 [[outputs]]
 id = "31ApRrXBSdQ3yudR4oGOj"
 uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_hero.jpg"
