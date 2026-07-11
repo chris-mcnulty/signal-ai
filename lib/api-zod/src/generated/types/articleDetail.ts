@@ -6,14 +6,17 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface ArticleSummary {
+export interface ArticleDetail {
   id: number;
   slug: string;
   title: string;
   dek: string;
+  body: string;
   category: string;
   author: string;
   readingMinutes: number;
   publishedAt: Date;
+  updatedAt: Date;
   heroImageUrl?: string | null;
+  sourceUrls?: string[] | null;
 }

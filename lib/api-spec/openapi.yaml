@@ -50,6 +50,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ArticleSummary"
+  /articles/{slug}:
+    get:
+      operationId: getArticle
+      tags: [articles]
+      summary: Get a published article by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Article detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArticleDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /case-studies:
     get:
       operationId: listCaseStudies
@@ -310,6 +334,9 @@ components:
         publishedAt:
           type: string
           format: date-time
+        heroImageUrl:
+          type: string
+          nullable: true
       required:
         - id
         - slug
@@ -319,6 +346,50 @@ components:
         - author
         - readingMinutes
         - publishedAt
+    ArticleDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        dek:
+          type: string
+        body:
+          type: string
+        category:
+          type: string
+        author:
+          type: string
+        readingMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        heroImageUrl:
+          type: string
+          nullable: true
+        sourceUrls:
+          type: array
+          nullable: true
+          items:
+            type: string
+      required:
+        - id
+        - slug
+        - title
+        - dek
+        - body
+        - category
+        - author
+        - readingMinutes
+        - publishedAt
+        - updatedAt
     CaseStudyCompany:
       type: object
       properties:

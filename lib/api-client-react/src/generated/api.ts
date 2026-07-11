@@ -21,6 +21,7 @@ import type {
 
 import type {
   ApiError,
+  ArticleDetail,
   ArticleSummary,
   CaseStudyDetail,
   CaseStudySummary,
@@ -210,6 +211,83 @@ export function useListArticles<TData = Awaited<ReturnType<typeof listArticles>>
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListArticlesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetArticleUrl = (slug: string,) => {
+
+
+
+
+  return `/api/articles/${slug}`
+}
+
+/**
+ * @summary Get a published article by slug
+ */
+export const getArticle = async (slug: string, options?: RequestInit): Promise<ArticleDetail> => {
+
+  return customFetch<ArticleDetail>(getGetArticleUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetArticleQueryKey = (slug: string,) => {
+    return [
+    `/api/articles/${slug}`
+    ] as const;
+    }
+
+
+export const getGetArticleQueryOptions = <TData = Awaited<ReturnType<typeof getArticle>>, TError = ErrorType<ErrorResponse>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetArticleQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getArticle>>> = ({ signal }) => getArticle(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getArticle>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetArticleQueryResult = NonNullable<Awaited<ReturnType<typeof getArticle>>>
+export type GetArticleQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a published article by slug
+ */
+
+export function useGetArticle<TData = Awaited<ReturnType<typeof getArticle>>, TError = ErrorType<ErrorResponse>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetArticleQueryOptions(slug,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

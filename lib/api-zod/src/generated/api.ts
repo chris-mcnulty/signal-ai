@@ -32,9 +32,33 @@ export const ListArticlesResponseItem = zod.object({
   "category": zod.string(),
   "author": zod.string(),
   "readingMinutes": zod.number(),
-  "publishedAt": zod.coerce.date()
+  "publishedAt": zod.coerce.date(),
+  "heroImageUrl": zod.string().nullish()
 })
 export const ListArticlesResponse = zod.array(ListArticlesResponseItem)
+
+
+/**
+ * @summary Get a published article by slug
+ */
+export const GetArticleParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetArticleResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "dek": zod.string(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "author": zod.string(),
+  "readingMinutes": zod.number(),
+  "publishedAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "heroImageUrl": zod.string().nullish(),
+  "sourceUrls": zod.array(zod.string()).nullish()
+})
 
 
 /**
@@ -108,7 +132,8 @@ export const GetCaseStudyResponse = zod.object({
   "category": zod.string(),
   "author": zod.string(),
   "readingMinutes": zod.number(),
-  "publishedAt": zod.coerce.date()
+  "publishedAt": zod.coerce.date(),
+  "heroImageUrl": zod.string().nullish()
 }))
 })
 

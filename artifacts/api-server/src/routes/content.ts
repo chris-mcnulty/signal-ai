@@ -2,15 +2,19 @@ import { Router, type IRouter } from "express";
 import {
   ListArticlesQueryParams,
   ListArticlesResponse,
+  GetArticleParams,
+  GetArticleResponse,
   ListCaseStudiesResponse,
   GetCaseStudyParams,
   GetCaseStudyResponse,
 } from "@workspace/api-zod";
 import {
   listPublishedArticles,
+  getArticleBySlug,
   listCaseStudiesWithArticles,
   getCaseStudyBySlug,
   toArticleSummary,
+  toArticleDetail,
   toCaseStudyCompany,
 } from "../lib/content";
 
@@ -24,6 +28,20 @@ router.get("/articles", async (req, res): Promise<void> => {
   }
   const articles = await listPublishedArticles(query.data.category);
   res.json(ListArticlesResponse.parse(articles.map(toArticleSummary)));
+});
+
+router.get("/articles/:slug", async (req, res): Promise<void> => {
+  const params = GetArticleParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const article = await getArticleBySlug(params.data.slug);
+  if (!article) {
+    res.status(404).json({ error: "Article not found" });
+    return;
+  }
+  res.json(GetArticleResponse.parse(toArticleDetail(article)));
 });
 
 router.get("/case-studies", async (_req, res): Promise<void> => {

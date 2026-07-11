@@ -80,6 +80,22 @@ export interface ArticleSummary {
   author: string;
   readingMinutes: number;
   publishedAt: string;
+  heroImageUrl?: string | null;
+}
+
+export interface ArticleDetail {
+  id: number;
+  slug: string;
+  title: string;
+  dek: string;
+  body: string;
+  category: string;
+  author: string;
+  readingMinutes: number;
+  publishedAt: string;
+  updatedAt: string;
+  heroImageUrl?: string | null;
+  sourceUrls?: string[] | null;
 }
 
 export interface CaseStudyCompany {

@@ -7,6 +7,7 @@
  */
 
 export * from './apiError';
+export * from './articleDetail';
 export * from './articleSummary';
 export * from './caseStudyCompany';
 export * from './caseStudyDetail';

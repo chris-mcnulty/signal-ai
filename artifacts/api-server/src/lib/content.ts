@@ -22,6 +22,17 @@ export async function listPublishedArticles(
   return query;
 }
 
+export async function getArticleBySlug(
+  slug: string,
+): Promise<Article | null> {
+  const rows = await db
+    .select()
+    .from(articlesTable)
+    .where(eq(articlesTable.slug, slug))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
 export async function listCaseStudiesWithArticles(): Promise<
   CaseStudyWithArticle[]
 > {
@@ -78,6 +89,24 @@ export function toArticleSummary(article: Article) {
     author: article.author,
     readingMinutes: article.readingMinutes,
     publishedAt: article.publishedAt,
+    heroImageUrl: article.heroImageUrl ?? null,
+  };
+}
+
+export function toArticleDetail(article: Article) {
+  return {
+    id: article.id,
+    slug: article.slug,
+    title: article.title,
+    dek: article.dek,
+    body: article.body,
+    category: article.category,
+    author: article.author,
+    readingMinutes: article.readingMinutes,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    heroImageUrl: article.heroImageUrl ?? null,
+    sourceUrls: article.sourceUrls ?? null,
   };
 }
 
