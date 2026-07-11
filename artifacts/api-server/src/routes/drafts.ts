@@ -21,7 +21,7 @@ router.post("/drafts", apiKeyAuth, async (req, res) => {
   if (!parsed.success) {
     res.status(400).json({
       error: `Invalid request body: ${parsed.error.issues
-        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .map((i: { path: PropertyKey[]; message: string }) => `${i.path.join(".")}: ${i.message}`)
         .join("; ")}`,
     });
     return;
@@ -67,7 +67,7 @@ router.post("/drafts/generate", apiKeyAuth, generateRateLimit, async (req, res) 
   if (!parsed.success) {
     res.status(400).json({
       error: `Invalid request body: ${parsed.error.issues
-        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .map((i: { path: PropertyKey[]; message: string }) => `${i.path.join(".")}: ${i.message}`)
         .join("; ")}`,
     });
     return;
