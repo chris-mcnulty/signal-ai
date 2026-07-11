@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { db, articlesTable, caseStudiesTable, seoNotificationsTable } from "@workspace/db";
-import { eq, isNull, lte, and } from "drizzle-orm";
+import { eq, isNull, lte, and, or, sql } from "drizzle-orm";
 import { logger } from "./logger";
 import { getPublicBaseUrl } from "./site";
 
@@ -48,13 +48,15 @@ async function submitToIndexNow(
 type PendingCaseStudy = {
   articleId: number;
   slug: string;
+  updatedAt: Date;
 };
 
-async function findUnnotifiedCaseStudies(): Promise<PendingCaseStudy[]> {
+export async function findPendingCaseStudies(): Promise<PendingCaseStudy[]> {
   const rows = await db
     .select({
       articleId: articlesTable.id,
       slug: articlesTable.slug,
+      updatedAt: articlesTable.updatedAt,
     })
     .from(caseStudiesTable)
     .innerJoin(articlesTable, eq(caseStudiesTable.articleId, articlesTable.id))
@@ -64,8 +66,13 @@ async function findUnnotifiedCaseStudies(): Promise<PendingCaseStudy[]> {
     )
     .where(
       and(
-        isNull(seoNotificationsTable.id),
         lte(articlesTable.publishedAt, new Date()),
+        or(
+          isNull(seoNotificationsTable.id),
+          // The ledger stores updatedAt via a JS Date (millisecond precision),
+          // while Postgres keeps microseconds; truncate to avoid a ping loop.
+          sql`date_trunc('milliseconds', ${articlesTable.updatedAt}) > coalesce(${seoNotificationsTable.notifiedUpdatedAt}, ${seoNotificationsTable.notifiedAt})`,
+        ),
       ),
     );
   return rows;
@@ -79,7 +86,7 @@ export async function notifyNewCaseStudies(): Promise<void> {
   }
   notifyInFlight = true;
   try {
-    const pending = await findUnnotifiedCaseStudies();
+    const pending = await findPendingCaseStudies();
     if (pending.length === 0) {
       return;
     }
@@ -123,13 +130,23 @@ export async function notifyNewCaseStudies(): Promise<void> {
           url: `${baseUrl}/case-studies/${entry.slug}`,
           status: "submitted",
           detail: `IndexNow HTTP ${result.status}`,
+          notifiedUpdatedAt: entry.updatedAt,
         })),
       )
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: seoNotificationsTable.articleId,
+        set: {
+          url: sql`excluded.url`,
+          status: sql`excluded.status`,
+          detail: sql`excluded.detail`,
+          notifiedAt: sql`now()`,
+          notifiedUpdatedAt: sql`excluded.notified_updated_at`,
+        },
+      });
 
     logger.info(
       { status: result.status, count: pending.length, urls },
-      "IndexNow: notified search engines of newly published case studies",
+      "IndexNow: notified search engines of new or updated case studies",
     );
   } catch (err) {
     logger.error({ err }, "IndexNow: notification attempt failed");

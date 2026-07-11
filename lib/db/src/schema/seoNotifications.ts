@@ -21,6 +21,9 @@ export const seoNotificationsTable = pgTable(
     notifiedAt: timestamp("notified_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    notifiedUpdatedAt: timestamp("notified_updated_at", {
+      withTimezone: true,
+    }),
   },
   (table) => [
     uniqueIndex("seo_notifications_article_idx").on(table.articleId),

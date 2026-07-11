@@ -5,7 +5,7 @@ description: How newly published case studies get pushed to search engines and t
 
 # Search engines are notified via a DB-polled IndexNow notifier in the api-server
 
-New case studies are pushed to search engines (Bing/Yandex/Naver/Seznam via IndexNow) by a poller in the api-server that runs at startup and every 5 minutes. It finds published case studies with no row in the `seo_notifications` ledger table, pings `api.indexnow.org` with the full URL batch, and records a ledger row per article on success (exactly-once; failures retry next poll).
+New and revised case studies are pushed to search engines (Bing/Yandex/Naver/Seznam via IndexNow) by a poller in the api-server that runs at startup and every 5 minutes. It finds published case studies with no row in the `seo_notifications` ledger table OR whose article `updatedAt` moved past the ledger's last-notified revision (`notified_updated_at`), pings `api.indexnow.org` with the full URL batch, and upserts a ledger row per article on success (exactly-once per revision; failures retry next poll). Gotcha: Postgres timestamps carry microseconds but JS Dates only milliseconds — the pending query must `date_trunc('milliseconds', updated_at)` before comparing, or every article looks perpetually revised and pings loop.
 
 **Why:** There is no single publish endpoint — content can appear via the seed script today and via a future editorial dashboard / draft API. Polling the DB catches all paths. Google removed its sitemap-ping endpoint in 2023, so IndexNow + sitemap `lastmod` is the correct mechanism; do not add a Google ping.
 
