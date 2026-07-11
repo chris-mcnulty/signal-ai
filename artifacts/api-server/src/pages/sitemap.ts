@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { getBaseUrl, escapeXml } from "../lib/site";
 import { listCaseStudiesWithArticles } from "../lib/content";
+import { getIndexNowKey, INDEXNOW_KEY_PATH } from "../lib/indexnow";
 
 const router: IRouter = Router();
 
@@ -33,6 +34,11 @@ Allow: /
 
 Sitemap: ${baseUrl}/sitemap.xml
 `);
+});
+
+router.get(INDEXNOW_KEY_PATH, (_req, res): void => {
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.send(getIndexNowKey());
 });
 
 export default router;

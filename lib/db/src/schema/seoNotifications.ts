@@ -1,0 +1,30 @@
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+import { articlesTable } from "./articles";
+
+export const seoNotificationsTable = pgTable(
+  "seo_notifications",
+  {
+    id: serial("id").primaryKey(),
+    articleId: integer("article_id")
+      .notNull()
+      .references(() => articlesTable.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    status: text("status").notNull(),
+    detail: text("detail"),
+    notifiedAt: timestamp("notified_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("seo_notifications_article_idx").on(table.articleId),
+  ],
+);
+
+export type SeoNotification = typeof seoNotificationsTable.$inferSelect;

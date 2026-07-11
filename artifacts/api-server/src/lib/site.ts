@@ -7,7 +7,7 @@ export const SITE = {
     "SignalAI is a publication covering commercial AI: use cases, news, opinion, and company case studies.",
 };
 
-export function getBaseUrl(req: Request): string {
+export function getPublicBaseUrl(): string | null {
   const domains = process.env.REPLIT_DOMAINS;
   if (domains) {
     const first = domains.split(",")[0]?.trim();
@@ -18,6 +18,14 @@ export function getBaseUrl(req: Request): string {
   const devDomain = process.env.REPLIT_DEV_DOMAIN;
   if (devDomain) {
     return `https://${devDomain}`;
+  }
+  return null;
+}
+
+export function getBaseUrl(req: Request): string {
+  const publicBaseUrl = getPublicBaseUrl();
+  if (publicBaseUrl) {
+    return publicBaseUrl;
   }
   const host = req.get("host") ?? "localhost";
   return `${req.protocol}://${host}`;
