@@ -32,7 +32,14 @@ export function caseStudyArticleJsonLd(
     headline: article.title,
     description: article.dek,
     articleSection: "Case Studies",
-    image: [`${baseUrl}/case-studies/static/og-default.png`],
+    image: [
+      {
+        "@type": "ImageObject",
+        url: `${baseUrl}/case-studies/og/${article.slug}.png`,
+        width: 1200,
+        height: 630,
+      },
+    ],
     datePublished: article.publishedAt.toISOString(),
     dateModified: article.updatedAt.toISOString(),
     author: {

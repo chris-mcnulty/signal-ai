@@ -14,6 +14,7 @@ import {
   jsonLdScript,
 } from "../lib/seo";
 import { renderPage, renderArticleBody } from "./layout";
+import { renderOgCard } from "../lib/ogCard";
 
 const router: IRouter = Router();
 
@@ -41,6 +42,50 @@ function setPageHeaders(res: express.Response): void {
     res.setHeader("Cache-Control", "no-store");
   }
 }
+
+router.get("/case-studies/og/:slug", async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.slug)
+    ? req.params.slug[0]
+    : req.params.slug;
+  const slug = raw?.replace(/\.png$/, "");
+  if (!slug) {
+    res.status(404).send("Not found");
+    return;
+  }
+  const entry = await getCaseStudyBySlug(slug);
+  if (!entry) {
+    res.status(404).send("Not found");
+    return;
+  }
+  const { article, caseStudy } = entry;
+  const metric = caseStudy.metrics[0];
+  const cacheKey = article.updatedAt.toISOString();
+  const etag = `"og-${slug}-${article.updatedAt.getTime()}"`;
+  if (req.headers["if-none-match"] === etag) {
+    res.status(304).end();
+    return;
+  }
+  try {
+    const png = await renderOgCard(slug, cacheKey, {
+      title: article.title,
+      metricValue: metric?.value,
+      metricLabel: metric?.label,
+      companyName: caseStudy.companyName,
+      industry: caseStudy.industry,
+    });
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("ETag", etag);
+    if (process.env.NODE_ENV === "production") {
+      res.setHeader("Cache-Control", "public, max-age=86400");
+    } else {
+      res.setHeader("Cache-Control", "no-store");
+    }
+    res.send(png);
+  } catch (err) {
+    req.log?.error({ err }, "failed to render og card");
+    res.status(500).send("Failed to render image");
+  }
+});
 
 router.get("/case-studies", async (req, res): Promise<void> => {
   const baseUrl = getBaseUrl(req);
@@ -206,7 +251,7 @@ ${relatedHtml}
         title: `${article.title} — ${SITE.name} Case Study`,
         description: article.dek,
         canonicalUrl: pageUrl,
-        ogImageUrl: `${baseUrl}/case-studies/static/og-default.png`,
+        ogImageUrl: `${baseUrl}/case-studies/og/${article.slug}.png`,
         ogType: "article",
         publishedTime: article.publishedAt.toISOString(),
         modifiedTime: article.updatedAt.toISOString(),
