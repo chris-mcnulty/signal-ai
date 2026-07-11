@@ -6,24 +6,34 @@ import {
   caseStudiesTable,
   seoNotificationsTable,
 } from "@workspace/db";
-import { eq } from "drizzle-orm";
-import { findPendingCaseStudies } from "../lib/indexnow";
+import { eq, and } from "drizzle-orm";
+import { findPendingCaseStudies, TARGET_INDEXNOW } from "../lib/indexnow";
 
 type LedgerRow = typeof seoNotificationsTable.$inferSelect;
 
 let articleId: number;
 let articleUpdatedAt: Date;
-let originalLedgerRow: LedgerRow | undefined;
+let originalLedgerRows: LedgerRow[] = [];
+
+async function clearIndexNowLedger(): Promise<void> {
+  await db
+    .delete(seoNotificationsTable)
+    .where(
+      and(
+        eq(seoNotificationsTable.articleId, articleId),
+        eq(seoNotificationsTable.target, TARGET_INDEXNOW),
+      ),
+    );
+}
 
 async function setLedger(row: {
   notifiedAt: Date;
   notifiedUpdatedAt: Date | null;
 }): Promise<void> {
-  await db
-    .delete(seoNotificationsTable)
-    .where(eq(seoNotificationsTable.articleId, articleId));
+  await clearIndexNowLedger();
   await db.insert(seoNotificationsTable).values({
     articleId,
+    target: TARGET_INDEXNOW,
     url: `https://example.com/case-studies/test`,
     status: "submitted",
     detail: "test",
@@ -53,29 +63,27 @@ beforeAll(async () => {
   articleId = row.articleId;
   articleUpdatedAt = row.updatedAt;
 
-  const [existing] = await db
+  originalLedgerRows = await db
     .select()
     .from(seoNotificationsTable)
     .where(eq(seoNotificationsTable.articleId, articleId));
-  originalLedgerRow = existing;
 });
 
 afterAll(async () => {
   await db
     .delete(seoNotificationsTable)
     .where(eq(seoNotificationsTable.articleId, articleId));
-  if (originalLedgerRow) {
-    const { id: _id, ...rest } = originalLedgerRow;
-    await db.insert(seoNotificationsTable).values(rest);
+  if (originalLedgerRows.length > 0) {
+    await db
+      .insert(seoNotificationsTable)
+      .values(originalLedgerRows.map(({ id: _id, ...rest }) => rest));
   }
   await pool.end();
 });
 
 describe("findPendingCaseStudies", () => {
   it("includes a case study with no ledger row (new publication)", async () => {
-    await db
-      .delete(seoNotificationsTable)
-      .where(eq(seoNotificationsTable.articleId, articleId));
+    await clearIndexNowLedger();
     expect(await isPending()).toBe(true);
   });
 
