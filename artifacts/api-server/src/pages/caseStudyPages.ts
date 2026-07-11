@@ -12,6 +12,7 @@ import {
   breadcrumbJsonLd,
   organizationPageJsonLd,
   jsonLdScript,
+  caseStudyOgImageUrl,
 } from "../lib/seo";
 import { renderPage, renderArticleBody } from "./layout";
 import { renderOgCard } from "../lib/ogCard";
@@ -76,7 +77,18 @@ router.get("/case-studies/og/:slug", async (req, res): Promise<void> => {
     res.setHeader("Content-Type", "image/png");
     res.setHeader("ETag", etag);
     if (process.env.NODE_ENV === "production") {
-      res.setHeader("Cache-Control", "public, max-age=86400");
+      const versionParam = Array.isArray(req.query.v)
+        ? req.query.v[0]
+        : req.query.v;
+      const isCurrentVersion =
+        typeof versionParam === "string" &&
+        versionParam === String(article.updatedAt.getTime());
+      res.setHeader(
+        "Cache-Control",
+        isCurrentVersion
+          ? "public, max-age=31536000, immutable"
+          : "public, max-age=86400",
+      );
     } else {
       res.setHeader("Cache-Control", "no-store");
     }
@@ -251,7 +263,7 @@ ${relatedHtml}
         title: `${article.title} — ${SITE.name} Case Study`,
         description: article.dek,
         canonicalUrl: pageUrl,
-        ogImageUrl: `${baseUrl}/case-studies/og/${article.slug}.png`,
+        ogImageUrl: caseStudyOgImageUrl(baseUrl, article),
         ogType: "article",
         publishedTime: article.publishedAt.toISOString(),
         modifiedTime: article.updatedAt.toISOString(),

@@ -3,6 +3,13 @@ import { SITE } from "./site";
 
 type JsonLd = Record<string, unknown>;
 
+export function caseStudyOgImageUrl(
+  baseUrl: string,
+  article: Pick<Article, "slug" | "updatedAt">,
+): string {
+  return `${baseUrl}/case-studies/og/${article.slug}.png?v=${article.updatedAt.getTime()}`;
+}
+
 export function publisherJsonLd(baseUrl: string): JsonLd {
   return {
     "@type": "Organization",
@@ -35,7 +42,7 @@ export function caseStudyArticleJsonLd(
     image: [
       {
         "@type": "ImageObject",
-        url: `${baseUrl}/case-studies/og/${article.slug}.png`,
+        url: caseStudyOgImageUrl(baseUrl, article),
         width: 1200,
         height: 630,
       },

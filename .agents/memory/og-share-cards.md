@@ -11,4 +11,4 @@ Per-case-study Open Graph cards are rendered at request time with satori (layout
 
 **How to apply:** Any new server-rendered imagery (other card types, badges) should reuse this stack and the vendored fonts; keep native image libs external in esbuild.
 
-**Gotcha:** Social platforms (LinkedIn, Twitter) cache share images by URL. The og:image URL contains only the slug, so an edited case study keeps showing the stale card on platforms until re-scraped or the URL is versioned.
+**Gotcha:** Social platforms (LinkedIn, Twitter) cache share images by URL. og:image/twitter:image/JSON-LD image URLs are therefore versioned with `?v=<updatedAt ms>` (shared helper in the seo lib) so an edit yields a fresh URL; the image route ignores the param for matching but serves long-lived immutable cache when the version matches the current updatedAt. Any new share-image URL must include the version param, and unversioned URLs must keep working for old shared links.
