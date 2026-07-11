@@ -6,7 +6,7 @@ import {
   caseStudiesTable,
   seoNotificationsTable,
 } from "@workspace/db";
-import { eq, and, isNull } from "drizzle-orm";
+import { eq, and, isNull, gt } from "drizzle-orm";
 import { findPendingCaseStudies, TARGET_INDEXNOW, findPendingRemovals } from "../lib/indexnow";
 
 type LedgerRow = typeof seoNotificationsTable.$inferSelect;
@@ -82,6 +82,21 @@ afterAll(async () => {
     await db
       .insert(seoNotificationsTable)
       .values(originalLedgerRows.map(({ id: _id, ...rest }) => rest));
+  }
+  // The "unpublished article" tests call db.update(articlesTable) to set
+  // publishedAt in the future, which triggers Drizzle's $onUpdate hook and
+  // bumps updatedAt beyond the original notifiedUpdatedAt in the restored
+  // ledger rows. Sync notifiedUpdatedAt to the current updatedAt so this
+  // article doesn't appear pending to seoNotifier runs after the test suite.
+  const [current] = await db
+    .select({ updatedAt: articlesTable.updatedAt })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, articleId));
+  if (current && gt(current.updatedAt, articleUpdatedAt)) {
+    await db
+      .update(seoNotificationsTable)
+      .set({ notifiedUpdatedAt: current.updatedAt })
+      .where(eq(seoNotificationsTable.articleId, articleId));
   }
   await pool.end();
 });
