@@ -15,6 +15,7 @@ export const seoNotificationsTable = pgTable(
     articleId: integer("article_id")
       .notNull()
       .references(() => articlesTable.id, { onDelete: "cascade" }),
+    target: text("target").notNull().default("indexnow"),
     url: text("url").notNull(),
     status: text("status").notNull(),
     detail: text("detail"),
@@ -26,7 +27,10 @@ export const seoNotificationsTable = pgTable(
     }),
   },
   (table) => [
-    uniqueIndex("seo_notifications_article_idx").on(table.articleId),
+    uniqueIndex("seo_notifications_article_target_idx").on(
+      table.articleId,
+      table.target,
+    ),
   ],
 );
 
