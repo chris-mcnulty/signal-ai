@@ -12,9 +12,9 @@ export const seoNotificationsTable = pgTable(
   "seo_notifications",
   {
     id: serial("id").primaryKey(),
-    articleId: integer("article_id")
-      .notNull()
-      .references(() => articlesTable.id, { onDelete: "cascade" }),
+    articleId: integer("article_id").references(() => articlesTable.id, {
+      onDelete: "set null",
+    }),
     target: text("target").notNull().default("indexnow"),
     url: text("url").notNull(),
     status: text("status").notNull(),

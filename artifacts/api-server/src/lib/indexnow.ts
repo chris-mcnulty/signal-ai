@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { db, articlesTable, caseStudiesTable, seoNotificationsTable } from "@workspace/db";
-import { eq, isNull, lte, and, or, sql } from "drizzle-orm";
+import { eq, isNull, lte, gt, and, or, ne, inArray, sql } from "drizzle-orm";
 import { logger } from "./logger";
 import { getPublicBaseUrl } from "./site";
 import { getGoogleServiceAccount, submitUrlToGoogle } from "./googleIndexing";
@@ -228,6 +228,59 @@ async function notifyGoogle(baseUrl: string): Promise<void> {
   }
 }
 
+type PendingRemoval = {
+  notificationId: number;
+  url: string;
+};
+
+/**
+ * Find SEO notification rows (IndexNow target) whose articles have been removed
+ * from public view:
+ *  1. articleId IS NULL  — the article was hard-deleted (FK set to NULL on cascade)
+ *  2. article exists but publishedAt is in the future — the article was unpublished
+ *
+ * Rows already marked "removal_submitted" are excluded to prevent ping loops.
+ */
+export async function findPendingRemovals(): Promise<PendingRemoval[]> {
+  const [deletedRows, unpublishedRows] = await Promise.all([
+    // Case 1: article was deleted; FK set to NULL
+    db
+      .select({
+        notificationId: seoNotificationsTable.id,
+        url: seoNotificationsTable.url,
+      })
+      .from(seoNotificationsTable)
+      .where(
+        and(
+          isNull(seoNotificationsTable.articleId),
+          eq(seoNotificationsTable.target, TARGET_INDEXNOW),
+          ne(seoNotificationsTable.status, "removal_submitted"),
+        ),
+      ),
+
+    // Case 2: article still exists but publishedAt moved into the future
+    db
+      .select({
+        notificationId: seoNotificationsTable.id,
+        url: seoNotificationsTable.url,
+      })
+      .from(seoNotificationsTable)
+      .innerJoin(
+        articlesTable,
+        eq(seoNotificationsTable.articleId, articlesTable.id),
+      )
+      .where(
+        and(
+          eq(seoNotificationsTable.target, TARGET_INDEXNOW),
+          gt(articlesTable.publishedAt, new Date()),
+          ne(seoNotificationsTable.status, "removal_submitted"),
+        ),
+      ),
+  ]);
+
+  return [...deletedRows, ...unpublishedRows];
+}
+
 let notifyInFlight = false;
 
 export async function notifyNewCaseStudies(): Promise<void> {
@@ -253,10 +306,74 @@ export async function notifyNewCaseStudies(): Promise<void> {
   }
 }
 
+let removalNotifyInFlight = false;
+
+export async function notifyRemovedCaseStudies(): Promise<void> {
+  if (removalNotifyInFlight) {
+    return;
+  }
+  removalNotifyInFlight = true;
+  try {
+    const pending = await findPendingRemovals();
+    if (pending.length === 0) {
+      return;
+    }
+
+    const baseUrl = getPublicBaseUrl();
+    if (!baseUrl) {
+      logger.warn(
+        { count: pending.length },
+        "IndexNow: no public domain configured; cannot notify removal",
+      );
+      return;
+    }
+
+    const urls = pending.map((r) => r.url);
+
+    if (!isSeoNotifierEnabled()) {
+      logger.info(
+        { count: pending.length, urls },
+        "IndexNow: disabled outside production; skipping removal ping (set INDEXNOW_ENABLED=true to override)",
+      );
+      return;
+    }
+
+    const result = await submitToIndexNow(baseUrl, urls);
+    if (!result.ok) {
+      logger.error(
+        { status: result.status, body: result.body.slice(0, 500), urls },
+        "IndexNow: removal ping failed; will retry on next poll",
+      );
+      return;
+    }
+
+    const ids = pending.map((r) => r.notificationId);
+    await db
+      .update(seoNotificationsTable)
+      .set({
+        status: "removal_submitted",
+        detail: `IndexNow removal HTTP ${result.status}`,
+        notifiedAt: new Date(),
+      })
+      .where(inArray(seoNotificationsTable.id, ids));
+
+    logger.info(
+      { status: result.status, count: pending.length, urls },
+      "IndexNow: notified search engines to remove case studies",
+    );
+  } catch (err) {
+    logger.error({ err }, "IndexNow: removal notification attempt failed");
+  } finally {
+    removalNotifyInFlight = false;
+  }
+}
+
 export function startSeoNotifier(): void {
   void notifyNewCaseStudies();
+  void notifyRemovedCaseStudies();
   const timer = setInterval(() => {
     void notifyNewCaseStudies();
+    void notifyRemovedCaseStudies();
   }, POLL_INTERVAL_MS);
   timer.unref();
 }
