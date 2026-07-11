@@ -57,7 +57,7 @@ router.get("/drafts", apiKeyAuth, async (req, res) => {
   res.json(drafts);
 });
 
-router.post("/drafts/generate", async (req, res) => {
+router.post("/drafts/generate", apiKeyAuth, async (req, res) => {
   const parsed = GenerateDraftBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({
