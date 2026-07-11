@@ -113,3 +113,87 @@ export const GetCaseStudyResponse = zod.object({
 })
 
 
+/**
+ * Accepts an article draft from an external tool and stores it as a pending-review draft. Requires an API key in the X-API-Key header.
+ * @summary Submit an article draft
+ */
+export const submitDraftBodyTitleMax = 300;
+
+
+export const submitDraftBodyCategoryMax = 100;
+
+
+
+export const SubmitDraftBody = zod.object({
+  "title": zod.string().min(1).max(submitDraftBodyTitleMax),
+  "body": zod.string().min(1),
+  "category": zod.string().max(submitDraftBodyCategoryMax).optional(),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).optional().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)')
+})
+
+export const SubmitDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "category": zod.string().nullable(),
+  "status": zod.string(),
+  "source": zod.string(),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * Lists drafts, newest first. Optionally filter by status. Requires an API key in the X-API-Key header.
+ * @summary List drafts
+ */
+export const ListDraftsQueryParams = zod.object({
+  "status": zod.enum(['pending_review', 'approved', 'rejected']).optional()
+})
+
+export const ListDraftsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "category": zod.string().nullable(),
+  "status": zod.string(),
+  "source": zod.string(),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListDraftsResponse = zod.array(ListDraftsResponseItem)
+
+
+/**
+ * Generates an article draft from a topic or prompt using AI and saves it to the review queue as a pending-review draft.
+ * @summary Generate an article draft with AI
+ */
+export const generateDraftBodyTopicMax = 500;
+
+export const generateDraftBodyCategoryMax = 100;
+
+export const generateDraftBodyInstructionsMax = 2000;
+
+
+
+export const GenerateDraftBody = zod.object({
+  "topic": zod.string().min(1).max(generateDraftBodyTopicMax).describe('The topic or prompt to write an article about'),
+  "category": zod.string().max(generateDraftBodyCategoryMax).optional(),
+  "instructions": zod.string().max(generateDraftBodyInstructionsMax).optional().describe('Optional extra instructions for tone, angle, or length')
+})
+
+export const GenerateDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "category": zod.string().nullable(),
+  "status": zod.string(),
+  "source": zod.string(),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+

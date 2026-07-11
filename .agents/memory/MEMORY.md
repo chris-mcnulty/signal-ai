@@ -1,1 +1,4 @@
 - [SEO pages are SSR'd from the api-server](seo-ssr-pages.md) — /case-studies, /sitemap.xml, /robots.txt are api-server SSR routes claimed at the proxy; the future React site must not shadow them.
+- [Drafts API conventions](drafts-api.md) — review-queue statuses, API-key auth pattern, and where the external docs live; keep new submission paths consistent.
+- [OpenAI template typecheck fix](openai-template-quirk.md) — the copied integrations-openai-ai-server template fails `typecheck:libs` (`response.data` possibly undefined); needs optional chaining.
+- [Env vars are committed to the repo](env-vars-in-replit-file.md) — shared/development env vars land in `.replit` (tracked); anything sensitive must be a Replit Secret.

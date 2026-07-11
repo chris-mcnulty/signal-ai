@@ -6,12 +6,20 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './apiError';
 export * from './articleSummary';
 export * from './caseStudyCompany';
 export * from './caseStudyDetail';
 export * from './caseStudyMetric';
 export * from './caseStudyQuote';
 export * from './caseStudySummary';
+export * from './draft';
+export * from './draftSourceMetadata';
 export * from './errorResponse';
+export * from './generateDraftRequest';
 export * from './healthStatus';
 export * from './listArticlesParams';
+export * from './listDraftsParams';
+export * from './listDraftsStatus';
+export * from './submitDraftRequest';
+export * from './submitDraftRequestSourceMetadata';

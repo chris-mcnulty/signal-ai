@@ -14,6 +14,8 @@ tags:
     description: Published articles
   - name: case-studies
     description: Company case studies
+  - name: drafts
+    description: Article draft submission and AI drafting
 paths:
   /healthz:
     get:
@@ -86,7 +88,111 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /drafts:
+    post:
+      operationId: submitDraft
+      tags: [drafts]
+      summary: Submit an article draft
+      description: >
+        Accepts an article draft from an external tool and stores it as a
+        pending-review draft. Requires an API key in the X-API-Key header.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitDraftRequest"
+      responses:
+        "201":
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    get:
+      operationId: listDrafts
+      tags: [drafts]
+      summary: List drafts
+      description: >
+        Lists drafts, newest first. Optionally filter by status. Requires an
+        API key in the X-API-Key header.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending_review, approved, rejected]
+      responses:
+        "200":
+          description: List of drafts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Draft"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /drafts/generate:
+    post:
+      operationId: generateDraft
+      tags: [drafts]
+      summary: Generate an article draft with AI
+      description: >
+        Generates an article draft from a topic or prompt using AI and saves
+        it to the review queue as a pending-review draft.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateDraftRequest"
+      responses:
+        "201":
+          description: AI-generated draft created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "502":
+          description: AI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
   schemas:
     HealthStatus:
       type: object
@@ -102,6 +208,88 @@ components:
           type: string
       required:
         - error
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+    SubmitDraftRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 300
+        body:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          maxLength: 100
+        sourceMetadata:
+          type: object
+          description: Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
+          additionalProperties: true
+      required:
+        - title
+        - body
+    GenerateDraftRequest:
+      type: object
+      properties:
+        topic:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: The topic or prompt to write an article about
+        category:
+          type: string
+          maxLength: 100
+        instructions:
+          type: string
+          maxLength: 2000
+          description: Optional extra instructions for tone, angle, or length
+      required:
+        - topic
+    Draft:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+        category:
+          type:
+            - string
+            - "null"
+        status:
+          type: string
+        source:
+          type: string
+        sourceMetadata:
+          type:
+            - object
+            - "null"
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - body
+        - category
+        - status
+        - source
+        - sourceMetadata
+        - createdAt
+        - updatedAt
     ArticleSummary:
       type: object
       properties:

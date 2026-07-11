@@ -13,6 +13,64 @@ export interface ErrorResponse {
   error: string;
 }
 
+export interface ApiError {
+  error: string;
+}
+
+/**
+ * Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
+ */
+export type SubmitDraftRequestSourceMetadata = { [key: string]: unknown };
+
+export interface SubmitDraftRequest {
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  title: string;
+  /** @minLength 1 */
+  body: string;
+  /** @maxLength 100 */
+  category?: string;
+  /** Arbitrary metadata about where the draft came from (repo, run id, model, etc.) */
+  sourceMetadata?: SubmitDraftRequestSourceMetadata;
+}
+
+export interface GenerateDraftRequest {
+  /**
+     * The topic or prompt to write an article about
+     * @minLength 1
+     * @maxLength 500
+     */
+  topic: string;
+  /** @maxLength 100 */
+  category?: string;
+  /**
+     * Optional extra instructions for tone, angle, or length
+     * @maxLength 2000
+     */
+  instructions?: string;
+}
+
+/**
+ * @nullable
+ */
+export type DraftSourceMetadata = { [key: string]: unknown } | null;
+
+export interface Draft {
+  id: number;
+  title: string;
+  body: string;
+  /** @nullable */
+  category: string | null;
+  status: string;
+  source: string;
+  /** @nullable */
+  sourceMetadata: DraftSourceMetadata;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ArticleSummary {
   id: number;
   slug: string;
@@ -76,4 +134,17 @@ export interface CaseStudyDetail {
 export type ListArticlesParams = {
 category?: string;
 };
+
+export type ListDraftsParams = {
+status?: ListDraftsStatus;
+};
+
+export type ListDraftsStatus = typeof ListDraftsStatus[keyof typeof ListDraftsStatus];
+
+
+export const ListDraftsStatus = {
+  pending_review: 'pending_review',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
 

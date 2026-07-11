@@ -18,3 +18,8 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+DRAFTS_API_KEY = "sk_drafts_b2bac5a1c31873a063c18b6cf4fa3b5b4b73b9bcc43ab813"
