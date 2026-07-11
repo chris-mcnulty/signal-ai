@@ -1,0 +1,61 @@
+uploads = []
+
+[[generated]]
+id = "LJr0BOCAKF6PymBeuK2pJ"
+uri = "file://artifacts/mockup-sandbox/public/images/warm-hero.png"
+type = "image"
+title = "warm architectural space"
+
+[[generated]]
+id = "NkxiUJBkUTPx8jHi8y7bW"
+uri = "file://artifacts/mockup-sandbox/public/images/warm-article-1.png"
+type = "image"
+title = "warm abstract data"
+
+[[generated]]
+id = "jEc2PNwQArHm6d7HDsE3k"
+uri = "file://artifacts/mockup-sandbox/public/images/warm-article-2.png"
+type = "image"
+title = "warm warehouse interior"
+
+[[generated]]
+id = "SeJujbJfnQScTkO-BSoLz"
+uri = "file://artifacts/mockup-sandbox/public/images/warm-article-3.png"
+type = "image"
+title = "warm abstract network"
+
+[[generated]]
+id = "WI5Hhl-zSnBowX9NGFiNN"
+uri = "file://artifacts/mockup-sandbox/public/images/hero-signal.png"
+type = "image"
+title = "Abstract signal filtering data viz"
+
+[[generated]]
+id = "Hukq38UcmemrObwnGOLvQ"
+uri = "file://artifacts/mockup-sandbox/public/images/logistics-grid.png"
+type = "image"
+title = "Abstract supply chain nodes"
+
+[[generated]]
+id = "IeB8pKKCqdUmvRReikWEn"
+uri = "file://artifacts/mockup-sandbox/public/images/finance-models.png"
+type = "image"
+title = "Abstract financial charts and nodes"
+
+[[outputs]]
+id = "31ApRrXBSdQ3yudR4oGOj"
+uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_hero.jpg"
+type = "image"
+title = "modern data center server rack dramatic lighting"
+
+[[outputs]]
+id = "PGIUSLy4oTUVPKkVgwkGN"
+uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_logistics.jpg"
+type = "image"
+title = "shipping container port aerial view abstract"
+
+[[outputs]]
+id = "MxZgQ_bo-1I5zVSmnYO6N"
+uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_finance.jpg"
+type = "image"
+title = "minimal abstract financial chart"
