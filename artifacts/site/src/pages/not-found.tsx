@@ -1,21 +1,27 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Link } from "wouter";
+import { Layout, Header, Footer } from "@/components/layout";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">404 Page Not Found</h1>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <Layout>
+      <Header />
+      <main className="max-w-[800px] mx-auto px-6 py-32 text-center animate-fade-in-up">
+        <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-6">Error 404</div>
+        <hr className="border-t-4 border-news mb-8 mx-auto w-24" />
+        <h1 className="font-serif text-6xl md:text-8xl font-bold leading-none mb-6 text-news-primary">
+          Page Not Found
+        </h1>
+        <p className="text-xl text-news-secondary font-serif leading-relaxed mb-12 max-w-md mx-auto">
+          The story you're looking for has moved, been archived, or doesn't exist.
+        </p>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-widest text-accent border border-accent px-6 py-3 hover:bg-accent hover:text-white transition-colors duration-200"
+        >
+          Return to Front Page
+        </Link>
+      </main>
+      <Footer />
+    </Layout>
   );
 }

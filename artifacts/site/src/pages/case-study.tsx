@@ -2,10 +2,48 @@ import React from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowLeft, Search, Menu, Building } from 'lucide-react';
 import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-react';
+import { SearchOverlay, useSearch } from '@/components/layout';
+
+function CaseStudyDetailSkeleton() {
+  return (
+    <div className="broadsheet-theme min-h-screen">
+      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
+        <div className="w-1/3" />
+        <div className="w-1/3 text-center">
+          <span className="font-serif text-xl font-black tracking-tight text-news-primary">
+            Signal<span className="text-accent">AI</span>
+          </span>
+        </div>
+        <div className="w-1/3" />
+      </header>
+      <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20 space-y-8 animate-fade-in-up">
+        <div className="news-skeleton h-4 w-32 rounded-none" />
+        <div className="news-skeleton h-16 w-full rounded-none" />
+        <div className="news-skeleton h-8 w-4/5 rounded-none" />
+        <div className="news-skeleton h-px w-full rounded-none bg-news" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-news">
+          {[0,1,2].map(i => (
+            <div key={i} className={`p-8 ${i < 2 ? 'border-b md:border-b-0 md:border-r border-news' : ''} space-y-2`}>
+              <div className="news-skeleton h-12 w-20 rounded-none" />
+              <div className="news-skeleton h-3 w-24 rounded-none" />
+              <div className="news-skeleton h-3 w-32 rounded-none" />
+            </div>
+          ))}
+        </div>
+        <div className="space-y-3 pt-4">
+          {Array(8).fill(0).map((_, i) => (
+            <div key={i} className={`news-skeleton h-4 rounded-none ${i % 5 === 4 ? 'w-3/5' : 'w-full'}`} />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
 
 export default function CaseStudyDetail() {
   const [, params] = useRoute("/case-studies/:slug");
   const slug = params?.slug || "";
+  const { searchOpen, openSearch, closeSearch } = useSearch();
 
   const { data: study, isLoading } = useGetCaseStudy(slug, { 
     query: { 
@@ -15,26 +53,24 @@ export default function CaseStudyDetail() {
   });
 
   if (isLoading) {
-    return (
-      <div className="broadsheet-theme min-h-screen flex items-center justify-center">
-        <div className="animate-pulse space-y-8 max-w-[1000px] w-full px-6">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-20 bg-gray-200 rounded w-full"></div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <CaseStudyDetailSkeleton />;
   }
 
   if (!study) {
     return (
-      <div className="broadsheet-theme min-h-screen flex flex-col items-center justify-center">
-        <h1 className="font-serif text-4xl font-bold mb-4">Case Study Not Found</h1>
-        <Link href="/case-studies" className="font-mono uppercase text-accent tracking-widest hover:underline">Return to Case Studies</Link>
+      <div className="broadsheet-theme min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-4">Error 404</div>
+        <hr className="border-t-4 border-news mb-6 w-16 mx-auto" />
+        <h1 className="font-serif text-5xl font-bold mb-4">Case Study Not Found</h1>
+        <p className="text-news-secondary font-serif text-lg mb-8">
+          This report may have been moved or archived.
+        </p>
+        <Link
+          href="/case-studies"
+          className="font-mono text-sm uppercase tracking-widest text-accent border border-accent px-5 py-2.5 hover:bg-accent hover:text-white transition-colors duration-200"
+        >
+          Return to Case Studies
+        </Link>
       </div>
     );
   }
@@ -47,136 +83,174 @@ export default function CaseStudyDetail() {
 
   return (
     <div className="broadsheet-theme">
-      {/* Header */}
-      <header className="border-b border-news py-3 px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
-        <div className="flex items-center gap-4 w-1/3">
-          <Link href="/case-studies" className="hover-dim text-news-primary flex items-center gap-2 font-mono text-xs uppercase tracking-wider" data-testid="link-back-list">
-            <ArrowLeft size={16} /> Case Studies
+      {/* Slim header */}
+      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
+        <div className="flex items-center gap-3 w-1/3">
+          <Link
+            href="/case-studies"
+            className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider"
+            data-testid="link-back-list"
+          >
+            <ArrowLeft size={14} /> Case Studies
           </Link>
         </div>
         <div className="w-1/3 text-center">
           <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-            <h1 className="font-serif text-2xl font-black tracking-tight text-news-primary">
+            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
               Signal<span className="text-accent">AI</span>
             </h1>
           </Link>
         </div>
-        <div className="w-1/3 flex justify-end gap-4">
-          <button className="hover-dim text-news-primary"><Search size={20} /></button>
-          <button className="hover-dim text-news-primary"><Menu size={20} /></button>
+        <div className="w-1/3 flex justify-end gap-1">
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
+          <button className="mobile-menu-btn hover-dim text-news-primary" aria-label="Open menu"><Menu size={18} /></button>
         </div>
       </header>
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
 
       <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
         
-        {/* Header */}
+        {/* Article Header */}
         <header className="mb-16 animate-fade-in-up">
-          <div className="flex items-center gap-3 mb-8">
-            <span className="font-mono text-xs font-bold uppercase text-accent tracking-widest border border-accent px-2 py-1">Enterprise Case Study</span>
-            <span className="font-mono text-xs text-news-secondary uppercase">{publishedDate} • {study.readingMinutes} min read</span>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="font-mono text-xs font-bold uppercase text-accent tracking-widest border border-accent px-2 py-1">
+              Enterprise Case Study
+            </span>
+            <span className="font-mono text-xs text-news-secondary uppercase">
+              {publishedDate} · {study.readingMinutes} min read
+            </span>
           </div>
+
+          <hr className="hero-rule" />
           
-          <h1 className="font-serif text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.04] tracking-tight mb-6">
             {study.title}
           </h1>
           
-          <p className="text-xl md:text-3xl text-news-secondary font-serif leading-relaxed mb-12">
+          <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed mb-10">
             {study.dek}
           </p>
 
           {/* Hero Image */}
           {study.heroImageUrl && (
-            <div className="w-full aspect-[21/9] overflow-hidden mb-12 border border-news">
+            <div className="w-full aspect-[21/9] overflow-hidden mb-10 border border-news">
               <img src={study.heroImageUrl} alt={study.title} className="w-full h-full object-cover" />
             </div>
           )}
 
           {/* Company Context Bar */}
-          <div className="bg-white border border-news p-6 md:p-8 flex flex-col md:flex-row gap-8 justify-between items-start md:items-center">
+          <div className="bg-white border border-news p-6 md:p-8 flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center">
             <div className="flex items-center gap-4">
-               <div className="p-3 bg-news rounded-full text-news-primary border border-border-color">
-                 <Building size={24} />
-               </div>
-               <div>
-                 <h3 className="font-serif text-2xl font-bold leading-none mb-1">{study.company.name}</h3>
-                 <div className="font-mono text-xs text-news-secondary uppercase tracking-widest">
-                   {study.company.industry} • {study.company.size}
-                 </div>
-               </div>
+              <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
+                <Building size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-bold leading-none mb-1">{study.company.name}</h3>
+                <div className="font-mono text-xs text-news-secondary uppercase tracking-widest">
+                  {study.company.industry} · {study.company.size}
+                </div>
+              </div>
             </div>
-            <a href={study.company.website} target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-accent hover:underline uppercase tracking-widest font-bold">
+            <a
+              href={study.company.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono text-xs text-accent hover:underline uppercase tracking-widest font-bold shrink-0"
+            >
               Visit Website &rarr;
             </a>
           </div>
         </header>
 
-        {/* Metrics Grid */}
+        {/* ── Metrics Grid ── */}
         {study.metrics && study.metrics.length > 0 && (
-          <section className="mb-16 border-t border-b border-black py-10 animate-fade-in-up delay-100">
-            <h3 className="font-mono text-sm font-bold uppercase tracking-widest mb-8 text-center">Impact Metrics</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-              {study.metrics.map((metric, i) => (
-                <div key={i} className="flex flex-col items-center">
-                  <div className="font-serif text-5xl font-bold text-accent mb-2">{metric.value}</div>
-                  <div className="font-mono text-sm font-bold uppercase mb-1">{metric.label}</div>
-                  <div className="font-sans text-sm text-news-secondary">{metric.context}</div>
-                </div>
-              ))}
+          <section className="mb-16 animate-fade-in-up delay-100">
+            <div className="border-t-4 border-black pt-6 mb-6">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-news-secondary">Impact Metrics</h3>
+            </div>
+            <div
+              className="border border-news"
+              style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(study.metrics.length, 3)}, 1fr)` }}
+            >
+              {study.metrics.map((metric, i) => {
+                const cols = Math.min(study.metrics.length, 3);
+                const isLastRow = i >= study.metrics.length - (study.metrics.length % cols || cols);
+                const isLastCol = (i + 1) % cols === 0;
+                return (
+                  <div
+                    key={i}
+                    className="metric-cell"
+                    style={{
+                      borderRight: isLastCol ? 'none' : '1px solid var(--border-color)',
+                      borderBottom: isLastRow ? 'none' : '1px solid var(--border-color)',
+                    }}
+                  >
+                    <span className="metric-value">{metric.value}</span>
+                    <span className="metric-label">{metric.label}</span>
+                    {metric.context && <span className="metric-context">{metric.context}</span>}
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           {/* Article Body */}
-          <div className="lg:col-span-8 article-body font-sans text-news-primary animate-fade-in-up delay-200">
+          <div className="lg:col-span-8 article-body font-sans text-news-primary animate-fade-in-up delay-200 max-w-none">
             {bodyParagraphs.map((paragraph, index) => {
               if (index === 0) {
-                 return (
-                   <p key={index} className="first-letter:font-serif first-letter:text-7xl first-letter:font-bold first-letter:float-left first-letter:mr-3 first-letter:mt-[-0.1em] first-letter:text-accent">
-                     {paragraph}
-                   </p>
-                 )
+                return (
+                  <p key={index} className="article-dropcap">
+                    {paragraph}
+                  </p>
+                );
               }
               if (paragraph.startsWith('## ')) {
-                 return <h2 key={index}>{paragraph.replace('## ', '')}</h2>
+                return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
               }
               if (paragraph.startsWith('> ')) {
-                 return <blockquote key={index}>{paragraph.replace('> ', '')}</blockquote>
+                return <blockquote key={index}>{paragraph.replace('> ', '')}</blockquote>;
               }
-              return <p key={index}>{paragraph}</p>
+              return <p key={index}>{paragraph}</p>;
             })}
           </div>
 
-          {/* Sidebar / Quotes */}
-          <aside className="lg:col-span-4 animate-fade-in-up delay-300 space-y-12">
+          {/* Sidebar */}
+          <aside className="lg:col-span-4 animate-fade-in-up delay-300 space-y-10">
             <div className="border-t-4 border-news pt-4">
-              <div className="font-mono text-sm uppercase tracking-widest text-news-secondary mb-4">Byline</div>
-              <div className="font-sans font-bold text-lg">{study.author}</div>
-              <div className="font-mono text-xs text-news-secondary uppercase">Enterprise Analyst</div>
+              <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-3">Byline</div>
+              <div className="font-sans font-bold text-base text-news-primary">{study.author}</div>
+              <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Enterprise Analyst</div>
             </div>
 
             {study.quotes && study.quotes.length > 0 && (
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {study.quotes.map((q, i) => (
-                  <div key={i} className="bg-news p-6 border-l-4 border-accent">
-                    <p className="font-serif text-xl italic leading-relaxed mb-4 text-news-primary">"{q.quote}"</p>
-                    <div className="font-sans font-bold text-sm">{q.attribution}</div>
-                    <div className="font-mono text-xs text-news-secondary uppercase">{q.role}</div>
+                  <div key={i} className="bg-white border-l-4 border-accent p-5">
+                    <p className="font-serif text-lg italic leading-relaxed mb-3 text-news-primary">"{q.quote}"</p>
+                    <div className="font-sans font-semibold text-sm text-news-primary">{q.attribution}</div>
+                    <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-0.5">{q.role}</div>
                   </div>
                 ))}
               </div>
             )}
 
             {study.sourceUrls && study.sourceUrls.length > 0 && (
-              <div className="border-t-4 border-news pt-4">
-                <div className="font-mono text-sm uppercase tracking-widest text-news-secondary mb-4">Sources</div>
-                <ol className="space-y-3 list-decimal list-inside">
+              <div className="border-t border-news pt-6">
+                <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-4">Sources</div>
+                <ol className="space-y-2 list-decimal list-inside">
                   {study.sourceUrls.map((url, i) => {
                     let label = url;
                     try { label = new URL(url).hostname.replace(/^www\./, ''); } catch {}
                     return (
                       <li key={i} className="font-mono text-xs text-news-secondary">
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="hover:text-accent hover:underline break-all">
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-accent hover:underline break-all transition-colors"
+                        >
                           {label}
                         </a>
                       </li>
@@ -187,33 +261,45 @@ export default function CaseStudyDetail() {
             )}
           </aside>
         </div>
-
       </main>
 
       {/* Related Reading */}
       {study.relatedArticles && study.relatedArticles.length > 0 && (
         <section className="bg-news border-t-4 border-black py-16 px-6 md:px-12 mt-12">
           <div className="max-w-[1200px] mx-auto">
-            <h3 className="font-serif text-3xl font-bold mb-10 text-center">Related Analysis</h3>
+            <div className="border-b-2 border-news pb-4 mb-10">
+              <h3 className="font-serif text-3xl font-bold">Related Analysis</h3>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {study.relatedArticles.map((article) => (
-                <Link key={article.id} href={`/articles/${article.slug}`} className="block group cursor-pointer" data-testid={`link-related-${article.slug}`}>
+                <Link
+                  key={article.id}
+                  href={`/articles/${article.slug}`}
+                  className="block group article-card"
+                  data-testid={`link-related-${article.slug}`}
+                >
                   <article>
-                    {article.heroImageUrl ? (
-                       <div className="w-full aspect-[4/3] bg-gray-200 mb-4 overflow-hidden">
-                         <img src={article.heroImageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                       </div>
-                    ) : (
-                      <div className="w-full aspect-[4/3] bg-gray-200 mb-4 overflow-hidden border border-news flex items-center justify-center bg-[#f0eee9]">
-                        <span className="font-serif text-4xl font-bold text-news-secondary opacity-30">{article.category}</span>
-                      </div>
-                    )}
+                    <div className="card-image w-full aspect-[4/3] bg-[#e8e4de] mb-4 overflow-hidden">
+                      {article.heroImageUrl ? (
+                        <img
+                          src={article.heroImageUrl}
+                          alt={article.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="font-serif text-3xl font-bold text-news-secondary opacity-25">
+                            {article.category}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <div className="font-mono text-xs font-bold text-accent uppercase tracking-widest mb-2">{article.category}</div>
-                    <h4 className="font-serif text-xl font-bold leading-tight mb-2 group-hover:text-accent transition-colors">
-                      {article.title}
+                    <h4 className="font-serif text-xl font-bold leading-tight mb-2">
+                      <span className="card-headline">{article.title}</span>
                     </h4>
-                    <p className="text-sm text-news-secondary line-clamp-2">{article.dek}</p>
+                    <p className="text-sm text-news-secondary line-clamp-2 leading-relaxed">{article.dek}</p>
                   </article>
                 </Link>
               ))}
@@ -223,13 +309,14 @@ export default function CaseStudyDetail() {
       )}
 
       {/* Footer */}
-      <footer className="bg-black text-white py-8 px-6 md:px-12 text-center">
-        <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-          <h2 className="font-serif text-2xl font-black tracking-tight mb-4 opacity-50 cursor-pointer">SignalAI</h2>
+      <footer className="bg-black text-white py-10 px-6 md:px-12 text-center">
+        <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
+          <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">SignalAI</h2>
         </Link>
-        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">© {new Date().getFullYear()} SignalAI Media. All rights reserved.</p>
+        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
+          © {new Date().getFullYear()} SignalAI Media. All rights reserved.
+        </p>
       </footer>
-
     </div>
   );
 }
