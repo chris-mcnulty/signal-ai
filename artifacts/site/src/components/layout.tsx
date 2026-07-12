@@ -136,12 +136,14 @@ export function Header() {
           <div className="w-1/3 text-center">
             <Link
               href="/"
-              className="inline-block hover:opacity-80 transition-opacity"
+              className="inline-flex flex-col items-center hover:opacity-80 transition-opacity"
               data-testid="link-home"
             >
-              <h1 className="font-serif text-4xl md:text-5xl font-black tracking-tight text-news-primary leading-none">
-                Signal<span className="text-accent">AI</span>
-              </h1>
+              <img
+                src="/logo.svg"
+                alt="SignalAI"
+                className="h-10 md:h-12 w-auto"
+              />
             </Link>
             <p className="header-tagline font-mono text-xs mt-1 text-news-secondary uppercase tracking-widest hidden md:block">
               Separating the signal from the AI noise

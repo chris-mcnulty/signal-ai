@@ -1,3 +1,13 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="SignalAI">
+  <title>SignalAI</title>
+  <rect width="64" height="64" rx="10" fill="#1a1a1a"/>
+  <text
+    font-family="Georgia, 'Times New Roman', serif"
+    font-weight="900"
+    font-size="38"
+    x="10"
+    y="46"
+    fill="#ffffff"
+    xml:space="preserve"
+  >S<tspan fill="#d94226">AI</tspan></text>
 </svg>
