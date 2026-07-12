@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function NetworkError({
   onRetry,
@@ -47,12 +47,13 @@ export function NetworkError({
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   useEffect(() => {
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [open, onClose]);
 
   return (
     <div
@@ -88,11 +89,9 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
 export function useSearch() {
   const [searchOpen, setSearchOpen] = useState(false);
-  return {
-    searchOpen,
-    openSearch: () => setSearchOpen(true),
-    closeSearch: () => setSearchOpen(false),
-  };
+  const openSearch = useCallback(() => setSearchOpen(true), []);
+  const closeSearch = useCallback(() => setSearchOpen(false), []);
+  return { searchOpen, openSearch, closeSearch };
 }
 
 export function Header() {
