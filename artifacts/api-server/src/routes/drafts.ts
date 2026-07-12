@@ -27,6 +27,7 @@ import {
   UnpublishDraftResponse,
 } from "@workspace/api-zod";
 import { apiKeyAuth } from "../middlewares/apiKeyAuth";
+import { requireEditor } from "../middlewares/requireEditor";
 import { rateLimit } from "../middlewares/rateLimit";
 import { promoteDueArticles, uniqueSlug } from "../lib/articles";
 import { generateArticleDraft } from "../lib/aiDrafting";
@@ -129,7 +130,7 @@ router.post("/drafts/generate", apiKeyAuth, generateRateLimit, async (req, res):
 
 // ── Editorial dashboard endpoints (API key auth) ──────────────────────────────
 
-router.use("/drafts", apiKeyAuth);
+router.use("/drafts", requireEditor);
 
 router.get("/drafts", async (req, res): Promise<void> => {
   const query = ListDraftsQueryParams.safeParse(req.query);

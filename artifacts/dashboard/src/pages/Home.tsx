@@ -1,15 +1,20 @@
 import { useState } from "react";
 import { Redirect } from "wouter";
 import { useAuth } from "@/lib/auth";
+import type { EditorStatus } from "@/lib/auth";
 
 export default function Home() {
-  const { isLoggedIn, login } = useAuth();
+  const { isLoggedIn, editorStatus, login } = useAuth();
   const [key, setKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (isLoggedIn) {
+  if (isLoggedIn && editorStatus === "approved") {
     return <Redirect to="/queue" />;
+  }
+
+  if (isLoggedIn && editorStatus === "pending") {
+    return <Redirect to="/access-pending" />;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -17,13 +22,24 @@ export default function Home() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/drafts/summary", {
+      const res = await fetch("/api/auth/me", {
         headers: { "x-api-key": key },
       });
+
       if (res.ok) {
-        login(key);
+        const data = await res.json() as { email: string; id: number };
+        login(key, data.email, "approved" as EditorStatus);
+      } else if (res.status === 401) {
+        setError("Invalid API key. Check your editor key and try again.");
+      } else if (res.status === 403) {
+        const body = await res.json().catch(() => ({})) as { code?: string };
+        if (body.code === "EDITOR_NOT_APPROVED") {
+          login(key, "", "pending" as EditorStatus);
+        } else {
+          setError("Access denied. Contact an administrator.");
+        }
       } else {
-        setError("Invalid API key. Check your DRAFTS_API_KEY and try again.");
+        setError("Could not reach the server. Try again.");
       }
     } catch {
       setError("Could not reach the server. Try again.");
@@ -55,7 +71,7 @@ export default function Home() {
         <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-3">
           <input
             type="password"
-            placeholder="Enter your API key"
+            placeholder="Enter your editor key"
             value={key}
             onChange={(e) => setKey(e.target.value)}
             required

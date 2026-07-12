@@ -11,3 +11,4 @@ export * from "./researchBriefings";
 export * from "./contentBriefs";
 export * from "./socialVariants";
 export * from "./engineJobs";
+export * from "./editors";

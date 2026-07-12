@@ -1,3 +1,4 @@
 - [Dual rendering for case studies](case-study-rendering.md) — /case-studies/* is proxied to SSR (api-server), not the React SPA; both layers must be kept in sync.
 - [Admin accounts](admin-accounts.md) — permanent admin credentials for dashboard login
+- [Editor allowlist auth](editor-allowlist-auth.md) — dashboard uses per-editor API keys (not shared key); requireEditor middleware; /auth/me for server-derived identity
 - [Source repositories](source-repositories.md) — upstream repos this project derives from
