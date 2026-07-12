@@ -42,7 +42,7 @@ export interface ResolvedSeoPage {
 }
 
 function defaultOgImage(baseUrl: string): string {
-  return `${baseUrl}/case-studies/static/signalai-logo.png`;
+  return `${baseUrl}/opengraph.jpg`;
 }
 
 function articleDescription(article: Article): string {
