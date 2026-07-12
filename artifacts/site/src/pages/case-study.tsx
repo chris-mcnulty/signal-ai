@@ -2,7 +2,7 @@ import React from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowLeft, Search, Menu, Building } from 'lucide-react';
 import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-react';
-import { SearchOverlay, useSearch } from '@/components/layout';
+import { SearchOverlay, useSearch, NetworkError } from '@/components/layout';
 
 function CaseStudyDetailSkeleton() {
   return (
@@ -45,15 +45,26 @@ export default function CaseStudyDetail() {
   const slug = params?.slug || "";
   const { searchOpen, openSearch, closeSearch } = useSearch();
 
-  const { data: study, isLoading } = useGetCaseStudy(slug, { 
+  const { data: study, isLoading, isError, refetch } = useGetCaseStudy(slug, { 
     query: { 
       enabled: !!slug, 
-      queryKey: getGetCaseStudyQueryKey(slug) 
+      queryKey: getGetCaseStudyQueryKey(slug),
+      retry: 1,
     } 
   });
 
   if (isLoading) {
     return <CaseStudyDetailSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <NetworkError
+        onRetry={() => refetch()}
+        backHref="/case-studies"
+        backLabel="Return to Case Studies"
+      />
+    );
   }
 
   if (!study) {

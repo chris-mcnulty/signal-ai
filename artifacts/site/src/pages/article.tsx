@@ -2,7 +2,7 @@ import React from 'react';
 import { useRoute, Link } from 'wouter';
 import { Search, Menu, ArrowLeft, Share2, Bookmark, Twitter, Linkedin } from 'lucide-react';
 import { useGetArticle, getGetArticleQueryKey } from '@workspace/api-client-react';
-import { SearchOverlay, useSearch } from '@/components/layout';
+import { SearchOverlay, useSearch, NetworkError } from '@/components/layout';
 
 function ArticleSkeleton() {
   return (
@@ -39,15 +39,26 @@ export default function ArticlePage() {
   const slug = params?.slug || "";
   const { searchOpen, openSearch, closeSearch } = useSearch();
 
-  const { data: article, isLoading } = useGetArticle(slug, { 
+  const { data: article, isLoading, isError, refetch } = useGetArticle(slug, { 
     query: { 
       enabled: !!slug, 
-      queryKey: getGetArticleQueryKey(slug) 
+      queryKey: getGetArticleQueryKey(slug),
+      retry: 1,
     } 
   });
 
   if (isLoading) {
     return <ArticleSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <NetworkError
+        onRetry={() => refetch()}
+        backHref="/"
+        backLabel="Return to Front Page"
+      />
+    );
   }
 
   if (!article) {

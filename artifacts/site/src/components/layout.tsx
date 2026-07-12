@@ -1,6 +1,49 @@
 import { Link } from "wouter";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+
+export function NetworkError({
+  onRetry,
+  backHref,
+  backLabel = "Return to Front Page",
+}: {
+  onRetry: () => void;
+  backHref: string;
+  backLabel?: string;
+}) {
+  return (
+    <div className="broadsheet-theme min-h-screen flex flex-col items-center justify-center px-6 text-center">
+      <div className="mb-6 text-accent opacity-60">
+        <WifiOff size={40} strokeWidth={1.5} />
+      </div>
+      <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-4">
+        Connection Error
+      </div>
+      <hr className="border-t-4 border-black mb-6 w-16 mx-auto" />
+      <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4 text-news-primary">
+        Unable to Load
+      </h1>
+      <p className="text-news-secondary font-serif text-lg mb-10 max-w-sm leading-relaxed">
+        The server didn't respond in time. Check your connection and try again.
+      </p>
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <button
+          onClick={onRetry}
+          className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest bg-[#1a1a1a] text-white px-5 py-2.5 hover:bg-accent transition-colors duration-200"
+        >
+          <RotateCcw size={14} />
+          Try Again
+        </button>
+        <Link
+          href={backHref}
+          className="font-mono text-sm uppercase tracking-widest text-news-primary border border-news px-5 py-2.5 hover:border-[#1a1a1a] transition-colors duration-200"
+        >
+          {backLabel}
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   useEffect(() => {

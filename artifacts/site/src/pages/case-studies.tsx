@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { useListCaseStudies } from '@workspace/api-client-react';
-import { Layout, Header, Footer } from '@/components/layout';
+import { Layout, Header, Footer, NetworkError } from '@/components/layout';
 
 function CaseStudySkeleton() {
   return (
@@ -35,7 +35,17 @@ function CaseStudySkeleton() {
 }
 
 export default function CaseStudiesPage() {
-  const { data: caseStudies, isLoading } = useListCaseStudies();
+  const { data: caseStudies, isLoading, isError, refetch } = useListCaseStudies({ query: { retry: 1 } });
+
+  if (isError) {
+    return (
+      <NetworkError
+        onRetry={() => refetch()}
+        backHref="/"
+        backLabel="Return to Front Page"
+      />
+    );
+  }
 
   return (
     <Layout>
