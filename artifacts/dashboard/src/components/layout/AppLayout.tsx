@@ -21,9 +21,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 px-6 h-14 flex items-center border-b border-border bg-background/90 backdrop-blur-md">
         <div className="flex items-center gap-6">
           <Link href="/queue" className="flex items-center gap-2 font-bold tracking-tight text-lg hover:text-primary transition-colors shrink-0">
-            <div className="w-5 h-5 bg-primary rounded-sm flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-white rounded-full" />
-            </div>
+            <img src="/logo-square-sai.svg" alt="SignalAI" className="w-5 h-5" />
             SignalAI
           </Link>
 
