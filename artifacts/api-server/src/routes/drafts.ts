@@ -28,7 +28,6 @@ import {
 } from "@workspace/api-zod";
 import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { rateLimit } from "../middlewares/rateLimit";
-import { requireAuth } from "../middlewares/requireAuth";
 import { promoteDueArticles, uniqueSlug } from "../lib/articles";
 import { generateArticleDraft } from "../lib/aiDrafting";
 import { submitUrls, type SubmitTrigger } from "../lib/seoSubmit";
@@ -128,9 +127,9 @@ router.post("/drafts/generate", apiKeyAuth, generateRateLimit, async (req, res):
   res.status(201).json(CreateDraftResponse.parse(article));
 });
 
-// ── Editorial dashboard endpoints (Clerk session auth) ───────────────────────
+// ── Editorial dashboard endpoints (API key auth) ──────────────────────────────
 
-router.use("/drafts", requireAuth);
+router.use("/drafts", apiKeyAuth);
 
 router.get("/drafts", async (req, res): Promise<void> => {
   const query = ListDraftsQueryParams.safeParse(req.query);

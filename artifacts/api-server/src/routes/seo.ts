@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { desc } from "drizzle-orm";
 import { db, seoSubmissionsTable } from "@workspace/db";
-import { requireAuth } from "../middlewares/requireAuth";
+import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { getBaseUrl } from "../lib/site";
 import { resolveSeoPage } from "../lib/seoPage";
 import { renderAgentHtml, renderOgHtml } from "../lib/agentRenderer";
@@ -88,9 +88,9 @@ router.get("/og", async (req, res): Promise<void> => {
   }
 });
 
-// ── Admin endpoints (Clerk session auth, consumed by the dashboard) ─────────
+// ── Admin endpoints (API key auth, consumed by the dashboard) ────────────────
 
-router.use("/seo/admin", requireAuth);
+router.use("/seo/admin", apiKeyAuth);
 
 /** GET /api/seo/admin/audit — audit published content for missing SEO fields. */
 router.get("/seo/admin/audit", async (req, res): Promise<void> => {

@@ -47,7 +47,7 @@ import {
   SeoOptimizeDraftParams,
   SeoOptimizeDraftResponse,
 } from "@workspace/api-zod";
-import { requireAuth } from "../middlewares/requireAuth";
+import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { rateLimit } from "../middlewares/rateLimit";
 import { enqueueEngineJob } from "../engine/job-queue";
 import { repurposeArticle } from "../engine/repurpose";
@@ -58,7 +58,7 @@ import { NewsConfigError } from "../engine/news";
 
 const router: IRouter = Router();
 
-// All engine endpoints are dashboard features behind Clerk session auth.
+// All engine endpoints are dashboard features behind API key auth.
 router.use(
   [
     "/voice",
@@ -68,7 +68,7 @@ router.use(
     "/ideation",
     "/briefs",
   ],
-  requireAuth,
+  apiKeyAuth,
 );
 
 // AI generation is expensive: throttle repeated calls per client.
@@ -355,7 +355,7 @@ router.post(
 
 router.get(
   "/drafts/:id/social-variants",
-  requireAuth,
+  apiKeyAuth,
   async (req, res): Promise<void> => {
     const params = ListSocialVariantsParams.safeParse(req.params);
     if (!params.success) {
@@ -381,7 +381,7 @@ router.get(
 
 router.post(
   "/drafts/:id/social-variants",
-  requireAuth,
+  apiKeyAuth,
   aiRateLimit,
   async (req, res): Promise<void> => {
     const params = RepurposeDraftParams.safeParse(req.params);
@@ -424,7 +424,7 @@ router.post(
 
 router.get(
   "/drafts/:id/social-variants/export",
-  requireAuth,
+  apiKeyAuth,
   async (req, res): Promise<void> => {
     const params = ExportSocialVariantsCsvParams.safeParse(req.params);
     if (!params.success) {
@@ -466,7 +466,7 @@ router.get(
 
 router.post(
   "/drafts/:id/seo-optimize",
-  requireAuth,
+  apiKeyAuth,
   aiRateLimit,
   async (req, res): Promise<void> => {
     const params = SeoOptimizeDraftParams.safeParse(req.params);

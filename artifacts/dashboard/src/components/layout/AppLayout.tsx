@@ -1,12 +1,11 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { useClerk, useUser } from "@clerk/react";
-import { LogOut, LayoutDashboard, Plus, PenSquare, Globe, Sparkles, Mic2 } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { signOut } = useClerk();
-  const { user } = useUser();
+  const { logout } = useAuth();
   const [location] = useLocation();
 
   return (
@@ -21,8 +20,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="flex items-center gap-1">
-            <Link 
-              href="/queue" 
+            <Link
+              href="/queue"
               className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
                 location === "/queue" || location === "/" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
@@ -39,8 +38,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Globe className="w-4 h-4" />
               SEO
             </Link>
-            <Link 
-              href="/engine" 
+            <Link
+              href="/engine"
               className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
                 location === "/engine" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
@@ -48,8 +47,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Sparkles className="w-4 h-4" />
               Engine
             </Link>
-            <Link 
-              href="/voice" 
+            <Link
+              href="/voice"
               className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
                 location === "/voice" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
@@ -70,19 +69,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
           <div className="w-px h-6 bg-border mx-1"></div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col items-end">
-              <span className="text-sm font-medium leading-none">{user?.fullName || user?.primaryEmailAddress?.emailAddress}</span>
-              <span className="text-xs text-muted-foreground">Editor</span>
-            </div>
-            <button
-              onClick={() => signOut({ redirectUrl: import.meta.env.BASE_URL || "/" })}
-              className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={logout}
+            className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+            title="Sign Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
       <main className="flex-1 flex flex-col w-full max-w-7xl mx-auto p-6 md:p-8">
