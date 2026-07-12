@@ -2,8 +2,96 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, editorsTable } from "@workspace/db";
 import { requireEditor } from "../middlewares/requireEditor";
+import jwksClient from "jwks-rsa";
+import jwt from "jsonwebtoken";
 
 const router: IRouter = Router();
+
+const ENTRA_CLIENT_ID = process.env["ENTRA_CLIENT_ID"];
+const ENTRA_TENANT_ID = process.env["ENTRA_TENANT_ID"] ?? "common";
+
+const jwks = jwksClient({
+  jwksUri: `https://login.microsoftonline.com/${ENTRA_TENANT_ID}/discovery/v2.0/keys`,
+  cache: true,
+  cacheMaxAge: 600_000,
+});
+
+function getSigningKey(header: jwt.JwtHeader): Promise<string> {
+  return new Promise((resolve, reject) => {
+    jwks.getSigningKey(header.kid, (err, key) => {
+      if (err) return reject(err);
+      resolve(key!.getPublicKey());
+    });
+  });
+}
+
+async function verifyEntraToken(idToken: string): Promise<{ email: string; tid: string }> {
+  if (!ENTRA_CLIENT_ID) {
+    throw new Error("ENTRA_CLIENT_ID is not configured");
+  }
+
+  const decoded = await new Promise<jwt.JwtPayload>((resolve, reject) => {
+    jwt.verify(
+      idToken,
+      (header, callback) => {
+        getSigningKey(header)
+          .then((key) => callback(null, key))
+          .catch(callback);
+      },
+      {
+        algorithms: ["RS256"],
+        audience: ENTRA_CLIENT_ID,
+      },
+      (err, payload) => {
+        if (err) return reject(err);
+        resolve(payload as jwt.JwtPayload);
+      },
+    );
+  });
+
+  const email = (decoded["preferred_username"] ?? decoded["email"] ?? decoded["upn"]) as string | undefined;
+  if (!email) {
+    throw new Error("No email claim in token");
+  }
+
+  return { email: email.toLowerCase(), tid: decoded["tid"] as string };
+}
+
+router.post("/auth/microsoft", async (req, res) => {
+  const { idToken } = req.body as { idToken?: string };
+
+  if (!idToken || typeof idToken !== "string") {
+    res.status(400).json({ error: "idToken is required" });
+    return;
+  }
+
+  let email: string;
+  try {
+    ({ email } = await verifyEntraToken(idToken));
+  } catch (err) {
+    req.log.warn({ err }, "Entra token verification failed");
+    res.status(401).json({ error: "Invalid or expired Microsoft token" });
+    return;
+  }
+
+  const [editor] = await db
+    .select({ id: editorsTable.id, email: editorsTable.email, apiKey: editorsTable.apiKey, isActive: editorsTable.isActive })
+    .from(editorsTable)
+    .where(eq(editorsTable.email, email))
+    .limit(1);
+
+  if (!editor) {
+    res.status(403).json({ error: "Access not yet approved", code: "EDITOR_NOT_APPROVED" });
+    return;
+  }
+
+  if (!editor.isActive) {
+    res.status(403).json({ error: "Access not yet approved", code: "EDITOR_NOT_APPROVED" });
+    return;
+  }
+
+  res.json({ apiKey: editor.apiKey, email: editor.email, id: editor.id });
+});
 
 router.get("/auth/me", requireEditor, async (req, res) => {
   const key =

@@ -2,3 +2,4 @@
 - [Admin accounts](admin-accounts.md) — permanent admin credentials for dashboard login
 - [Editor allowlist auth](editor-allowlist-auth.md) — dashboard uses per-editor API keys (not shared key); requireEditor middleware; /auth/me for server-derived identity
 - [Source repositories](source-repositories.md) — upstream repos this project derives from
+- [Entra SSO login](entra-sso.md) — dashboard login replaced with Microsoft SSO; API keys still used downstream; token verification via jwks-rsa/jsonwebtoken
