@@ -71,7 +71,7 @@ async function getPublishedArticleBySlug(
   return rows[0] ?? null;
 }
 
-function genericArticleJsonLd(baseUrl: string, article: Article): JsonLd {
+export function genericArticleJsonLd(baseUrl: string, article: Article): JsonLd {
   const pageUrl = `${baseUrl}/articles/${article.slug}`;
   return {
     "@context": "https://schema.org",
