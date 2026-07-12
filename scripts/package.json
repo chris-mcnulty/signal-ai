@@ -7,10 +7,12 @@
     "hello": "tsx ./src/hello.ts",
     "seed-content": "tsx ./src/seed-content.ts",
     "seed-news": "tsx ./src/seed-news.ts",
+    "correct-british-english": "tsx ./src/correct-british-english.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@workspace/db": "workspace:*"
+    "@workspace/db": "workspace:*",
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
