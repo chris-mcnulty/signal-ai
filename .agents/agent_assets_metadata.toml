@@ -215,3 +215,15 @@ id = "MxZgQ_bo-1I5zVSmnYO6N"
 uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_finance.jpg"
 type = "image"
 title = "minimal abstract financial chart"
+
+[[outputs]]
+id = "816bChy-8GLJr_E0-uhOG"
+uri = "file://artifacts/site/public/linkedin-banner.png"
+type = "image"
+title = "LinkedIn Banner (1152×168)"
+
+[[outputs]]
+id = "YFVwJaASJKVAuwHySzDVq"
+uri = "file://artifacts/site/public/logo.svg"
+type = "image"
+title = "SignalAI Logo (SVG)"

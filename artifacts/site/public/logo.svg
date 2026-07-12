@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 100" width="460" height="100" role="img" aria-label="SignalAI">
+  <title>SignalAI</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&amp;display=swap');
+      .wordmark {
+        font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+        font-weight: 900;
+        font-size: 84px;
+        letter-spacing: -1px;
+      }
+      .signal { fill: #1a1a1a; }
+      .ai { fill: #d94226; }
+    </style>
+  </defs>
+  <text class="wordmark" x="4" y="82" xml:space="preserve"><tspan class="signal">Signal</tspan><tspan class="ai">AI</tspan></text>
+</svg>
