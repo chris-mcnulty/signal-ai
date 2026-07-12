@@ -144,6 +144,60 @@ uri = "file://attached_assets/generated_images/modern_hospital_operations_center
 type = "image"
 title = "generated_image"
 
+[[generated]]
+id = "75PuTt1O5C0jZex0Dpm4t"
+uri = "file://artifacts/api-server/public/static/case-studies/pwc-microsoft-copilot-enterprise-scale.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "V8tjkZrLXzUYKlJ3abUfU"
+uri = "file://artifacts/api-server/public/static/case-studies/synozur-pe-ai-transformation.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "e3S8C3I9lJay-iOdsCzvK"
+uri = "file://artifacts/api-server/public/static/case-studies/holland-america-anna-copilot-studio.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "CK72OB6cFaXBKKMDcryTS"
+uri = "file://artifacts/api-server/public/static/case-studies/agco-copilot-studio-employee-agents.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "DPPAdQizv02XnKdr6ll67"
+uri = "file://artifacts/api-server/public/static/case-studies/broward-county-schools-microsoft-365-copilot.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "ztaZ1jYTtkBVemVXgPHZC"
+uri = "file://attached_assets/generated_images/luxury_cruise_ship_at_1aff.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "FFI0MSaiPvAsE_kk4Z6nW"
+uri = "file://attached_assets/generated_images/modern_private_equity_boardroom_cc78.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "o3vLZyhWRp_LUZP5OBXAn"
+uri = "file://attached_assets/generated_images/bright_modern_k_12_99d8.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "jXtlNJCAEuIp3ZZEvaflq"
+uri = "file://attached_assets/generated_images/agricultural_machinery_factory_floor_1d0b.png"
+type = "image"
+title = "generated_image"
+
 [[outputs]]
 id = "31ApRrXBSdQ3yudR4oGOj"
 uri = "file://artifacts/mockup-sandbox/public/images/broadsheet_hero.jpg"
