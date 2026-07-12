@@ -339,6 +339,94 @@
   color: var(--border-color);
 }
 
+.search-results {
+  width: 100%;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.search-result-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+  border-top: 2px solid var(--text-primary);
+}
+
+.search-result-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-result-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 0;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.15s ease;
+  min-height: 44px;
+}
+
+.search-result-link:hover {
+  opacity: 0.65;
+}
+
+.search-result-category {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+
+.search-result-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.search-result-dek {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.search-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--text-primary);
+}
+
+.search-empty-icon {
+  font-size: 2rem;
+  color: var(--border-color);
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.search-empty-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.search-empty-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* ─── Subscribe CTA ─────────────────────────────────────────────── */
 
 .subscribe-cta {

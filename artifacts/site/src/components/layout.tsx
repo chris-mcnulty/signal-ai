@@ -1,6 +1,16 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { useListArticles } from "@workspace/api-client-react";
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
 
 export function NetworkError({
   onRetry,
@@ -46,6 +56,33 @@ export function NetworkError({
 }
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debouncedQuery = useDebounce(query, 200);
+
+  const { data: articles } = useListArticles(
+    {},
+    { query: { enabled: open, staleTime: 60_000 } },
+  );
+
+  const results = useMemo(() => {
+    if (!articles || !debouncedQuery.trim()) return null;
+    const q = debouncedQuery.toLowerCase();
+    return articles.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.dek.toLowerCase().includes(q) ||
+        a.category.toLowerCase().includes(q),
+    );
+  }, [articles, debouncedQuery]);
+
+  useEffect(() => {
+    if (open) {
+      setQuery("");
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -75,13 +112,54 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             <X size={22} />
           </button>
         </div>
+
         <input
-          autoFocus={open}
+          ref={inputRef}
           type="search"
           placeholder="Search articles…"
           aria-label="Search articles"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
-        <p className="font-mono text-xs text-news-secondary mt-4 uppercase tracking-wider">Press Esc to close</p>
+
+        <div className="search-results" aria-live="polite">
+          {!debouncedQuery.trim() && (
+            <p className="font-mono text-xs text-news-secondary mt-6 uppercase tracking-wider">
+              Start typing to search articles
+            </p>
+          )}
+
+          {debouncedQuery.trim() && results && results.length === 0 && (
+            <div className="search-empty-state">
+              <span className="search-empty-icon">◌</span>
+              <p className="search-empty-heading">No results for &ldquo;{debouncedQuery}&rdquo;</p>
+              <p className="search-empty-sub">Try a different keyword or browse the front page.</p>
+            </div>
+          )}
+
+          {results && results.length > 0 && (
+            <ul className="search-result-list" role="list">
+              {results.map((article) => (
+                <li key={article.slug} className="search-result-item">
+                  <Link
+                    href={`/articles/${article.slug}`}
+                    onClick={onClose}
+                    className="search-result-link"
+                    aria-label={`${article.title} — ${article.category}`}
+                  >
+                    <span className="search-result-category">{article.category}</span>
+                    <span className="search-result-title">{article.title}</span>
+                    <span className="search-result-dek">{article.dek}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <p className="font-mono text-xs text-news-secondary mt-6 uppercase tracking-wider">
+          Press Esc to close
+        </p>
       </div>
     </div>
   );
@@ -89,6 +167,12 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
 export function useSearch() {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [location] = useLocation();
+
+  useEffect(() => {
+    setSearchOpen(false);
+  }, [location]);
+
   const openSearch = useCallback(() => setSearchOpen(true), []);
   const closeSearch = useCallback(() => setSearchOpen(false), []);
   return { searchOpen, openSearch, closeSearch };
