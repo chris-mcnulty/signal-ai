@@ -1,6 +1,7 @@
 import { db, articlesTable, caseStudiesTable, articleRelationsTable } from "@workspace/db";
 import type { Article, CaseStudy } from "@workspace/db";
-import { desc, eq, inArray } from "drizzle-orm";
+import { desc, eq, and, inArray } from "drizzle-orm";
+import { promoteDueArticles } from "./articles";
 
 export const CASE_STUDY_CATEGORY = "case-study";
 
@@ -12,14 +13,17 @@ export type CaseStudyWithArticle = {
 export async function listPublishedArticles(
   category?: string,
 ): Promise<Article[]> {
-  const query = db
+  await promoteDueArticles();
+  const published = eq(articlesTable.status, "published");
+  return db
     .select()
     .from(articlesTable)
+    .where(
+      category
+        ? and(published, eq(articlesTable.category, category))
+        : published,
+    )
     .orderBy(desc(articlesTable.publishedAt));
-  if (category) {
-    return query.where(eq(articlesTable.category, category));
-  }
-  return query;
 }
 
 export async function getArticleBySlug(
@@ -36,10 +40,12 @@ export async function getArticleBySlug(
 export async function listCaseStudiesWithArticles(): Promise<
   CaseStudyWithArticle[]
 > {
+  await promoteDueArticles();
   const rows = await db
     .select()
     .from(caseStudiesTable)
     .innerJoin(articlesTable, eq(caseStudiesTable.articleId, articlesTable.id))
+    .where(eq(articlesTable.status, "published"))
     .orderBy(desc(articlesTable.publishedAt));
   return rows.map((row) => ({
     article: row.articles,
@@ -50,11 +56,17 @@ export async function listCaseStudiesWithArticles(): Promise<
 export async function getCaseStudyBySlug(
   slug: string,
 ): Promise<(CaseStudyWithArticle & { relatedArticles: Article[] }) | null> {
+  await promoteDueArticles();
   const rows = await db
     .select()
     .from(caseStudiesTable)
     .innerJoin(articlesTable, eq(caseStudiesTable.articleId, articlesTable.id))
-    .where(eq(articlesTable.slug, slug))
+    .where(
+      and(
+        eq(articlesTable.slug, slug),
+        eq(articlesTable.status, "published"),
+      ),
+    )
     .limit(1);
   const row = rows[0];
   if (!row) {
@@ -69,7 +81,12 @@ export async function getCaseStudyBySlug(
     ? await db
         .select()
         .from(articlesTable)
-        .where(inArray(articlesTable.id, relatedIds))
+        .where(
+          and(
+            inArray(articlesTable.id, relatedIds),
+            eq(articlesTable.status, "published"),
+          ),
+        )
         .orderBy(desc(articlesTable.publishedAt))
     : [];
   return {
@@ -88,7 +105,7 @@ export function toArticleSummary(article: Article) {
     category: article.category,
     author: article.author,
     readingMinutes: article.readingMinutes,
-    publishedAt: article.publishedAt,
+    publishedAt: article.publishedAt ?? article.createdAt,
     heroImageUrl: article.heroImageUrl ?? null,
   };
 }
@@ -103,7 +120,7 @@ export function toArticleDetail(article: Article) {
     category: article.category,
     author: article.author,
     readingMinutes: article.readingMinutes,
-    publishedAt: article.publishedAt,
+    publishedAt: article.publishedAt ?? article.createdAt,
     updatedAt: article.updatedAt,
     heroImageUrl: article.heroImageUrl ?? null,
     sourceUrls: article.sourceUrls ?? null,

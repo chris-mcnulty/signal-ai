@@ -139,8 +139,8 @@ export const GetCaseStudyResponse = zod.object({
 
 
 /**
- * Accepts an article draft from an external tool and stores it as a pending-review draft. Requires an API key in the X-API-Key header.
- * @summary Submit an article draft
+ * Accepts an article draft from an external tool (e.g. a CI pipeline or content agent) and stores it as a pending draft. Requires an API key in the X-API-Key header (set DRAFTS_API_KEY secret).
+ * @summary Submit an article draft from an external tool
  */
 export const submitDraftBodyTitleMax = 300;
 
@@ -159,36 +159,20 @@ export const SubmitDraftBody = zod.object({
 export const SubmitDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
   "body": zod.string(),
-  "category": zod.string().nullable(),
-  "status": zod.string(),
-  "source": zod.string(),
-  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
-
-
-/**
- * Lists drafts, newest first. Optionally filter by status. Requires an API key in the X-API-Key header.
- * @summary List drafts
- */
-export const ListDraftsQueryParams = zod.object({
-  "status": zod.enum(['pending_review', 'approved', 'rejected']).optional()
-})
-
-export const ListDraftsResponseItem = zod.object({
-  "id": zod.number(),
-  "title": zod.string(),
-  "body": zod.string(),
-  "category": zod.string().nullable(),
-  "status": zod.string(),
-  "source": zod.string(),
-  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable(),
-  "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
-})
-export const ListDraftsResponse = zod.array(ListDraftsResponseItem)
 
 
 /**
@@ -212,11 +196,278 @@ export const GenerateDraftBody = zod.object({
 export const GenerateDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
   "body": zod.string(),
-  "category": zod.string().nullable(),
-  "status": zod.string(),
-  "source": zod.string(),
-  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List all articles for the editorial queue, optionally filtered by status
+ */
+export const ListDraftsQueryParams = zod.object({
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']).optional()
+})
+
+export const ListDraftsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListDraftsResponse = zod.array(ListDraftsResponseItem)
+
+
+/**
+ * @summary Create a new draft in the review queue
+ */
+
+
+
+
+
+export const CreateDraftBody = zod.object({
+  "title": zod.string().min(1),
+  "body": zod.string().min(1),
+  "category": zod.string().min(1),
+  "excerpt": zod.string().optional(),
+  "imageUrl": zod.string().optional()
+})
+
+export const CreateDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Counts of articles by status for the dashboard
+ */
+export const GetDraftsSummaryResponse = zod.object({
+  "pending": zod.number(),
+  "approved": zod.number(),
+  "published": zod.number(),
+  "rejected": zod.number(),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Get a single article for editing
+ */
+export const GetDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Edit a draft's title, body, category, excerpt, or image
+ */
+export const UpdateDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+
+
+export const UpdateDraftBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "body": zod.string().min(1).optional(),
+  "category": zod.string().min(1).optional(),
+  "excerpt": zod.string().nullish(),
+  "imageUrl": zod.string().nullish()
+})
+
+export const UpdateDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete an article
+ */
+export const DeleteDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteDraftResponse = zod.void()
+
+
+/**
+ * @summary Approve a draft — publishes immediately or schedules for a future time
+ */
+export const ApproveDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ApproveDraftBody = zod.object({
+  "scheduledFor": zod.coerce.date().nullish().describe('If set to a future time, the article is scheduled; if omitted or past, it publishes immediately.')
+})
+
+export const ApproveDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Reject a draft with an optional reason
+ */
+export const RejectDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RejectDraftBody = zod.object({
+  "reason": zod.string().optional()
+})
+
+export const RejectDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Publish an approved or scheduled article immediately
+ */
+export const PublishDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const PublishDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Move a published or rejected article back to pending review
+ */
+export const UnpublishDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UnpublishDraftResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "slug": zod.string(),
+  "excerpt": zod.string().nullable(),
+  "body": zod.string(),
+  "category": zod.string(),
+  "imageUrl": zod.string().nullable(),
+  "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
+  "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
+  "sourceMetadata": zod.record(zod.string(), zod.unknown()).nullable().describe('Arbitrary metadata about where the draft came from (repo, run id, model, etc.)'),
+  "scheduledFor": zod.coerce.date().nullable(),
+  "publishedAt": zod.coerce.date().nullable(),
+  "rejectionReason": zod.string().nullable(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })

@@ -47,7 +47,7 @@ export function caseStudyArticleJsonLd(
         height: 630,
       },
     ],
-    datePublished: article.publishedAt.toISOString(),
+    datePublished: (article.publishedAt ?? article.createdAt).toISOString(),
     dateModified: article.updatedAt.toISOString(),
     author: {
       "@type": "Person",

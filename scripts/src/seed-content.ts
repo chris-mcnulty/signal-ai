@@ -281,7 +281,7 @@ async function main(): Promise<void> {
   for (const seed of caseStudies) {
     const [article] = await db
       .insert(articlesTable)
-      .values({ ...seed.article, category: "case-study" })
+      .values({ ...seed.article, category: "case-study", status: "published" })
       .returning();
     if (!article) throw new Error("Insert failed");
     idBySlug.set(article.slug, article.id);
@@ -294,7 +294,7 @@ async function main(): Promise<void> {
   for (const articleSeed of supportingArticles) {
     const [article] = await db
       .insert(articlesTable)
-      .values(articleSeed)
+      .values({ ...articleSeed, status: "published" })
       .returning();
     if (!article) throw new Error("Insert failed");
     idBySlug.set(article.slug, article.id);

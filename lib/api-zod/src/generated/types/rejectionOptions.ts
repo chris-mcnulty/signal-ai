@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-/**
- * @nullable
- */
-export type DraftSourceMetadata = { [key: string]: unknown } | null;
+export interface RejectionOptions {
+  reason?: string;
+}

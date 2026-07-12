@@ -109,7 +109,7 @@ router.get("/case-studies", async (req, res): Promise<void> => {
         ? ` · <strong>${escapeHtml(metric.value)}</strong> ${escapeHtml(metric.label.toLowerCase())}`
         : "";
       return `<li>
-<span class="kicker mono">Case Study</span><span class="meta mono">${escapeHtml(formatDate(article.publishedAt))} · ${article.readingMinutes} min read</span>
+<span class="kicker mono">Case Study</span><span class="meta mono">${escapeHtml(formatDate(article.publishedAt ?? article.createdAt))} · ${article.readingMinutes} min read</span>
 <a class="cs-title" href="/case-studies/${escapeHtml(article.slug)}">${escapeHtml(article.title)}</a>
 <p class="cs-dek">${escapeHtml(article.dek)}</p>
 <p class="cs-company mono">${escapeHtml(caseStudy.companyName)} · ${escapeHtml(caseStudy.industry)}${metricLine}</p>
@@ -222,7 +222,7 @@ ${caseStudy.metrics
 <ul>
 ${relatedCaseStudies
   .map(
-    (a) => `<li><a href="/case-studies/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a><span class="rmeta mono">${escapeHtml(formatDate(a.publishedAt))} · ${a.readingMinutes} min read</span></li>`,
+    (a) => `<li><a href="/case-studies/${escapeHtml(a.slug)}">${escapeHtml(a.title)}</a><span class="rmeta mono">${escapeHtml(formatDate(a.publishedAt ?? a.createdAt))} · ${a.readingMinutes} min read</span></li>`,
   )
   .join("\n")}
 </ul>
@@ -231,7 +231,7 @@ ${relatedCaseStudies
 
   const body = `<main>
 <article>
-<span class="kicker mono">Case Study</span><span class="meta mono">${escapeHtml(formatDate(article.publishedAt))} · ${article.readingMinutes} min read</span>
+<span class="kicker mono">Case Study</span><span class="meta mono">${escapeHtml(formatDate(article.publishedAt ?? article.createdAt))} · ${article.readingMinutes} min read</span>
 <h1 class="headline">${escapeHtml(article.title)}</h1>
 <p class="dek">${escapeHtml(article.dek)}</p>
 <div class="byline mono">By ${escapeHtml(article.author)} · ${escapeHtml(SITE.name)}</div>
@@ -265,7 +265,7 @@ ${relatedHtml}
         canonicalUrl: pageUrl,
         ogImageUrl: caseStudyOgImageUrl(baseUrl, article),
         ogType: "article",
-        publishedTime: article.publishedAt.toISOString(),
+        publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
         modifiedTime: article.updatedAt.toISOString(),
         jsonLd: [
           jsonLdScript(caseStudyArticleJsonLd(baseUrl, article, caseStudy)),

@@ -5,9 +5,19 @@ import {
   integer,
   timestamp,
   uniqueIndex,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+
+export const ARTICLE_STATUSES = [
+  "pending",
+  "approved",
+  "published",
+  "rejected",
+] as const;
+
+export type ArticleStatus = (typeof ARTICLE_STATUSES)[number];
 
 export const articlesTable = pgTable(
   "articles",
@@ -15,21 +25,30 @@ export const articlesTable = pgTable(
     id: serial("id").primaryKey(),
     slug: text("slug").notNull(),
     title: text("title").notNull(),
-    dek: text("dek").notNull(),
+    dek: text("dek").notNull().default(""),
+    excerpt: text("excerpt"),
     body: text("body").notNull(),
     category: text("category").notNull(),
-    author: text("author").notNull(),
+    author: text("author").notNull().default("SignalAI Staff"),
     heroImageUrl: text("hero_image_url"),
     sourceUrls: text("source_urls").array(),
     readingMinutes: integer("reading_minutes").notNull().default(5),
-    publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
+    imageUrl: text("image_url"),
+    status: text("status", { enum: ARTICLE_STATUSES })
+      .notNull()
+      .default("pending"),
+    source: text("source").notNull().default("manual"),
+    sourceMetadata: jsonb("source_metadata"),
+    scheduledFor: timestamp("scheduled_for", { withTimezone: true }),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    rejectionReason: text("rejection_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
   },
   (table) => [uniqueIndex("articles_slug_idx").on(table.slug)],
 );

@@ -11,11 +11,11 @@ tags:
   - name: health
     description: Health operations
   - name: articles
-    description: Published articles
+    description: Public published articles
   - name: case-studies
     description: Company case studies
   - name: drafts
-    description: Article draft submission and AI drafting
+    description: Editorial draft review queue and external draft submission
 paths:
   /healthz:
     get:
@@ -112,14 +112,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /drafts:
+  /drafts/submit:
     post:
       operationId: submitDraft
       tags: [drafts]
-      summary: Submit an article draft
+      summary: Submit an article draft from an external tool
       description: >
-        Accepts an article draft from an external tool and stores it as a
-        pending-review draft. Requires an API key in the X-API-Key header.
+        Accepts an article draft from an external tool (e.g. a CI pipeline or
+        content agent) and stores it as a pending draft. Requires an API key
+        in the X-API-Key header (set DRAFTS_API_KEY secret).
       security:
         - ApiKeyAuth: []
       requestBody:
@@ -134,50 +135,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Draft"
+                $ref: "#/components/schemas/Article"
         "400":
           description: Invalid request body
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: "#/components/schemas/ErrorMessage"
         "401":
           description: Missing or invalid API key
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
-    get:
-      operationId: listDrafts
-      tags: [drafts]
-      summary: List drafts
-      description: >
-        Lists drafts, newest first. Optionally filter by status. Requires an
-        API key in the X-API-Key header.
-      security:
-        - ApiKeyAuth: []
-      parameters:
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-            enum: [pending_review, approved, rejected]
-      responses:
-        "200":
-          description: List of drafts
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Draft"
-        "401":
-          description: Missing or invalid API key
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: "#/components/schemas/ErrorMessage"
   /drafts/generate:
     post:
       operationId: generateDraft
@@ -202,7 +172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Draft"
+                $ref: "#/components/schemas/Article"
         "400":
           description: Invalid request body
           content:
@@ -231,7 +201,297 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts:
+    get:
+      operationId: listDrafts
+      tags: [drafts]
+      summary: List all articles for the editorial queue, optionally filtered by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, approved, published, rejected]
+      responses:
+        "200":
+          description: Articles for review
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    post:
+      operationId: createDraft
+      tags: [drafts]
+      summary: Create a new draft in the review queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleInput"
+      responses:
+        "201":
+          description: Created draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/summary:
+    get:
+      operationId: getDraftsSummary
+      tags: [drafts]
+      summary: Counts of articles by status for the dashboard
+      responses:
+        "200":
+          description: Status counts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DraftsSummary"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}:
+    get:
+      operationId: getDraft
+      tags: [drafts]
+      summary: Get a single article for editing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    patch:
+      operationId: updateDraft
+      tags: [drafts]
+      summary: Edit a draft's title, body, category, excerpt, or image
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleUpdate"
+      responses:
+        "200":
+          description: Updated article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    delete:
+      operationId: deleteDraft
+      tags: [drafts]
+      summary: Delete an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/approve:
+    post:
+      operationId: approveDraft
+      tags: [drafts]
+      summary: Approve a draft — publishes immediately or schedules for a future time
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApprovalOptions"
+      responses:
+        "200":
+          description: Approved article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/reject:
+    post:
+      operationId: rejectDraft
+      tags: [drafts]
+      summary: Reject a draft with an optional reason
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectionOptions"
+      responses:
+        "200":
+          description: Rejected article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/publish:
+    post:
+      operationId: publishDraft
+      tags: [drafts]
+      summary: Publish an approved or scheduled article immediately
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Published article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/unpublish:
+    post:
+      operationId: unpublishDraft
+      tags: [drafts]
+      summary: Move a published or rejected article back to pending review
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Article moved back to pending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -260,6 +520,12 @@ components:
           type: string
       required:
         - error
+    ErrorMessage:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
     SubmitDraftRequest:
       type: object
       properties:
@@ -297,44 +563,6 @@ components:
           description: Optional extra instructions for tone, angle, or length
       required:
         - topic
-    Draft:
-      type: object
-      properties:
-        id:
-          type: integer
-        title:
-          type: string
-        body:
-          type: string
-        category:
-          type:
-            - string
-            - "null"
-        status:
-          type: string
-        source:
-          type: string
-        sourceMetadata:
-          type:
-            - object
-            - "null"
-          additionalProperties: true
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - title
-        - body
-        - category
-        - status
-        - source
-        - sourceMetadata
-        - createdAt
-        - updatedAt
     ArticleSummary:
       type: object
       properties:
@@ -544,3 +772,121 @@ components:
         - metrics
         - quotes
         - relatedArticles
+    Article:
+      type: object
+      required:
+        [
+          id,
+          title,
+          slug,
+          body,
+          category,
+          status,
+          source,
+          excerpt,
+          imageUrl,
+          scheduledFor,
+          publishedAt,
+          rejectionReason,
+          sourceMetadata,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: ["string", "null"]
+        body:
+          type: string
+        category:
+          type: string
+        imageUrl:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [pending, approved, published, rejected]
+        source:
+          type: string
+          description: Where the draft came from (manual, api, ai)
+        sourceMetadata:
+          type: ["object", "null"]
+          description: Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
+          additionalProperties: true
+        scheduledFor:
+          type: ["string", "null"]
+          format: date-time
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+        rejectionReason:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ArticleInput:
+      type: object
+      required: [title, body, category]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        excerpt:
+          type: string
+        imageUrl:
+          type: string
+    ArticleUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+        excerpt:
+          type: ["string", "null"]
+        imageUrl:
+          type: ["string", "null"]
+    ApprovalOptions:
+      type: object
+      properties:
+        scheduledFor:
+          type: ["string", "null"]
+          format: date-time
+          description: If set to a future time, the article is scheduled; if omitted or past, it publishes immediately.
+    RejectionOptions:
+      type: object
+      properties:
+        reason:
+          type: string
+    DraftsSummary:
+      type: object
+      required: [pending, approved, published, rejected, total]
+      properties:
+        pending:
+          type: integer
+        approved:
+          type: integer
+        published:
+          type: integer
+        rejected:
+          type: integer
+        total:
+          type: integer

@@ -6,7 +6,7 @@ import {
   caseStudiesTable,
   seoNotificationsTable,
 } from "@workspace/db";
-import { eq, and, isNull, gt } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { findPendingCaseStudies, TARGET_INDEXNOW, findPendingRemovals } from "../lib/indexnow";
 
 type LedgerRow = typeof seoNotificationsTable.$inferSelect;
@@ -92,7 +92,7 @@ afterAll(async () => {
     .select({ updatedAt: articlesTable.updatedAt })
     .from(articlesTable)
     .where(eq(articlesTable.id, articleId));
-  if (current && gt(current.updatedAt, articleUpdatedAt)) {
+  if (current && current.updatedAt > articleUpdatedAt) {
     await db
       .update(seoNotificationsTable)
       .set({ notifiedUpdatedAt: current.updatedAt })

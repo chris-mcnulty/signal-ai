@@ -10,7 +10,8 @@ export type ListDraftsStatus = typeof ListDraftsStatus[keyof typeof ListDraftsSt
 
 
 export const ListDraftsStatus = {
-  pending_review: 'pending_review',
+  pending: 'pending',
   approved: 'approved',
+  published: 'published',
   rejected: 'rejected',
 } as const;

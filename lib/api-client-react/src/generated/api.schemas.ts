@@ -17,6 +17,10 @@ export interface ApiError {
   error: string;
 }
 
+export interface ErrorMessage {
+  error: string;
+}
+
 /**
  * Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
  */
@@ -50,25 +54,6 @@ export interface GenerateDraftRequest {
      * @maxLength 2000
      */
   instructions?: string;
-}
-
-/**
- * @nullable
- */
-export type DraftSourceMetadata = { [key: string]: unknown } | null;
-
-export interface Draft {
-  id: number;
-  title: string;
-  body: string;
-  /** @nullable */
-  category: string | null;
-  status: string;
-  source: string;
-  /** @nullable */
-  sourceMetadata: DraftSourceMetadata;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface ArticleSummary {
@@ -147,6 +132,94 @@ export interface CaseStudyDetail {
   relatedArticles: ArticleSummary[];
 }
 
+export type ArticleStatus = typeof ArticleStatus[keyof typeof ArticleStatus];
+
+
+export const ArticleStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  published: 'published',
+  rejected: 'rejected',
+} as const;
+
+/**
+ * Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
+ * @nullable
+ */
+export type ArticleSourceMetadata = { [key: string]: unknown } | null;
+
+export interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  /** @nullable */
+  excerpt: string | null;
+  body: string;
+  category: string;
+  /** @nullable */
+  imageUrl: string | null;
+  status: ArticleStatus;
+  /** Where the draft came from (manual, api, ai) */
+  source: string;
+  /**
+     * Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
+     * @nullable
+     */
+  sourceMetadata: ArticleSourceMetadata;
+  /** @nullable */
+  scheduledFor: string | null;
+  /** @nullable */
+  publishedAt: string | null;
+  /** @nullable */
+  rejectionReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ArticleInput {
+  /** @minLength 1 */
+  title: string;
+  /** @minLength 1 */
+  body: string;
+  /** @minLength 1 */
+  category: string;
+  excerpt?: string;
+  imageUrl?: string;
+}
+
+export interface ArticleUpdate {
+  /** @minLength 1 */
+  title?: string;
+  /** @minLength 1 */
+  body?: string;
+  /** @minLength 1 */
+  category?: string;
+  /** @nullable */
+  excerpt?: string | null;
+  /** @nullable */
+  imageUrl?: string | null;
+}
+
+export interface ApprovalOptions {
+  /**
+     * If set to a future time, the article is scheduled; if omitted or past, it publishes immediately.
+     * @nullable
+     */
+  scheduledFor?: string | null;
+}
+
+export interface RejectionOptions {
+  reason?: string;
+}
+
+export interface DraftsSummary {
+  pending: number;
+  approved: number;
+  published: number;
+  rejected: number;
+  total: number;
+}
+
 export type ListArticlesParams = {
 category?: string;
 };
@@ -159,8 +232,9 @@ export type ListDraftsStatus = typeof ListDraftsStatus[keyof typeof ListDraftsSt
 
 
 export const ListDraftsStatus = {
-  pending_review: 'pending_review',
+  pending: 'pending',
   approved: 'approved',
+  published: 'published',
   rejected: 'rejected',
 } as const;
 
