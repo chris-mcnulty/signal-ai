@@ -5,6 +5,6 @@
 - [OG share card rendering](og-share-cards.md) — share images use satori+resvg with vendored fonts; keep @resvg/* external in esbuild; platforms cache images by URL.
 - [IndexNow notifier](indexnow-notifier.md) — new case studies auto-pinged via DB-polled IndexNow ledger; key file at /indexnow-key.txt is a claimed proxy path; publish flows need no extra wiring.
 - [SEO notifier tests & dev-DB state](seo-notifier-tests-db-state.md) — seo-tests assert exact call counts against the real dev DB and need ≥1 published case study; missing seo_notifications ledger rows cause false failures, backfill instead of editing code.
-- [Clerk handshake breaks public HTML endpoints](clerk-handshake-public-html.md) — cookie-less `Accept: text/html` GETs get 307'd by clerkMiddleware; public SEO/SSR routes must be in the CLERK_EXEMPT list in app.ts.
 - [GNews API integration](gnews-api.md) — GNews v4 auth param is `apikey` (not legacy `token`); "did not provide an API key" 400 usually means wrong param name or a placeholder key.
+- [Source Repositories](source-repositories.md) — synozur-orbit (AI marketing/content engine, source of SignalAI's engine/) and synozur-webbase (baseline monorepo, source of SEO stack); check these before building AI or SEO features from scratch.
 - [Admin Accounts](admin-accounts.md) — chris.mcnulty@synozur.com and admin@synozur.com are permanent full admins; must survive any auth changes.
