@@ -8,6 +8,8 @@ import Home from "@/pages/home";
 import Article from "@/pages/article";
 import CaseStudies from "@/pages/case-studies";
 import CaseStudy from "@/pages/case-study";
+import News from "@/pages/news";
+import About from "@/pages/about";
 import { SeoHead } from "@/lib/seo";
 
 const queryClient = new QueryClient({
@@ -25,6 +27,8 @@ function Router() {
       <Route path="/articles/:slug" component={Article} />
       <Route path="/case-studies" component={CaseStudies} />
       <Route path="/case-studies/:slug" component={CaseStudy} />
+      <Route path="/news" component={News} />
+      <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>
   );

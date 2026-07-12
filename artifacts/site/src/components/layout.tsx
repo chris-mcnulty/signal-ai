@@ -2,6 +2,11 @@ import { Link, useLocation } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useListArticles } from "@workspace/api-client-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -178,9 +183,72 @@ export function useSearch() {
   return { searchOpen, openSearch, closeSearch };
 }
 
+const NAV_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/news", label: "News" },
+  { href: "/case-studies", label: "Case Studies" },
+  { href: "/about", label: "About" },
+];
+
+function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [location, navigate] = useLocation();
+
+  return (
+    <Sheet open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <SheetContent
+        side="left"
+        className="bg-news border-r-4 border-news p-0 w-72 sm:max-w-72 flex flex-col"
+        aria-label="Navigation menu"
+      >
+        <div className="flex items-center justify-between px-6 py-5 border-b border-news">
+          <span className="font-serif text-2xl font-black tracking-tight">
+            Signal<span className="text-accent">AI</span>
+          </span>
+          <SheetClose asChild>
+            <button
+              className="mobile-menu-btn text-news-primary"
+              aria-label="Close menu"
+            >
+              <X size={22} />
+            </button>
+          </SheetClose>
+        </div>
+
+        <nav className="flex flex-col flex-1 px-6 py-8 gap-1" role="navigation" aria-label="Main navigation">
+          {NAV_LINKS.map((link) => {
+            const isActive = location === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={onClose}
+                className={`font-mono text-sm uppercase tracking-widest px-3 py-3 border-b border-news transition-colors duration-150 ${
+                  isActive
+                    ? "text-accent font-bold"
+                    : "text-news-primary hover:text-accent"
+                }`}
+                data-testid={`nav-drawer-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="px-6 py-5 border-t border-news">
+          <p className="font-mono text-xs text-news-secondary uppercase tracking-widest leading-relaxed">
+            Separating the signal<br />from the AI noise
+          </p>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 export function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { searchOpen, openSearch, closeSearch } = useSearch();
 
   useEffect(() => {
@@ -203,6 +271,7 @@ export function Header() {
               className="mobile-menu-btn text-news-primary"
               data-testid="btn-menu"
               aria-label="Open menu"
+              onClick={() => setMenuOpen(true)}
             >
               <Menu size={22} />
             </button>
@@ -241,6 +310,7 @@ export function Header() {
         </div>
       </header>
 
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
     </>
   );
@@ -259,10 +329,13 @@ export function Footer() {
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-6 font-mono text-sm uppercase tracking-wider">
-          <span className="hover:text-accent cursor-pointer transition-colors" data-testid="link-about">About</span>
-          <span className="hover:text-accent cursor-pointer transition-colors" data-testid="link-manifesto">Manifesto</span>
-          <span className="hover:text-accent cursor-pointer transition-colors" data-testid="link-subscribe-footer">Subscribe</span>
-          <span className="hover:text-accent cursor-pointer transition-colors" data-testid="link-contact">Contact</span>
+          <Link
+            href="/about"
+            className="hover:text-accent transition-colors"
+            data-testid="link-about"
+          >
+            About
+          </Link>
         </div>
       </div>
     </footer>
