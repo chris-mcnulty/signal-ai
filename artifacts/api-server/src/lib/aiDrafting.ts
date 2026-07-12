@@ -16,6 +16,8 @@ export async function generateArticleDraft(
 ): Promise<GeneratedArticle> {
   const systemPrompt = [
     "You are an editorial writer for SignalAI, a publication covering AI and technology.",
+    "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose.",
+    "Use American English spelling and idioms throughout — never British variants (e.g. 'program' not 'programme', 'organization' not 'organisation', 'color' not 'colour').",
     "Write a complete, well-structured article draft in Markdown.",
     "Respond ONLY with a JSON object with these keys:",
     '- "title": a compelling headline (string)',

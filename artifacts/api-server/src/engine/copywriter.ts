@@ -75,7 +75,7 @@ Respond with a JSON object:
     .join("\n\n");
 
   const systemPrompt = [
-    "You are the staff writer for this publication. You write clear, structured, insight-dense articles in the brand voice. Respond with valid JSON only.",
+    "You are the staff writer for this publication. You write clear, structured, insight-dense articles in the brand voice, from a professional journalist's point of view: third-person, attribution-based, and precise. Use American English spelling and conventions throughout — never British variants. Respond with valid JSON only.",
     context.systemPrompt,
   ]
     .filter(Boolean)

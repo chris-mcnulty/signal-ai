@@ -88,7 +88,13 @@ export async function resolvePromptContext(
       : db.select().from(groundingDocumentsTable),
   ]);
 
-  const sections = [renderVoiceBlock(voice), renderDocumentBlocks(documents)]
+  const languageStandards =
+    "## Language and voice standards\n" +
+    "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose. " +
+    "Use American English spelling and idioms throughout — never British variants (use 'program' not 'programme', 'organization' not 'organisation', 'standardization' not 'standardisation', 'color' not 'colour', etc.). " +
+    "Maintain a clear, authoritative register appropriate for a professional editorial publication.";
+
+  const sections = [renderVoiceBlock(voice), renderDocumentBlocks(documents), languageStandards]
     .filter(Boolean)
     .join("\n\n");
 

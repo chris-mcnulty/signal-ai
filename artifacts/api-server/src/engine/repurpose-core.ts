@@ -109,7 +109,7 @@ export function buildRepurposePrompt(input: {
 
   return [
     `Repurpose the article below into ${input.perPlatform} social post variant(s) for EACH of these platforms: ${input.platforms.join(", ")}. Each variant for the same platform must take a different angle.`,
-    `## Platform guidance\n${guidance}`,
+    `## Platform guidance\n${guidance}\n- All variants must use American English spelling and conventions (not British). Maintain a journalist-adjacent professional register — clear, credible, and precise.`,
     input.articleUrl
       ? `Reference the article at: ${input.articleUrl} (mention that the link is in the post where natural — do not paste the URL into the copy).`
       : "",

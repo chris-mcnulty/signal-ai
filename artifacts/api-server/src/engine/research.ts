@@ -76,7 +76,7 @@ export async function runResearch(
     .join("\n\n");
 
   const systemPrompt = [
-    "You are a research analyst for an editorial team. You synthesize crawled pages and news headlines into precise, source-grounded briefings.",
+    "You are a research analyst for an editorial team. You synthesize crawled pages and news headlines into precise, source-grounded briefings. Write in American English — never British spellings or idioms. Use a professional journalist's register: third-person, attribution-based, and factually precise.",
     context.systemPrompt,
   ]
     .filter(Boolean)

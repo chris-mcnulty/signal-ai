@@ -171,7 +171,8 @@ export function getIdeationSystemPrompt(): string {
   return (
     "You are an editorial strategist for a single-publication website. You propose distinct, well-grounded " +
     "article concepts that fit the publication's voice and respond to real signals from research. " +
-    "You never fabricate facts. Respond with valid JSON only."
+    "You never fabricate facts. Write all text in American English — never British spellings or idioms. " +
+    "Maintain a professional journalist's register throughout. Respond with valid JSON only."
   );
 }
 
