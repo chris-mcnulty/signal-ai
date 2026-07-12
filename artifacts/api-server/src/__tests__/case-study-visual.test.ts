@@ -323,18 +323,23 @@ describe("Parity: metrics grid layout", () => {
 // ---------------------------------------------------------------------------
 
 describe("Parity: typography families", () => {
-  it("SSR body font stack includes a named serif (Georgia)", () => {
+  it("SSR body uses Inter (matching SPA sans-serif)", () => {
     const html = renderPage(dummyMeta, "<main></main>");
     const ssrCss = extractInlineCss(html);
     assert.ok(
-      ssrCss.includes("Georgia"),
-      "SSR body must specify Georgia in its serif font stack for editorial consistency",
+      ssrCss.includes("font-family:'Inter'") ||
+        ssrCss.includes('font-family:"Inter"'),
+      "SSR body font-family must use Inter to match the SPA sans-serif stack",
     );
-    // Confirm it appears in a body rule, not just a comment
+  });
+
+  it("SSR headings use Playfair Display (matching SPA serif)", () => {
+    const html = renderPage(dummyMeta, "<main></main>");
+    const ssrCss = extractInlineCss(html);
     assert.ok(
-      ssrCss.includes("font-family:Georgia") ||
-        ssrCss.includes("font-family:'Georgia'"),
-      "SSR body font-family must include Georgia as the primary serif",
+      ssrCss.includes("'Playfair Display'") ||
+        ssrCss.includes('"Playfair Display"'),
+      "SSR heading font-family must use Playfair Display to match the SPA serif stack",
     );
   });
 
@@ -346,12 +351,13 @@ describe("Parity: typography families", () => {
     );
   });
 
-  it("SSR defines a monospace class for metadata elements", () => {
+  it("SSR .mono class uses Space Mono (matching SPA monospace)", () => {
     const html = renderPage(dummyMeta, "<main></main>");
     const ssrCss = extractInlineCss(html);
     assert.ok(
-      ssrCss.includes(".mono") && ssrCss.includes("monospace"),
-      "SSR must define a .mono class with monospace font for kicker/meta metadata",
+      ssrCss.includes(".mono") &&
+        (ssrCss.includes("'Space Mono'") || ssrCss.includes('"Space Mono"')),
+      "SSR .mono must use Space Mono to match the SPA monospace font",
     );
   });
 
@@ -360,6 +366,26 @@ describe("Parity: typography families", () => {
     assert.ok(
       spaCss.includes("Space Mono"),
       "SPA CSS must load Space Mono for monospace metadata elements",
+    );
+  });
+
+  it("SSR links Google Fonts for Playfair Display, Inter, and Space Mono", () => {
+    const html = renderPage(dummyMeta, "<main></main>");
+    assert.ok(
+      html.includes("fonts.googleapis.com"),
+      "SSR layout must link Google Fonts",
+    );
+    assert.ok(
+      html.includes("Playfair+Display") || html.includes("Playfair Display"),
+      "SSR Google Fonts link must include Playfair Display",
+    );
+    assert.ok(
+      html.includes("Inter"),
+      "SSR Google Fonts link must include Inter",
+    );
+    assert.ok(
+      html.includes("Space+Mono") || html.includes("Space Mono"),
+      "SSR Google Fonts link must include Space Mono",
     );
   });
 });

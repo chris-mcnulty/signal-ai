@@ -3,9 +3,10 @@ import { SITE, escapeHtml } from "../lib/site";
 const CSS = `
 :root{--bg:#f7f5f2;--ink:#1a1a1a;--muted:#4a4a4a;--accent:#d94226;--line:#d1cdc7}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif;line-height:1.6}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6}
 a{color:inherit}
-.mono{font-family:'Courier New',Courier,monospace;letter-spacing:.08em;text-transform:uppercase}
+h1,h2,h3,h4,h5{font-family:'Playfair Display',serif}
+.mono{font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
 header.masthead{border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(247,245,242,.95)}
 .brand{font-size:26px;font-weight:900;letter-spacing:-.02em;text-decoration:none}
 .brand span{color:var(--accent)}
@@ -105,6 +106,9 @@ export function renderPage(meta: PageMeta, bodyHtml: string): string {
 <meta name="description" content="${escapeHtml(meta.description)}">
 ${verificationMetaTags()}
 <link rel="canonical" href="${escapeHtml(meta.canonicalUrl)}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="/case-studies/static/signalai-logo.png">
 <meta property="og:site_name" content="${escapeHtml(SITE.name)}">
 <meta property="og:type" content="${meta.ogType}">
