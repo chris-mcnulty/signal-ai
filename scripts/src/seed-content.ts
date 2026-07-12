@@ -47,7 +47,6 @@ Median claim routing time fell from 9 days to 4 hours for previously unmatched c
 ## What they'd do differently
 
 The team's main regret: not involving the adjusters sooner. The shadow-mode disagreement reviews that began as a validation step became the most valuable part of the project — and could have started on day one.`,
-      author: "Dana Okafor",
       readingMinutes: 8,
       publishedAt: new Date("2026-05-14T09:00:00Z"),
     },
@@ -118,7 +117,6 @@ Acceptance climbed to 64%. Empty miles fell 22% fleet-wide, worth roughly $11 mi
 ## What they'd do differently
 
 Vantage now treats the rejection log as its most valuable dataset. The team says they would have designed for disagreement from the start rather than treating rejections as failures.`,
-      author: "Tom Whitfield",
       readingMinutes: 7,
       publishedAt: new Date("2026-06-02T09:00:00Z"),
     },
@@ -183,7 +181,6 @@ The bank set its automation threshold deliberately conservatively: the model onl
 ## What they'd do differently
 
 The team estimates the audit-trail-first approach added four months to the timeline — and considers it the reason the project survived its first examination. Their advice: in regulated industries, build the explanation machinery before the decision machinery.`,
-      author: "Dana Okafor",
       readingMinutes: 9,
       publishedAt: new Date("2026-06-24T09:00:00Z"),
     },
@@ -235,7 +232,6 @@ const supportingArticles: InsertArticle[] = [
 
 The projects that survive share a trait: they automate a bottleneck the business already measured, rather than searching for a use case to justify the technology.`,
     category: "opinion",
-    author: "Ruth Calloway",
     readingMinutes: 8,
     publishedAt: new Date("2026-04-20T09:00:00Z"),
   },
@@ -249,7 +245,6 @@ The projects that survive share a trait: they automate a bottleneck the business
 
 Shadow mode converts deployment risk into training signal. Every disagreement between model and human is either a model error worth fixing or an inconsistency in the organization's own historical practice worth knowing about.`,
     category: "use-cases",
-    author: "Tom Whitfield",
     readingMinutes: 6,
     publishedAt: new Date("2026-05-28T09:00:00Z"),
   },
@@ -263,7 +258,6 @@ Shadow mode converts deployment risk into training signal. Every disagreement be
 
 Institutions that maintain fact-level provenance — every automated conclusion linked to its source evidence — are clearing examinations. Those that log only final decisions are not.`,
     category: "news",
-    author: "Ruth Calloway",
     readingMinutes: 5,
     publishedAt: new Date("2026-06-30T09:00:00Z"),
   },

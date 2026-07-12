@@ -49,10 +49,10 @@ export function caseStudyArticleJsonLd(
     ],
     datePublished: (article.publishedAt ?? article.createdAt).toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    author: {
-      "@type": "Person",
-      name: article.author,
-    },
+    author:
+      !article.author || article.author === "SignalAI Staff"
+        ? { "@type": "Organization", name: "SignalAI" }
+        : { "@type": "Person", name: article.author },
     publisher: publisherJsonLd(baseUrl),
     mainEntityOfPage: {
       "@type": "WebPage",

@@ -27,7 +27,6 @@ The distinction sounds subtle but isn't. A chat assistant that explains how to b
 
 Admins still control availability, and Microsoft's release notes are candid that Agent mode's output quality depends heavily on how much structure the underlying document already has. Early enterprise feedback suggests the feature performs best on well-formed financial models and struggles with the messy, hand-built spreadsheets that dominate real workplaces — which is precisely the gap Microsoft will need to close.`,
     category: "news",
-    author: "Dana Okafor",
     sourceUrls: [
       "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/what%E2%80%99s-new-in-microsoft-365-copilot--january-2026/4488916",
       "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/what%e2%80%99s-new-in-microsoft-365-copilot--february-2026/4496489",
@@ -55,7 +54,6 @@ For years, Microsoft 365 Copilot was synonymous with OpenAI models. Wave 3 forma
 
 April's follow-up added a Planner agent, eight new third-party connectors, and the "Hey Copilot" wake word on Windows. The direction of travel is unambiguous: Microsoft is converting Copilot from a feature into a workforce, and pricing it accordingly.`,
     category: "news",
-    author: "Tom Whitfield",
     sourceUrls: [
       "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/what%E2%80%99s-new-in-microsoft-365-copilot--march-2026/4506322",
       "https://learn.microsoft.com/en-us/microsoft-365/copilot/release-notes",
@@ -83,7 +81,6 @@ The subtler April feature may prove the stickier one. When users ask Copilot Cha
 
 April also brought a Planner agent and eight new third-party Copilot connectors, continuing the Wave 3 pattern of converting each Office surface into something that can be delegated to rather than merely operated. Adoption data will lag the announcements, as it always does — but the surface area Microsoft is giving these agents is expanding monthly.`,
     category: "news",
-    author: "Dana Okafor",
     sourceUrls: [
       "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/what%E2%80%99s-new-in-microsoft-365-copilot--april-2026/4510935",
       "https://supersimple365.com/whats-new-in-microsoft-365-and-copilot-april-2026/",
@@ -115,7 +112,6 @@ Cowork selects models per task: OpenAI's GPT-5.5 Thinking for deep research with
 
 Between Cowork's GA and Scout's preview, Build 2026 marked the moment Microsoft stopped positioning agents as an experiment. The question enterprises now face is not whether to pilot agentic AI, but how to govern spend on software that bills like a contractor.`,
     category: "news",
-    author: "Ruth Calloway",
     sourceUrls: [
       "https://techcommunity.microsoft.com/blog/microsoft365copilotblog/what%E2%80%99s-new-in-microsoft-365-copilot--june-2026/4529572",
       "https://espc.tech/learning-hub/blog/microsoft-build-2026-announcements/",
@@ -146,7 +142,6 @@ On January 27, Anthropic announced it had been selected to develop and pilot an 
 
 Claude for Healthcare launched with HIPAA-ready tooling, and ServiceNow announced Claude as the default build-agent model inside its Action Fabric platform. Add Anthropic Labs — the consumer-product group co-led by Instagram co-founder Mike Krieger, launched January 11 — and January read less like a month of releases than a declaration of scope.`,
     category: "news",
-    author: "Tom Whitfield",
     sourceUrls: [
       "https://www.anthropic.com/news",
       "https://releasebot.io/updates/anthropic",
@@ -174,7 +169,6 @@ Anthropic's stated priorities for the round were familiar: compute, compute, and
 
 February's round made Anthropic, briefly, the most highly valued private AI company besides OpenAI. That footnote would not survive the spring — but the Series G established the trajectory that made May's far larger round possible.`,
     category: "news",
-    author: "Ruth Calloway",
     sourceUrls: [
       "https://sacra.com/c/anthropic/",
       "https://tracxn.com/d/companies/anthropic/__SzoxXDMin-NK5tKB7ks8yHr6S9Mz68pjVCzFEcGFZ08/funding-and-investors",
@@ -202,7 +196,6 @@ The valuation only parses against Anthropic's 2026 revenue trajectory: roughly $
 
 Days after the round, Anthropic confidentially filed a draft S-1 with the SEC. A near-trillion-dollar private valuation leaves exactly one exit large enough to matter, and the company is visibly preparing for it. For enterprise customers, the practical takeaway is simpler: the vendor risk question about Anthropic is no longer viability — it is concentration.`,
     category: "news",
-    author: "Ruth Calloway",
     sourceUrls: [
       "https://www.anthropic.com/news/series-h",
       "https://techcrunch.com/2026/05/28/anthropic-raises-65-billion-nears-1t-valuation-ahead-of-ipo/",
@@ -231,7 +224,6 @@ Opus 4.8 keeps its predecessor's pricing at $5 per million input tokens and $25 
 
 The headline capability for engineering organizations: a single Claude Code session can now plan and run hundreds of subagents in parallel, enabling codebase-scale migrations across hundreds of thousands of lines. Available on the Claude API, Amazon Bedrock, Google Vertex AI, Microsoft Foundry, GitHub Copilot, and GitLab from day one — distribution breadth that has quietly become one of Anthropic's structural advantages.`,
     category: "news",
-    author: "Dana Okafor",
     sourceUrls: [
       "https://hidekazu-konishi.com/entry/anthropic_claude_model_release_timeline.html",
       "https://releasebot.io/updates/anthropic",
@@ -259,7 +251,6 @@ Launched June 30, Sonnet 5 delivers what Anthropic called frontier performance a
 
 On June 29, California Governor Gavin Newsom announced a partnership providing Anthropic tools to state agencies. Following January's GOV.UK selection, it extends a pattern: Anthropic is systematically collecting sovereign and public-sector references — the hardest procurement processes in the world to pass, and the most durable customers once passed.`,
     category: "news",
-    author: "Tom Whitfield",
     sourceUrls: [
       "https://www.gov.ca.gov/2026/06/29/governor-newsom-announces-a-first-of-its-kind-partnership-providing-anthropic-tools-to-state-agencies-and-improving-services-for-californians/",
       "https://www.anthropic.com/news",
@@ -290,7 +281,6 @@ Frontier Alliances is the more telling move. Enterprise AI deployments stall in 
 
 February also saw OpenAI hire Peter Steinberger, creator of the viral OpenClaw assistant, to lead what Sam Altman described as the next generation of personal agents. Platform, distribution, talent: the through-line of OpenAI's February was that the model is no longer the product. The deployment is.`,
     category: "news",
-    author: "Dana Okafor",
     sourceUrls: [
       "https://www.computerworld.com/article/4015023/openai-latest-news-and-insights.html",
       "https://openai.com/news/",
@@ -318,7 +308,6 @@ Coverage of the launch consistently framed it as an assault on enterprise territ
 
 The spring cadence did not slow: GPT-5.5 arrived within weeks as OpenAI's smartest model yet, followed by GPT-5.5 Instant as ChatGPT's default, with reduced hallucinations and improved personalization. The mainline-model release cycle across the industry now runs in weeks. Enterprises building on these APIs should assume the model underneath them changes quarterly — and architect for it.`,
     category: "news",
-    author: "Tom Whitfield",
     sourceUrls: [
       "https://fortune.com/2026/03/05/openai-new-model-gpt5-4-enterprise-agentic-anthropic/",
       "https://openai.com/index/introducing-gpt-5-4/",
@@ -347,7 +336,6 @@ The government-limited rollout is the story that will outlast the benchmarks. Fr
 
 OpenAI shipped GPT-Live-1 and GPT-Live-1 mini on July 8, full-duplex voice models designed for natural real-time conversation with extensive red-teaming behind their safety claims. Voice, long the demo-ware of the AI era, is quietly becoming production infrastructure — and the enterprise contact-center market is the obvious first casualty.`,
     category: "news",
-    author: "Ruth Calloway",
     sourceUrls: [
       "https://openai.com/news/",
       "https://releasebot.io/updates/openai",
@@ -371,6 +359,7 @@ async function main(): Promise<void> {
         set: {
           heroImageUrl: article.heroImageUrl,
           sourceUrls: article.sourceUrls,
+          author: article.author ?? "SignalAI Staff",
         },
       })
       .returning({ id: articlesTable.id });

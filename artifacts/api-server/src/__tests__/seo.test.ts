@@ -122,7 +122,7 @@ describe("case study detail page structured data", () => {
       expect(String(article!["dateModified"])).toMatch(/^\d{4}-\d{2}-\d{2}T/);
 
       const author = article!["author"] as JsonLd;
-      expect(author["@type"]).toBe("Person");
+      expect(["Person", "Organization"], `Article.author["@type"] must be Person or Organization on /case-studies/${slug}`).toContain(author["@type"]);
       expect(author["name"]).toBeTruthy();
 
       const publisher = article!["publisher"] as JsonLd;
