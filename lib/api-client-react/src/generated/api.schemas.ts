@@ -129,6 +129,8 @@ export interface CaseStudyDetail {
   company: CaseStudyCompany;
   metrics: CaseStudyMetric[];
   quotes: CaseStudyQuote[];
+  heroImageUrl?: string | null;
+  sourceUrls?: string[] | null;
   relatedArticles: ArticleSummary[];
 }
 
