@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -216,11 +215,11 @@ export default function DraftEditor() {
     });
   };
 
-  // Approval/Scheduling state
   const [scheduleDate, setScheduleDate] = useState<Date>();
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [seoOpen, setSeoOpen] = useState(false);
 
   if (!isNew && isDraftLoading) {
     return <AppLayout><div className="animate-pulse h-96 bg-muted rounded-xl"></div></AppLayout>;
@@ -228,13 +227,13 @@ export default function DraftEditor() {
 
   return (
     <AppLayout>
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-3 mb-6">
         <Button variant="ghost" size="icon" onClick={() => setLocation("/queue")} className="shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight truncate">
+            <h1 className="text-xl font-bold tracking-tight truncate">
               {isNew ? "New Draft" : draft?.title || "Untitled"}
             </h1>
             {!isNew && draft && <DraftStatusBadge status={draft.status} />}
@@ -242,23 +241,23 @@ export default function DraftEditor() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button 
-            variant="outline" 
             onClick={form.handleSubmit(onSave)}
             disabled={createMutation.isPending || updateMutation.isPending}
             className="gap-2"
           >
             <Save className="w-4 h-4" />
-            Save
+            Save Draft
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Two-column layout: wide editor, narrow sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6">
         
-        {/* Editor Form */}
-        <div className="lg:col-span-2">
+        {/* Editor — primary focus area */}
+        <div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSave)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSave)} className="space-y-5">
               <FormField
                 control={form.control}
                 name="title"
@@ -273,7 +272,7 @@ export default function DraftEditor() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="category"
@@ -293,7 +292,7 @@ export default function DraftEditor() {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cover Image URL (Optional)</FormLabel>
+                      <FormLabel>Cover Image URL <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
                       <FormControl>
                         <Input placeholder="https://..." {...field} />
                       </FormControl>
@@ -312,7 +311,7 @@ export default function DraftEditor() {
                     <FormControl>
                       <Textarea 
                         placeholder="A short summary of the article..." 
-                        className="resize-none h-20" 
+                        className="resize-none h-16" 
                         {...field} 
                       />
                     </FormControl>
@@ -325,12 +324,12 @@ export default function DraftEditor() {
                 control={form.control}
                 name="body"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Content (Markdown)</FormLabel>
+                  <FormItem>
+                    <FormLabel>Content <span className="text-muted-foreground font-normal text-xs ml-1">Markdown</span></FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Write your article here..." 
-                        className="min-h-[400px] font-mono text-sm leading-relaxed p-4" 
+                        className="min-h-[480px] font-mono text-sm leading-relaxed p-4 resize-y" 
                         {...field} 
                       />
                     </FormControl>
@@ -342,193 +341,213 @@ export default function DraftEditor() {
           </Form>
         </div>
 
-        {/* Sidebar Actions */}
+        {/* Sidebar — clearly secondary */}
         <div>
-          <div className="sticky top-20 space-y-6">
+          <div className="sticky top-20 space-y-4">
+
+            {/* Workflow info */}
             {!isNew && draft && (
-              <div className="bg-muted/30 border border-border rounded-xl p-5 space-y-6">
-                <div>
-                  <h3 className="font-semibold mb-1 text-sm uppercase tracking-wider text-muted-foreground">Workflow</h3>
-                  <div className="text-sm">
-                    <div className="flex justify-between py-2 border-b border-border/50">
-                      <span className="text-muted-foreground">Source</span>
-                      <span className="font-medium capitalize">{draft.source}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-border/50">
-                      <span className="text-muted-foreground">Created</span>
-                      <span className="font-medium">{format(new Date(draft.createdAt), "MMM d, h:mm a")}</span>
-                    </div>
-                    {draft.scheduledFor && (
-                      <div className="flex justify-between py-2 border-b border-border/50">
-                        <span className="text-muted-foreground">Scheduled</span>
-                        <span className="font-medium text-blue-600">{format(new Date(draft.scheduledFor), "MMM d, h:mm a")}</span>
-                      </div>
-                    )}
-                    {draft.publishedAt && (
-                      <div className="flex justify-between py-2 border-b border-border/50">
-                        <span className="text-muted-foreground">Published</span>
-                        <span className="font-medium text-green-600">{format(new Date(draft.publishedAt), "MMM d, h:mm a")}</span>
-                      </div>
-                    )}
-                  </div>
+              <div className="border border-border rounded-xl overflow-hidden">
+                <div className="px-4 py-3 bg-muted/40 border-b border-border">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Workflow</h3>
                 </div>
-
-                <div className="space-y-3">
-                  {draft.status === "pending" && (
-                    <>
-                      <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
-                        <DialogTrigger asChild>
-                          <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white">
-                            <CheckCircle className="w-4 h-4" />
-                            Approve...
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Approve Article</DialogTitle>
-                            <DialogDescription>
-                              You can publish this article immediately or schedule it for the future.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="py-4 space-y-4">
-                            <div className="flex flex-col space-y-2">
-                              <label className="text-sm font-medium">Schedule for later (optional)</label>
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                      "w-full justify-start text-left font-normal",
-                                      !scheduleDate && "text-muted-foreground"
-                                    )}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {scheduleDate ? format(scheduleDate, "PPP") : <span>Pick a date</span>}
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                  <Calendar
-                                    mode="single"
-                                    selected={scheduleDate}
-                                    onSelect={setScheduleDate}
-                                    initialFocus
-                                  />
-                                </PopoverContent>
-                              </Popover>
-                              {scheduleDate && (
-                                <p className="text-xs text-muted-foreground">Will schedule for 9:00 AM on the selected date.</p>
-                              )}
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsApproveOpen(false)}>Cancel</Button>
-                            <Button onClick={() => {
-                              const isoStr = scheduleDate ? new Date(scheduleDate.setHours(9, 0, 0, 0)).toISOString() : null;
-                              handleApprove(isoStr);
-                              setIsApproveOpen(false);
-                            }}>
-                              {scheduleDate ? "Schedule Article" : "Approve & Publish Now"}
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-
-                      <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
-                            <XCircle className="w-4 h-4" />
-                            Reject...
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Reject Article</DialogTitle>
-                            <DialogDescription>
-                              Provide a reason for rejecting this article. The author will see this.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="py-4">
-                            <Textarea 
-                              value={rejectionReason} 
-                              onChange={e => setRejectionReason(e.target.value)} 
-                              placeholder="Reason for rejection (optional)"
-                            />
-                          </div>
-                          <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsRejectOpen(false)}>Cancel</Button>
-                            <Button variant="destructive" onClick={() => {
-                              handleReject(rejectionReason);
-                              setIsRejectOpen(false);
-                            }}>Confirm Rejection</Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </>
-                  )}
-
-                  {draft.status === "approved" && (
-                    <Button className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white" onClick={handlePublish}>
-                      <Send className="w-4 h-4" />
-                      Publish Now
-                    </Button>
-                  )}
-
-                  {(draft.status === "approved" || draft.status === "published" || draft.status === "rejected") && (
-                    <Button variant="outline" className="w-full gap-2" onClick={handleUnpublish}>
-                      Move back to Pending
-                    </Button>
-                  )}
-
-                  {draft.status === "published" && (
-                    <Button variant="secondary" className="w-full gap-2" onClick={() => window.open(`/articles/${draft.slug}`, '_blank')}>
-                      <Globe className="w-4 h-4" />
-                      View Live Article
-                    </Button>
-                  )}
-
-                  <div className="pt-6 border-t border-border mt-6">
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10">
-                          <Trash2 className="w-4 h-4" />
-                          Delete Draft
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete this draft and remove the data from our servers.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction className="bg-destructive text-white" onClick={handleDelete}>Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                <div className="divide-y divide-border/60">
+                  <div className="flex justify-between px-4 py-2.5 text-sm">
+                    <span className="text-muted-foreground">Source</span>
+                    <span className="font-medium capitalize">{draft.source}</span>
                   </div>
-
+                  <div className="flex justify-between px-4 py-2.5 text-sm">
+                    <span className="text-muted-foreground">Created</span>
+                    <span className="font-medium">{format(new Date(draft.createdAt), "MMM d, h:mm a")}</span>
+                  </div>
+                  {draft.scheduledFor && (
+                    <div className="flex justify-between px-4 py-2.5 text-sm">
+                      <span className="text-muted-foreground">Scheduled</span>
+                      <span className="font-medium text-purple-600 dark:text-purple-400">{format(new Date(draft.scheduledFor), "MMM d, h:mm a")}</span>
+                    </div>
+                  )}
+                  {draft.publishedAt && (
+                    <div className="flex justify-between px-4 py-2.5 text-sm">
+                      <span className="text-muted-foreground">Published</span>
+                      <span className="font-medium text-green-600">{format(new Date(draft.publishedAt), "MMM d, h:mm a")}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
+            {/* Primary workflow actions */}
+            {!isNew && draft && (
+              <div className="space-y-2">
+                {/* Primary actions */}
+                {draft.status === "pending" && (
+                  <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full gap-2">
+                        <CheckCircle className="w-4 h-4" />
+                        Approve Article…
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Approve Article</DialogTitle>
+                        <DialogDescription>
+                          Publish immediately or schedule for a future date.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4 space-y-4">
+                        <div className="flex flex-col space-y-2">
+                          <label className="text-sm font-medium">Schedule for later (optional)</label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !scheduleDate && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {scheduleDate ? format(scheduleDate, "PPP") : <span>Pick a date</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={scheduleDate}
+                                onSelect={setScheduleDate}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          {scheduleDate && (
+                            <p className="text-xs text-muted-foreground">Will schedule for 9:00 AM on the selected date.</p>
+                          )}
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsApproveOpen(false)}>Cancel</Button>
+                        <Button onClick={() => {
+                          const isoStr = scheduleDate ? new Date(scheduleDate.setHours(9, 0, 0, 0)).toISOString() : null;
+                          handleApprove(isoStr);
+                          setIsApproveOpen(false);
+                        }}>
+                          {scheduleDate ? "Schedule Article" : "Approve & Publish Now"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                )}
+
+                {draft.status === "approved" && (
+                  <Button className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white border-0" onClick={handlePublish}>
+                    <Send className="w-4 h-4" />
+                    Publish Now
+                  </Button>
+                )}
+
+                {draft.status === "published" && (
+                  <Button variant="secondary" className="w-full gap-2" onClick={() => window.open(`/articles/${draft.slug}`, '_blank')}>
+                    <Globe className="w-4 h-4" />
+                    View Live Article
+                  </Button>
+                )}
+
+                {(draft.status === "approved" || draft.status === "published" || draft.status === "rejected") && (
+                  <Button variant="outline" className="w-full gap-2 text-sm" onClick={handleUnpublish}>
+                    Move back to Pending
+                  </Button>
+                )}
+
+                {/* Divider before destructive actions */}
+                <div className="pt-2 border-t border-border space-y-2">
+                  {draft.status === "pending" && (
+                    <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30">
+                          <XCircle className="w-4 h-4" />
+                          Reject Article…
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Reject Article</DialogTitle>
+                          <DialogDescription>
+                            Provide a reason for rejecting this article. The author will see this.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <Textarea 
+                            value={rejectionReason} 
+                            onChange={e => setRejectionReason(e.target.value)} 
+                            placeholder="Reason for rejection (optional)"
+                          />
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setIsRejectOpen(false)}>Cancel</Button>
+                          <Button variant="destructive" onClick={() => {
+                            handleReject(rejectionReason);
+                            setIsRejectOpen(false);
+                          }}>Confirm Rejection</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 text-sm">
+                        <Trash2 className="w-4 h-4" />
+                        Delete Draft
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this draft permanently?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This cannot be undone. The draft and all its data will be removed.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction className="bg-destructive text-white" onClick={handleDelete}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            )}
+
+            {/* AI SEO Panel — collapsible */}
             {!isNew && draft && draftId && (
-              <DraftEnginePanel
-                draftId={draftId}
-                onApplySeo={(proposal) => {
-                  if (proposal.seoTitle) {
-                    form.setValue("title", proposal.seoTitle, { shouldDirty: true });
-                  }
-                }}
-              />
+              <div className="border border-border rounded-xl overflow-hidden">
+                <button
+                  className="w-full flex items-center justify-between px-4 py-3 bg-muted/40 hover:bg-muted/60 transition-colors text-left"
+                  onClick={() => setSeoOpen((v) => !v)}
+                >
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">AI SEO Assist</span>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${seoOpen ? "rotate-180" : ""}`} />
+                </button>
+                {seoOpen && (
+                  <div className="p-4">
+                    <DraftEnginePanel
+                      draftId={draftId}
+                      onApplySeo={(proposal) => {
+                        if (proposal.seoTitle) {
+                          form.setValue("title", proposal.seoTitle, { shouldDirty: true });
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             )}
 
             {isNew && (
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
-                <h3 className="font-semibold text-primary mb-2">Save to enable workflow</h3>
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+                <h3 className="font-semibold text-primary mb-1 text-sm">Save to enable workflow</h3>
                 <p className="text-sm text-muted-foreground">
-                  Once you save this draft for the first time, you'll be able to approve, schedule, or publish it.
+                  Once saved, you'll be able to approve, schedule, or publish this draft.
                 </p>
               </div>
             )}

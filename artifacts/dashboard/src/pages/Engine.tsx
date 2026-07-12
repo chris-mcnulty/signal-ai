@@ -52,6 +52,7 @@ import {
   XCircle,
   PenSquare,
   ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -99,7 +100,7 @@ export default function Engine() {
           Research topics, generate concept briefs, and turn them into drafts for the review queue.
         </p>
       </div>
-      <div className="grid lg:grid-cols-2 gap-8 items-start mb-10">
+      <div className="grid lg:grid-cols-2 gap-6 items-start mb-10">
         <ResearchPanel />
         <IdeationPanel />
       </div>
@@ -160,8 +161,10 @@ function ResearchPanel() {
   return (
     <Card className="p-6 space-y-4">
       <div className="flex items-center gap-2">
-        <FlaskConical className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold">Research</h2>
+        <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
+          <FlaskConical className="w-4 h-4 text-primary" />
+        </div>
+        <h2 className="text-base font-semibold">Research</h2>
       </div>
       <p className="text-sm text-muted-foreground">
         Scans recent news and optionally crawls a seed site, then writes an intelligence briefing.
@@ -178,7 +181,7 @@ function ResearchPanel() {
           placeholder="Optional seed URL to crawl"
         />
         <Button
-          className="gap-2"
+          className="w-full gap-2"
           disabled={!topic.trim() || startResearch.isPending || poller.isActive}
           onClick={() =>
             startResearch.mutate({
@@ -189,29 +192,35 @@ function ResearchPanel() {
           {poller.isActive || startResearch.isPending ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              {poller.job?.status === "running" ? "Researching..." : "Starting..."}
+              {poller.job?.status === "running" ? "Researching…" : "Starting…"}
             </>
           ) : (
-            "Start research"
+            "Start Research"
           )}
         </Button>
       </div>
 
       <div className="pt-4 border-t border-border">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
           Briefings
         </h3>
         {isLoading ? (
           <div className="h-24 animate-pulse bg-muted rounded-md" />
         ) : !briefings || briefings.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No briefings yet.</p>
+          <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
+            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
+              <FlaskConical className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <p className="text-sm text-muted-foreground font-medium mb-0.5">No briefings yet</p>
+            <p className="text-xs text-muted-foreground">Run a research scan above to generate one.</p>
+          </div>
         ) : (
           <Accordion type="single" collapsible className="w-full">
             {briefings.map((b) => (
               <AccordionItem key={b.id} value={`b-${b.id}`}>
                 <AccordionTrigger className="text-left">
                   <div className="flex-1 min-w-0 pr-2">
-                    <span className="font-medium">{b.topic}</span>
+                    <span className="font-medium text-sm">{b.topic}</span>
                     <span className="text-xs text-muted-foreground ml-2">
                       {format(new Date(b.createdAt), "MMM d, h:mm a")}
                     </span>
@@ -223,7 +232,7 @@ function ResearchPanel() {
                   </div>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive">
+                      <Button variant="ghost" size="sm" className="gap-1 text-destructive hover:text-destructive hover:bg-destructive/10">
                         <Trash2 className="w-3.5 h-3.5" /> Delete briefing
                       </Button>
                     </AlertDialogTrigger>
@@ -297,8 +306,10 @@ function IdeationPanel() {
   return (
     <Card className="p-6 space-y-4">
       <div className="flex items-center gap-2">
-        <Lightbulb className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold">Ideation</h2>
+        <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
+          <Lightbulb className="w-4 h-4 text-primary" />
+        </div>
+        <h2 className="text-base font-semibold">Ideation</h2>
       </div>
       <p className="text-sm text-muted-foreground">
         Answers a short interview, then proposes 5–10 concept briefs judged against your brand voice.
@@ -343,7 +354,7 @@ function IdeationPanel() {
           </div>
         )}
         <Button
-          className="gap-2"
+          className="w-full gap-2"
           disabled={!goal.trim() || startIdeation.isPending || poller.isActive}
           onClick={() =>
             startIdeation.mutate({
@@ -360,10 +371,10 @@ function IdeationPanel() {
           {poller.isActive || startIdeation.isPending ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              {poller.job?.status === "running" ? "Generating briefs..." : "Starting..."}
+              {poller.job?.status === "running" ? "Generating briefs…" : "Starting…"}
             </>
           ) : (
-            "Generate concept briefs"
+            "Generate Concept Briefs"
           )}
         </Button>
       </div>
@@ -371,11 +382,23 @@ function IdeationPanel() {
   );
 }
 
-const BRIEF_STATUS_STYLES: Record<string, string> = {
-  proposed: "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300",
-  accepted: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300",
-  rejected: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
-  drafted: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300",
+const BRIEF_STATUS_CONFIG: Record<string, { className: string; label: string }> = {
+  proposed: {
+    className: "bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-900",
+    label: "Proposed",
+  },
+  accepted: {
+    className: "bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-900",
+    label: "Accepted",
+  },
+  rejected: {
+    className: "bg-red-100 text-red-700 border border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-900",
+    label: "Rejected",
+  },
+  drafted: {
+    className: "bg-green-100 text-green-700 border border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-900",
+    label: "Draft Ready",
+  },
 };
 
 function BriefsPanel() {
@@ -441,17 +464,28 @@ function BriefsPanel() {
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-4">
-        <PenSquare className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold">Concept briefs</h2>
+      <div className="flex items-center gap-2 mb-5">
+        <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
+          <PenSquare className="w-4 h-4 text-primary" />
+        </div>
+        <h2 className="text-lg font-semibold">Concept Briefs</h2>
+        {briefs && briefs.length > 0 && (
+          <span className="ml-1 text-xs font-medium bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
+            {briefs.length}
+          </span>
+        )}
       </div>
 
       {isLoading ? (
-        <div className="h-32 animate-pulse bg-muted rounded-md" />
+        <div className="h-32 animate-pulse bg-muted rounded-xl" />
       ) : !briefs || briefs.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed border-border rounded-xl">
-          <p className="text-muted-foreground">
-            No concept briefs yet. Run ideation above to generate some.
+          <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+            <Sparkles className="w-5 h-5 text-primary" />
+          </div>
+          <h3 className="text-base font-semibold mb-1">No concept briefs yet</h3>
+          <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+            Run <strong>Ideation</strong> above to generate a batch of content ideas tailored to your brand voice.
           </p>
         </div>
       ) : (
@@ -492,32 +526,39 @@ function BriefCard({
   onDraft: () => void;
 }) {
   const fit = brief.fitAssessment;
+  const statusConfig = BRIEF_STATUS_CONFIG[brief.status];
+
   return (
-    <Card className="p-5 flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${BRIEF_STATUS_STYLES[brief.status] ?? "bg-muted"}`}>
-              {brief.status}
-            </span>
-            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-              {brief.category}
-            </span>
-            {fit && (
-              <span
-                className="text-xs text-muted-foreground"
-                title={fit.rationale}
-              >
-                voice: {fit.voiceFit} · topic: {fit.topicFit} ·{" "}
-                {fit.recommendation === "keep" ? "recommended" : "not recommended"}
-              </span>
-            )}
-          </div>
-          <h3 className="font-semibold tracking-tight">{brief.title}</h3>
-        </div>
+    <Card className="p-5 flex flex-col gap-3 hover:border-primary/30 transition-colors">
+      {/* Header: status + category */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className={`text-xs px-2 py-0.5 rounded-md font-semibold ${statusConfig?.className ?? "bg-muted text-muted-foreground"}`}>
+          {statusConfig?.label ?? brief.status}
+        </span>
+        <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+          {brief.category}
+        </span>
+        {fit && (
+          <span
+            className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-md border ${
+              fit.recommendation === "keep"
+                ? "text-green-700 bg-green-50 border-green-200 dark:text-green-300 dark:bg-green-950 dark:border-green-900"
+                : "text-muted-foreground bg-muted border-border"
+            }`}
+            title={fit.rationale}
+          >
+            {fit.recommendation === "keep" ? "✓ Recommended" : "~ Not recommended"}
+          </span>
+        )}
       </div>
-      <p className="text-sm text-muted-foreground">{brief.summary}</p>
-      <p className="text-sm"><span className="font-medium">Angle:</span> {brief.angle}</p>
+
+      {/* Idea title — largest element */}
+      <h3 className="text-base font-bold tracking-tight leading-snug">{brief.title}</h3>
+
+      {/* Summary + angle */}
+      <p className="text-sm text-muted-foreground leading-relaxed">{brief.summary}</p>
+      <p className="text-sm"><span className="font-medium text-foreground">Angle:</span> {brief.angle}</p>
+
       {brief.keyPoints && brief.keyPoints.length > 0 && (
         <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-0.5">
           {brief.keyPoints.map((p, i) => (
@@ -525,40 +566,50 @@ function BriefCard({
           ))}
         </ul>
       )}
-      <div className="flex items-center gap-2 mt-auto pt-2 flex-wrap">
+
+      {/* Actions — Accept/Reject prominent, delete secondary */}
+      <div className="flex items-center gap-2 mt-auto pt-3 border-t border-border flex-wrap">
         {brief.status === "proposed" && (
           <>
-            <Button size="sm" variant="outline" className="gap-1" onClick={onAccept}>
-              <CheckCircle2 className="w-3.5 h-3.5" /> Accept
+            <Button size="sm" className="gap-1.5" onClick={onAccept}>
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Accept
             </Button>
-            <Button size="sm" variant="outline" className="gap-1 text-destructive hover:text-destructive" onClick={onReject}>
-              <XCircle className="w-3.5 h-3.5" /> Reject
+            <Button size="sm" variant="outline" className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30" onClick={onReject}>
+              <XCircle className="w-3.5 h-3.5" />
+              Reject
             </Button>
           </>
         )}
         {(brief.status === "proposed" || brief.status === "accepted") && (
-          <Button size="sm" className="gap-1" disabled={anyDrafting} onClick={onDraft}>
+          <Button
+            size="sm"
+            variant={brief.status === "accepted" ? "default" : "outline"}
+            className="gap-1.5"
+            disabled={anyDrafting}
+            onClick={onDraft}
+          >
             {isDrafting ? (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Writing draft...
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Writing…
               </>
             ) : (
               <>
-                <PenSquare className="w-3.5 h-3.5" /> Generate draft
+                <PenSquare className="w-3.5 h-3.5" /> Generate Draft
               </>
             )}
           </Button>
         )}
         {brief.status === "drafted" && brief.articleId && (
-          <Button size="sm" variant="secondary" asChild className="gap-1">
+          <Button size="sm" variant="secondary" asChild className="gap-1.5">
             <Link href={`/drafts/${brief.articleId}`}>
-              <ExternalLink className="w-3.5 h-3.5" /> Open draft
+              <ExternalLink className="w-3.5 h-3.5" /> Open Draft
             </Link>
           </Button>
         )}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive ml-auto">
+            <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 ml-auto">
               <Trash2 className="w-3.5 h-3.5" />
             </Button>
           </AlertDialogTrigger>

@@ -4,79 +4,62 @@ import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays } fr
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
+const NAV_LINKS = [
+  { href: "/queue", label: "Queue", icon: LayoutDashboard, matchPaths: ["/queue", "/"] },
+  { href: "/schedule", label: "Schedule", icon: CalendarDays, matchPaths: ["/schedule"] },
+  { href: "/seo", label: "SEO", icon: Globe, matchPaths: ["/seo"] },
+  { href: "/engine", label: "Engine", icon: Sparkles, matchPaths: ["/engine"] },
+  { href: "/voice", label: "Voice", icon: Mic2, matchPaths: ["/voice"] },
+];
+
 export function AppLayout({ children }: { children: ReactNode }) {
   const { logout } = useAuth();
   const [location] = useLocation();
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary selection:text-white">
-      <header className="sticky top-0 z-50 px-6 h-14 flex items-center border-b border-border bg-background/80 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 px-6 h-14 flex items-center border-b border-border bg-background/90 backdrop-blur-md">
         <div className="flex items-center gap-6">
-          <Link href="/queue" className="flex items-center gap-2 font-bold tracking-tight text-lg hover:text-primary transition-colors">
+          <Link href="/queue" className="flex items-center gap-2 font-bold tracking-tight text-lg hover:text-primary transition-colors shrink-0">
             <div className="w-5 h-5 bg-primary rounded-sm flex items-center justify-center">
-              <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+              <div className="w-1.5 h-1.5 bg-white rounded-full" />
             </div>
             SignalAI
           </Link>
 
-          <nav className="flex items-center gap-1">
-            <Link
-              href="/queue"
-              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
-                location === "/queue" || location === "/" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              }`}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Queue
-            </Link>
-            <Link
-              href="/schedule"
-              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
-                location === "/schedule" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              }`}
-            >
-              <CalendarDays className="w-4 h-4" />
-              Scheduled
-            </Link>
-            <Link
-              href="/seo"
-              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
-                location === "/seo" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              }`}
-            >
-              <Globe className="w-4 h-4" />
-              SEO
-            </Link>
-            <Link
-              href="/engine"
-              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
-                location === "/engine" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              Engine
-            </Link>
-            <Link
-              href="/voice"
-              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
-                location === "/voice" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-              }`}
-            >
-              <Mic2 className="w-4 h-4" />
-              Voice
-            </Link>
+          <nav className="flex items-center gap-0.5">
+            {NAV_LINKS.map(({ href, label, icon: Icon, matchPaths }) => {
+              const isActive = matchPaths.some((p) => location === p);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`relative h-9 px-3.5 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
+                    isActive
+                      ? "text-foreground bg-secondary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-primary rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
-        <div className="ml-auto flex items-center gap-4">
-          <Button variant="default" size="sm" asChild className="gap-2">
+        <div className="ml-auto flex items-center gap-3">
+          <Button variant="default" size="sm" asChild className="gap-1.5 shadow-sm font-semibold">
             <Link href="/drafts/new">
               <Plus className="w-4 h-4" />
               New Draft
             </Link>
           </Button>
 
-          <div className="w-px h-6 bg-border mx-1"></div>
+          <div className="w-px h-5 bg-border" />
 
           <button
             onClick={logout}

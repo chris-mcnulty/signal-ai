@@ -40,10 +40,19 @@ import {
   CalendarDays,
   Pencil,
   ChevronRight,
+  Plus,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type TabValue = "all" | "scheduled" | ArticleStatus;
+
+const STATUS_BORDER: Record<string, string> = {
+  pending: "bg-orange-400",
+  approved: "bg-blue-400",
+  published: "bg-green-400",
+  rejected: "bg-red-400",
+};
 
 export default function Queue({ initialTab = "all" }: { initialTab?: TabValue }) {
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
@@ -126,7 +135,7 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mb-1">Editorial Queue</h1>
-          <p className="text-muted-foreground">Manage and review articles before publishing.</p>
+          <p className="text-muted-foreground">Review, approve, and schedule articles for publishing.</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -155,7 +164,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           label="Scheduled"
           value="scheduled"
           count={scheduledCount}
-          icon={<CalendarDays className="w-4 h-4 text-purple-500" />}
+          icon={<CalendarDays className="w-3.5 h-3.5" />}
+          accentColor="text-purple-500"
           active={activeTab === "scheduled"}
           onClick={() => setActiveTab("scheduled")}
         />
@@ -163,7 +173,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           label="Pending"
           value="pending"
           count={summary?.pending}
-          icon={<Clock className="w-4 h-4 text-orange-500" />}
+          icon={<Clock className="w-3.5 h-3.5" />}
+          accentColor="text-orange-500"
           active={activeTab === "pending"}
           onClick={() => setActiveTab("pending")}
         />
@@ -171,7 +182,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           label="Approved"
           value="approved"
           count={summary?.approved}
-          icon={<CheckCircle2 className="w-4 h-4 text-blue-500" />}
+          icon={<CheckCircle2 className="w-3.5 h-3.5" />}
+          accentColor="text-blue-500"
           active={activeTab === "approved"}
           onClick={() => setActiveTab("approved")}
         />
@@ -179,7 +191,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           label="Published"
           value="published"
           count={summary?.published}
-          icon={<CheckCircle2 className="w-4 h-4 text-green-500" />}
+          icon={<CheckCircle2 className="w-3.5 h-3.5" />}
+          accentColor="text-green-500"
           active={activeTab === "published"}
           onClick={() => setActiveTab("published")}
         />
@@ -187,16 +200,17 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           label="Rejected"
           value="rejected"
           count={summary?.rejected}
-          icon={<XCircle className="w-4 h-4 text-red-500" />}
+          icon={<XCircle className="w-3.5 h-3.5" />}
+          accentColor="text-red-500"
           active={activeTab === "rejected"}
           onClick={() => setActiveTab("rejected")}
         />
       </div>
 
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i} className="p-6 h-32 animate-pulse bg-muted/50 border-0" />
+            <Card key={i} className="p-5 h-24 animate-pulse bg-muted/50 border-0" />
           ))}
         </div>
       ) : activeTab === "scheduled" ? (
@@ -210,87 +224,75 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           }}
         />
       ) : filteredDrafts.length === 0 ? (
-        <div className="text-center py-24 border-2 border-dashed border-border rounded-xl">
-          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-            <LayoutGrid className="w-8 h-8 text-muted-foreground" />
-          </div>
-          <h3 className="text-lg font-medium mb-1">No drafts found</h3>
-          <p className="text-muted-foreground">
-            {searchQuery ? "Try a different search term." : "The queue is currently empty."}
-          </p>
-        </div>
+        <QueueEmptyState tab={activeTab} searchQuery={searchQuery} />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredDrafts.map((draft, i) => (
             <Link key={draft.id} href={`/drafts/${draft.id}`}>
               <Card
-                className="group relative overflow-hidden transition-all hover:shadow-md hover:border-primary/50 cursor-pointer p-0 animate-in fade-in slide-in-from-bottom-4"
-                style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+                className="group relative overflow-hidden transition-all hover:shadow-md hover:border-primary/40 cursor-pointer p-0 animate-in fade-in slide-in-from-bottom-4"
+                style={{ animationDelay: `${i * 40}ms`, animationFillMode: "both" }}
               >
-                <div className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                {/* Status accent bar */}
+                <div
+                  className={`absolute left-0 top-0 bottom-0 w-1.5 ${STATUS_BORDER[draft.status] ?? "bg-muted-foreground"}`}
+                />
+
+                <div className="pl-5 pr-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
                   {draft.imageUrl && (
-                    <div className="w-full sm:w-24 h-16 bg-muted rounded-md overflow-hidden shrink-0 hidden sm:block">
+                    <div className="w-full sm:w-20 h-14 bg-muted rounded-md overflow-hidden shrink-0 hidden sm:block">
                       <img src={draft.imageUrl} alt="" className="w-full h-full object-cover" />
                     </div>
                   )}
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
+                    {/* Status + meta row */}
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <DraftStatusBadge status={draft.status} />
                       <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
                         {draft.category}
                       </span>
                       {draft.source === "api" ? (
-                        <span className="text-xs text-muted-foreground flex items-center gap-1" title="Received from API">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Bot className="w-3 h-3" /> API
                         </span>
                       ) : (
-                        <span className="text-xs text-muted-foreground flex items-center gap-1" title="Written manually">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <User className="w-3 h-3" /> Manual
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg font-semibold tracking-tight truncate group-hover:text-primary transition-colors">
+
+                    <h3 className="text-base font-semibold tracking-tight truncate group-hover:text-primary transition-colors">
                       {draft.title}
                     </h3>
                     {draft.excerpt && (
-                      <p className="text-sm text-muted-foreground line-clamp-1 mt-1">{draft.excerpt}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{draft.excerpt}</p>
                     )}
                   </div>
 
-                  <div className="flex sm:flex-col items-center sm:items-end gap-3 text-sm text-muted-foreground shrink-0 mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-border">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5" />
-                      {format(new Date(draft.updatedAt), "MMM d, h:mm a")}
+                  <div className="flex sm:flex-col items-center sm:items-end gap-2 text-xs text-muted-foreground shrink-0 mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-border">
+                    <div className="flex items-center gap-1" title={format(new Date(draft.updatedAt), "PPPp")}>
+                      <Clock className="w-3 h-3" />
+                      {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true })}
                     </div>
                     {draft.scheduledFor && draft.status === "approved" && (
-                      <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-medium">
-                        <CalendarDays className="w-3.5 h-3.5" />
-                        Sched: {format(new Date(draft.scheduledFor), "MMM d, h:mm a")}
+                      <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium">
+                        <CalendarDays className="w-3 h-3" />
+                        {format(new Date(draft.scheduledFor), "MMM d")}
                       </div>
                     )}
                     {draft.status === "rejected" && draft.rejectionReason && (
                       <div
-                        className="text-red-600 dark:text-red-400 text-xs max-w-[150px] truncate"
+                        className="text-red-500 text-xs max-w-[140px] truncate italic"
                         title={draft.rejectionReason}
                       >
                         "{draft.rejectionReason}"
                       </div>
                     )}
+                    <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity sm:block hidden" />
                   </div>
                 </div>
-
-                <div
-                  className={`absolute left-0 top-0 bottom-0 w-1 ${
-                    draft.status === "pending"
-                      ? "bg-orange-400"
-                      : draft.status === "approved"
-                      ? "bg-blue-400"
-                      : draft.status === "published"
-                      ? "bg-green-400"
-                      : "bg-red-400"
-                  }`}
-                />
               </Card>
             </Link>
           ))}
@@ -350,6 +352,82 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
   );
 }
 
+function QueueEmptyState({ tab, searchQuery }: { tab: TabValue; searchQuery: string }) {
+  if (searchQuery) {
+    return (
+      <div className="text-center py-20 border-2 border-dashed border-border rounded-xl">
+        <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+          <Search className="w-5 h-5 text-muted-foreground" />
+        </div>
+        <h3 className="text-base font-semibold mb-1">No matches for "{searchQuery}"</h3>
+        <p className="text-sm text-muted-foreground">Try a different search term or clear the filter.</p>
+      </div>
+    );
+  }
+
+  const emptyConfig: Record<TabValue, { icon: React.ReactNode; title: string; body: React.ReactNode }> = {
+    all: {
+      icon: <LayoutGrid className="w-5 h-5 text-primary" />,
+      title: "Queue is empty",
+      body: (
+        <>
+          No drafts yet.{" "}
+          <Link href="/drafts/new" className="text-primary font-medium hover:underline inline-flex items-center gap-1">
+            <Plus className="w-3.5 h-3.5" /> Write a new draft
+          </Link>{" "}
+          or{" "}
+          <Link href="/engine" className="text-primary font-medium hover:underline inline-flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5" /> generate ideas in the Engine
+          </Link>.
+        </>
+      ),
+    },
+    scheduled: {
+      icon: <CalendarDays className="w-5 h-5 text-purple-500" />,
+      title: "Nothing scheduled",
+      body: "Approve an article with a future date to see it here.",
+    },
+    pending: {
+      icon: <Clock className="w-5 h-5 text-orange-500" />,
+      title: "No pending drafts",
+      body: (
+        <>
+          All caught up.{" "}
+          <Link href="/drafts/new" className="text-primary font-medium hover:underline">Write a new draft</Link>{" "}
+          to add to the review queue.
+        </>
+      ),
+    },
+    approved: {
+      icon: <CheckCircle2 className="w-5 h-5 text-blue-500" />,
+      title: "No approved drafts",
+      body: "Approve a pending draft to move it into this view.",
+    },
+    published: {
+      icon: <Send className="w-5 h-5 text-green-500" />,
+      title: "Nothing published yet",
+      body: "Approved articles will appear here once published.",
+    },
+    rejected: {
+      icon: <XCircle className="w-5 h-5 text-red-500" />,
+      title: "No rejected drafts",
+      body: "Drafts marked as rejected will appear here.",
+    },
+  };
+
+  const config = emptyConfig[tab] ?? emptyConfig.all;
+
+  return (
+    <div className="text-center py-20 border-2 border-dashed border-border rounded-xl">
+      <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+        {config.icon}
+      </div>
+      <h3 className="text-base font-semibold mb-1">{config.title}</h3>
+      <p className="text-sm text-muted-foreground max-w-sm mx-auto">{config.body}</p>
+    </div>
+  );
+}
+
 type ScheduledDraft = {
   id: number;
   title: string;
@@ -372,12 +450,12 @@ function ScheduledView({
 }) {
   if (drafts.length === 0) {
     return (
-      <div className="text-center py-24 border-2 border-dashed border-border rounded-xl">
-        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-          <CalendarDays className="w-8 h-8 text-muted-foreground" />
+      <div className="text-center py-20 border-2 border-dashed border-border rounded-xl">
+        <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
+          <CalendarDays className="w-5 h-5 text-purple-500" />
         </div>
-        <h3 className="text-lg font-medium mb-1">Nothing scheduled</h3>
-        <p className="text-muted-foreground">
+        <h3 className="text-base font-semibold mb-1">Nothing scheduled</h3>
+        <p className="text-sm text-muted-foreground">
           Approve an article with a future date to see it here.
         </p>
       </div>
@@ -385,7 +463,7 @@ function ScheduledView({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {drafts.map((draft, i) => {
         const goLive = new Date(draft.scheduledFor!);
         const timeUntil = formatDistanceToNow(goLive, { addSuffix: true });
@@ -394,20 +472,20 @@ function ScheduledView({
           <Card
             key={draft.id}
             className="relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 p-0"
-            style={{ animationDelay: `${i * 50}ms`, animationFillMode: "both" }}
+            style={{ animationDelay: `${i * 40}ms`, animationFillMode: "both" }}
           >
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-400" />
+            <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-400" />
 
-            <div className="p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="pl-5 pr-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
               {draft.imageUrl && (
-                <div className="w-full sm:w-24 h-16 bg-muted rounded-md overflow-hidden shrink-0 hidden sm:block">
+                <div className="w-full sm:w-20 h-14 bg-muted rounded-md overflow-hidden shrink-0 hidden sm:block">
                   <img src={draft.imageUrl} alt="" className="w-full h-full object-cover" />
                 </div>
               )}
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-900 px-2 py-0.5 rounded-md">
                     <CalendarDays className="w-3 h-3" />
                     Scheduled
                   </span>
@@ -415,19 +493,19 @@ function ScheduledView({
                     {draft.category}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold tracking-tight truncate">
+                <h3 className="text-base font-semibold tracking-tight truncate">
                   {draft.title}
                 </h3>
                 {draft.excerpt && (
-                  <p className="text-sm text-muted-foreground line-clamp-1 mt-1">{draft.excerpt}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{draft.excerpt}</p>
                 )}
-                <div className="flex items-center gap-4 mt-2 text-sm">
-                  <span className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-medium">
-                    <CalendarIcon className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-4 mt-1.5 text-xs">
+                  <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium">
+                    <CalendarIcon className="w-3 h-3" />
                     {format(goLive, "EEE, MMM d · h:mm a")}
                   </span>
                   <span className="text-muted-foreground flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5" />
+                    <Clock className="w-3 h-3" />
                     {timeUntil}
                   </span>
                 </div>
@@ -445,7 +523,7 @@ function ScheduledView({
                 </Button>
                 <Button
                   size="sm"
-                  className="gap-1.5 bg-green-600 hover:bg-green-700 text-white"
+                  className="gap-1.5 bg-green-600 hover:bg-green-700 text-white border-0"
                   disabled={isPublishing}
                   onClick={() => onPublishNow(draft.id)}
                 >
@@ -472,6 +550,7 @@ function StatusTab({
   value,
   count,
   icon,
+  accentColor,
   active,
   onClick,
 }: {
@@ -479,22 +558,27 @@ function StatusTab({
   value: string;
   count?: number;
   icon?: React.ReactNode;
+  accentColor?: string;
   active: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all ${
         active
-          ? "bg-foreground text-background shadow-md"
-          : "bg-background border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+          ? "bg-foreground text-background shadow-sm"
+          : `bg-background border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground`
       }`}
     >
-      {icon}
+      {icon && (
+        <span className={active ? "text-background/70" : (accentColor ?? "")}>
+          {icon}
+        </span>
+      )}
       {label}
       {count !== undefined && (
-        <span className={`px-1.5 py-0.5 rounded-full text-xs ${active ? "bg-background/20" : "bg-muted"}`}>
+        <span className={`px-1.5 py-0.5 rounded-full text-xs leading-none ${active ? "bg-background/20 text-background" : "bg-muted text-muted-foreground"}`}>
           {count}
         </span>
       )}
