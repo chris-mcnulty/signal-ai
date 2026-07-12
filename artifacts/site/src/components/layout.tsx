@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useListArticles } from "@workspace/api-client-react";
 import {
   Sheet,
@@ -63,23 +63,14 @@ export function NetworkError({
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const debouncedQuery = useDebounce(query, 200);
+  const debouncedQuery = useDebounce(query, 300);
 
-  const { data: articles } = useListArticles(
-    {},
-    { query: { enabled: open, staleTime: 60_000 } },
+  const trimmedQuery = debouncedQuery.trim();
+
+  const { data: results } = useListArticles(
+    trimmedQuery ? { q: trimmedQuery } : {},
+    { query: { enabled: open && !!trimmedQuery, staleTime: 30_000 } },
   );
-
-  const results = useMemo(() => {
-    if (!articles || !debouncedQuery.trim()) return null;
-    const q = debouncedQuery.toLowerCase();
-    return articles.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.dek.toLowerCase().includes(q) ||
-        a.category.toLowerCase().includes(q),
-    );
-  }, [articles, debouncedQuery]);
 
   useEffect(() => {
     if (open) {
@@ -142,7 +133,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             </div>
           )}
 
-          {results && results.length > 0 && (
+          {trimmedQuery && results && results.length > 0 && (
             <ul className="search-result-list" role="list">
               {results.map((article) => (
                 <li key={article.slug} className="search-result-item">

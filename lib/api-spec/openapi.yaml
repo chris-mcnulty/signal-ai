@@ -45,6 +45,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: q
+          in: query
+          required: false
+          description: Full-text search query matched against title and dek
+          schema:
+            type: string
       responses:
         "200":
           description: List of articles

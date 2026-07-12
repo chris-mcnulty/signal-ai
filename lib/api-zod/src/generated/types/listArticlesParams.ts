@@ -8,4 +8,8 @@
 
 export type ListArticlesParams = {
 category?: string;
+/**
+ * Full-text search query matched against title and dek
+ */
+q?: string;
 };

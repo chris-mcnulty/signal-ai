@@ -1,6 +1,6 @@
 import { db, articlesTable, caseStudiesTable, articleRelationsTable } from "@workspace/db";
 import type { Article, CaseStudy } from "@workspace/db";
-import { desc, eq, and, inArray } from "drizzle-orm";
+import { desc, eq, and, inArray, or, ilike } from "drizzle-orm";
 import { promoteDueArticles } from "./articles";
 
 export const CASE_STUDY_CATEGORY = "case-study";
@@ -12,17 +12,26 @@ export type CaseStudyWithArticle = {
 
 export async function listPublishedArticles(
   category?: string,
+  q?: string,
 ): Promise<Article[]> {
   await promoteDueArticles();
   const published = eq(articlesTable.status, "published");
+  const categoryFilter = category
+    ? eq(articlesTable.category, category)
+    : undefined;
+  const searchFilter = q
+    ? or(
+        ilike(articlesTable.title, `%${q}%`),
+        ilike(articlesTable.dek, `%${q}%`),
+      )
+    : undefined;
+  const filters = [published, categoryFilter, searchFilter].filter(
+    Boolean,
+  ) as Parameters<typeof and>;
   return db
     .select()
     .from(articlesTable)
-    .where(
-      category
-        ? and(published, eq(articlesTable.category, category))
-        : published,
-    )
+    .where(filters.length > 1 ? and(...filters) : filters[0])
     .orderBy(desc(articlesTable.publishedAt));
 }
 

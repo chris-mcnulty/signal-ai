@@ -26,7 +26,7 @@ router.get("/articles", async (req, res): Promise<void> => {
     res.status(400).json({ error: query.error.message });
     return;
   }
-  const articles = await listPublishedArticles(query.data.category);
+  const articles = await listPublishedArticles(query.data.category, query.data.q);
   res.json(ListArticlesResponse.parse(articles.map(toArticleSummary)));
 });
 

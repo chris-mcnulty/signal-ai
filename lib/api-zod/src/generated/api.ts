@@ -21,7 +21,8 @@ export const HealthCheckResponse = zod.object({
  * @summary List published articles
  */
 export const ListArticlesQueryParams = zod.object({
-  "category": zod.coerce.string().optional()
+  "category": zod.coerce.string().optional(),
+  "q": zod.coerce.string().optional().describe('Full-text search query matched against title and dek')
 })
 
 export const ListArticlesResponseItem = zod.object({
