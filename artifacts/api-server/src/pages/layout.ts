@@ -16,6 +16,7 @@ main{max-width:800px;margin:0 auto;padding:48px 24px 80px}
 h1.headline{font-size:clamp(34px,6vw,54px);line-height:1.07;letter-spacing:-.01em;margin:20px 0 16px;font-weight:800}
 .dek{font-size:21px;color:var(--muted);line-height:1.5;margin-bottom:28px}
 .byline{font-size:13px;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:36px}
+.hero-rule{border:none;border-top:3px solid var(--ink);margin:0 0 20px}
 .hero-image{margin:0 0 36px;overflow:hidden;border:1px solid var(--line)}
 .hero-image img{width:100%;max-height:420px;object-fit:cover;display:block}
 .sources{border-top:1px solid var(--line);margin-top:36px;padding-top:20px}
@@ -37,6 +38,7 @@ h1.headline{font-size:clamp(34px,6vw,54px);line-height:1.07;letter-spacing:-.01e
 .metric .label{font-size:11px;font-weight:700;margin-top:6px}
 .metric .context{font-size:12px;color:var(--muted);margin-top:4px}
 .article-body p{margin-bottom:24px;font-size:18px;line-height:1.8}
+.article-body p:first-child::first-letter{font-size:5.5rem;font-weight:900;float:left;line-height:0.82;margin-right:0.1em;margin-top:0.05em;color:var(--accent)}
 .article-body h2{font-size:27px;margin:44px 0 14px;font-weight:800}
 blockquote{border-left:4px solid var(--accent);padding-left:22px;margin:36px 0;font-style:italic;font-size:24px;line-height:1.45;color:var(--accent)}
 blockquote footer{font-style:normal;font-size:13px;color:var(--muted);margin-top:10px}

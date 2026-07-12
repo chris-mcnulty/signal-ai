@@ -254,6 +254,7 @@ ${article.sourceUrls
   const body = `<main>
 <article>
 <span class="kicker mono">Case Study</span><span class="meta mono">${escapeHtml(formatDate(article.publishedAt ?? article.createdAt))} · ${article.readingMinutes} min read</span>
+<hr class="hero-rule">
 <h1 class="headline">${escapeHtml(article.title)}</h1>
 <p class="dek">${escapeHtml(article.dek)}</p>
 <div class="byline mono">By ${escapeHtml(article.author)} · ${escapeHtml(SITE.name)}</div>
