@@ -4,12 +4,14 @@ import contentRouter from "./content";
 import articlesRouter from "./articles";
 import draftsRouter from "./drafts";
 import seoRouter from "./seo";
+import engineRouter from "./engine";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(contentRouter);
 router.use(articlesRouter);
+router.use(engineRouter);
 router.use(draftsRouter);
 router.use(seoRouter);
 

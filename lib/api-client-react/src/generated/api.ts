@@ -27,26 +27,41 @@ import type {
   ArticleInput,
   ArticleSummary,
   ArticleUpdate,
+  BrandVoice,
+  BrandVoiceInput,
+  BriefUpdate,
   CaseStudyDetail,
   CaseStudySummary,
+  ContentBrief,
   DraftsSummary,
+  EngineJob,
   ErrorMessage,
   ErrorResponse,
   GenerateDraftRequest,
+  GroundingDocument,
+  GroundingDocumentInput,
   HealthStatus,
+  IdeationRequest,
   ListArticlesParams,
+  ListBriefsParams,
   ListDraftsParams,
+  ListEngineJobsParams,
   ListSeoCoverageUrlsParams,
   RejectionOptions,
+  RepurposeRequest,
+  ResearchBriefing,
+  ResearchRequest,
   SeoAuditReport,
   SeoAutofillRequest,
   SeoAutofillResult,
   SeoCoverageOverview,
   SeoCoverageUrlRow,
+  SeoOptimization,
   SeoScanResult,
   SeoSubmissionRow,
   SeoSubmitBundle,
   SeoSubmitRequest,
+  SocialVariant,
   SubmitDraftRequest
 } from './api.schemas';
 
@@ -1878,5 +1893,1495 @@ export const useRunSeoCoverageScan = <TError = ErrorType<ErrorMessage>,
         TContext
       > => {
       return useMutation(getRunSeoCoverageScanMutationOptions(options));
+    }
+
+export const getGetBrandVoiceUrl = () => {
+
+
+
+
+  return `/api/voice`
+}
+
+/**
+ * @summary Get the publication's brand voice profile
+ */
+export const getBrandVoice = async ( options?: RequestInit): Promise<BrandVoice> => {
+
+  return customFetch<BrandVoice>(getGetBrandVoiceUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBrandVoiceQueryKey = () => {
+    return [
+    `/api/voice`
+    ] as const;
+    }
+
+
+export const getGetBrandVoiceQueryOptions = <TData = Awaited<ReturnType<typeof getBrandVoice>>, TError = ErrorType<ErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBrandVoice>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBrandVoiceQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBrandVoice>>> = ({ signal }) => getBrandVoice({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBrandVoice>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBrandVoiceQueryResult = NonNullable<Awaited<ReturnType<typeof getBrandVoice>>>
+export type GetBrandVoiceQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Get the publication's brand voice profile
+ */
+
+export function useGetBrandVoice<TData = Awaited<ReturnType<typeof getBrandVoice>>, TError = ErrorType<ErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBrandVoice>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBrandVoiceQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateBrandVoiceUrl = () => {
+
+
+
+
+  return `/api/voice`
+}
+
+/**
+ * @summary Update the publication's brand voice profile
+ */
+export const updateBrandVoice = async (brandVoiceInput: BrandVoiceInput, options?: RequestInit): Promise<BrandVoice> => {
+
+  return customFetch<BrandVoice>(getUpdateBrandVoiceUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(brandVoiceInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateBrandVoiceMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBrandVoice>>, TError,{data: BodyType<BrandVoiceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateBrandVoice>>, TError,{data: BodyType<BrandVoiceInput>}, TContext> => {
+
+const mutationKey = ['updateBrandVoice'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateBrandVoice>>, {data: BodyType<BrandVoiceInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateBrandVoice(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateBrandVoiceMutationResult = NonNullable<Awaited<ReturnType<typeof updateBrandVoice>>>
+    export type UpdateBrandVoiceMutationBody = BodyType<BrandVoiceInput>
+    export type UpdateBrandVoiceMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Update the publication's brand voice profile
+ */
+export const useUpdateBrandVoice = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBrandVoice>>, TError,{data: BodyType<BrandVoiceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateBrandVoice>>,
+        TError,
+        {data: BodyType<BrandVoiceInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateBrandVoiceMutationOptions(options));
+    }
+
+export const getListGroundingDocumentsUrl = () => {
+
+
+
+
+  return `/api/grounding-documents`
+}
+
+/**
+ * @summary List grounding documents that steer AI generation
+ */
+export const listGroundingDocuments = async ( options?: RequestInit): Promise<GroundingDocument[]> => {
+
+  return customFetch<GroundingDocument[]>(getListGroundingDocumentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListGroundingDocumentsQueryKey = () => {
+    return [
+    `/api/grounding-documents`
+    ] as const;
+    }
+
+
+export const getListGroundingDocumentsQueryOptions = <TData = Awaited<ReturnType<typeof listGroundingDocuments>>, TError = ErrorType<ErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listGroundingDocuments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListGroundingDocumentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listGroundingDocuments>>> = ({ signal }) => listGroundingDocuments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listGroundingDocuments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListGroundingDocumentsQueryResult = NonNullable<Awaited<ReturnType<typeof listGroundingDocuments>>>
+export type ListGroundingDocumentsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary List grounding documents that steer AI generation
+ */
+
+export function useListGroundingDocuments<TData = Awaited<ReturnType<typeof listGroundingDocuments>>, TError = ErrorType<ErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listGroundingDocuments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListGroundingDocumentsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateGroundingDocumentUrl = () => {
+
+
+
+
+  return `/api/grounding-documents`
+}
+
+/**
+ * @summary Add a grounding document (pasted text)
+ */
+export const createGroundingDocument = async (groundingDocumentInput: GroundingDocumentInput, options?: RequestInit): Promise<GroundingDocument> => {
+
+  return customFetch<GroundingDocument>(getCreateGroundingDocumentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(groundingDocumentInput)
+  }
+);}
+
+
+
+
+
+export const getCreateGroundingDocumentMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGroundingDocument>>, TError,{data: BodyType<GroundingDocumentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createGroundingDocument>>, TError,{data: BodyType<GroundingDocumentInput>}, TContext> => {
+
+const mutationKey = ['createGroundingDocument'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createGroundingDocument>>, {data: BodyType<GroundingDocumentInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createGroundingDocument(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateGroundingDocumentMutationResult = NonNullable<Awaited<ReturnType<typeof createGroundingDocument>>>
+    export type CreateGroundingDocumentMutationBody = BodyType<GroundingDocumentInput>
+    export type CreateGroundingDocumentMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Add a grounding document (pasted text)
+ */
+export const useCreateGroundingDocument = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createGroundingDocument>>, TError,{data: BodyType<GroundingDocumentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createGroundingDocument>>,
+        TError,
+        {data: BodyType<GroundingDocumentInput>},
+        TContext
+      > => {
+      return useMutation(getCreateGroundingDocumentMutationOptions(options));
+    }
+
+export const getDeleteGroundingDocumentUrl = (id: number,) => {
+
+
+
+
+  return `/api/grounding-documents/${id}`
+}
+
+/**
+ * @summary Delete a grounding document
+ */
+export const deleteGroundingDocument = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteGroundingDocumentUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteGroundingDocumentMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGroundingDocument>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteGroundingDocument>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteGroundingDocument'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteGroundingDocument>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteGroundingDocument(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteGroundingDocumentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteGroundingDocument>>>
+
+    export type DeleteGroundingDocumentMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Delete a grounding document
+ */
+export const useDeleteGroundingDocument = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteGroundingDocument>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteGroundingDocument>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteGroundingDocumentMutationOptions(options));
+    }
+
+export const getStartResearchUrl = () => {
+
+
+
+
+  return `/api/research`
+}
+
+/**
+ * @summary Start an async research job (crawl + news scan + AI briefing)
+ */
+export const startResearch = async (researchRequest: ResearchRequest, options?: RequestInit): Promise<EngineJob> => {
+
+  return customFetch<EngineJob>(getStartResearchUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(researchRequest)
+  }
+);}
+
+
+
+
+
+export const getStartResearchMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startResearch>>, TError,{data: BodyType<ResearchRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startResearch>>, TError,{data: BodyType<ResearchRequest>}, TContext> => {
+
+const mutationKey = ['startResearch'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startResearch>>, {data: BodyType<ResearchRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  startResearch(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartResearchMutationResult = NonNullable<Awaited<ReturnType<typeof startResearch>>>
+    export type StartResearchMutationBody = BodyType<ResearchRequest>
+    export type StartResearchMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Start an async research job (crawl + news scan + AI briefing)
+ */
+export const useStartResearch = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startResearch>>, TError,{data: BodyType<ResearchRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof startResearch>>,
+        TError,
+        {data: BodyType<ResearchRequest>},
+        TContext
+      > => {
+      return useMutation(getStartResearchMutationOptions(options));
+    }
+
+export const getListBriefingsUrl = () => {
+
+
+
+
+  return `/api/research/briefings`
+}
+
+/**
+ * @summary List completed research briefings
+ */
+export const listBriefings = async ( options?: RequestInit): Promise<ResearchBriefing[]> => {
+
+  return customFetch<ResearchBriefing[]>(getListBriefingsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBriefingsQueryKey = () => {
+    return [
+    `/api/research/briefings`
+    ] as const;
+    }
+
+
+export const getListBriefingsQueryOptions = <TData = Awaited<ReturnType<typeof listBriefings>>, TError = ErrorType<ErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBriefings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBriefingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBriefings>>> = ({ signal }) => listBriefings({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBriefings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListBriefingsQueryResult = NonNullable<Awaited<ReturnType<typeof listBriefings>>>
+export type ListBriefingsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary List completed research briefings
+ */
+
+export function useListBriefings<TData = Awaited<ReturnType<typeof listBriefings>>, TError = ErrorType<ErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBriefings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListBriefingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetBriefingUrl = (id: number,) => {
+
+
+
+
+  return `/api/research/briefings/${id}`
+}
+
+/**
+ * @summary Get a research briefing
+ */
+export const getBriefing = async (id: number, options?: RequestInit): Promise<ResearchBriefing> => {
+
+  return customFetch<ResearchBriefing>(getGetBriefingUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetBriefingQueryKey = (id: number,) => {
+    return [
+    `/api/research/briefings/${id}`
+    ] as const;
+    }
+
+
+export const getGetBriefingQueryOptions = <TData = Awaited<ReturnType<typeof getBriefing>>, TError = ErrorType<ErrorMessage>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBriefing>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBriefingQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBriefing>>> = ({ signal }) => getBriefing(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBriefing>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetBriefingQueryResult = NonNullable<Awaited<ReturnType<typeof getBriefing>>>
+export type GetBriefingQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Get a research briefing
+ */
+
+export function useGetBriefing<TData = Awaited<ReturnType<typeof getBriefing>>, TError = ErrorType<ErrorMessage>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getBriefing>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetBriefingQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDeleteBriefingUrl = (id: number,) => {
+
+
+
+
+  return `/api/research/briefings/${id}`
+}
+
+/**
+ * @summary Delete a research briefing
+ */
+export const deleteBriefing = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteBriefingUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteBriefingMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBriefing>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteBriefing>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteBriefing'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteBriefing>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteBriefing(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteBriefingMutationResult = NonNullable<Awaited<ReturnType<typeof deleteBriefing>>>
+
+    export type DeleteBriefingMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Delete a research briefing
+ */
+export const useDeleteBriefing = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBriefing>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteBriefing>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteBriefingMutationOptions(options));
+    }
+
+export const getListEngineJobsUrl = (params?: ListEngineJobsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/jobs?${stringifiedParams}` : `/api/jobs`
+}
+
+/**
+ * @summary List recent engine jobs
+ */
+export const listEngineJobs = async (params?: ListEngineJobsParams, options?: RequestInit): Promise<EngineJob[]> => {
+
+  return customFetch<EngineJob[]>(getListEngineJobsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListEngineJobsQueryKey = (params?: ListEngineJobsParams,) => {
+    return [
+    `/api/jobs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListEngineJobsQueryOptions = <TData = Awaited<ReturnType<typeof listEngineJobs>>, TError = ErrorType<ErrorMessage>>(params?: ListEngineJobsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEngineJobs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListEngineJobsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listEngineJobs>>> = ({ signal }) => listEngineJobs(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listEngineJobs>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListEngineJobsQueryResult = NonNullable<Awaited<ReturnType<typeof listEngineJobs>>>
+export type ListEngineJobsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary List recent engine jobs
+ */
+
+export function useListEngineJobs<TData = Awaited<ReturnType<typeof listEngineJobs>>, TError = ErrorType<ErrorMessage>>(
+ params?: ListEngineJobsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listEngineJobs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListEngineJobsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetEngineJobUrl = (id: number,) => {
+
+
+
+
+  return `/api/jobs/${id}`
+}
+
+/**
+ * @summary Poll an engine job's status and result
+ */
+export const getEngineJob = async (id: number, options?: RequestInit): Promise<EngineJob> => {
+
+  return customFetch<EngineJob>(getGetEngineJobUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEngineJobQueryKey = (id: number,) => {
+    return [
+    `/api/jobs/${id}`
+    ] as const;
+    }
+
+
+export const getGetEngineJobQueryOptions = <TData = Awaited<ReturnType<typeof getEngineJob>>, TError = ErrorType<ErrorMessage>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEngineJob>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEngineJobQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEngineJob>>> = ({ signal }) => getEngineJob(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEngineJob>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEngineJobQueryResult = NonNullable<Awaited<ReturnType<typeof getEngineJob>>>
+export type GetEngineJobQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Poll an engine job's status and result
+ */
+
+export function useGetEngineJob<TData = Awaited<ReturnType<typeof getEngineJob>>, TError = ErrorType<ErrorMessage>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEngineJob>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEngineJobQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getStartIdeationUrl = () => {
+
+
+
+
+  return `/api/ideation`
+}
+
+/**
+ * @summary Start an async ideation job producing 5-10 concept briefs
+ */
+export const startIdeation = async (ideationRequest: IdeationRequest, options?: RequestInit): Promise<EngineJob> => {
+
+  return customFetch<EngineJob>(getStartIdeationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(ideationRequest)
+  }
+);}
+
+
+
+
+
+export const getStartIdeationMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startIdeation>>, TError,{data: BodyType<IdeationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startIdeation>>, TError,{data: BodyType<IdeationRequest>}, TContext> => {
+
+const mutationKey = ['startIdeation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startIdeation>>, {data: BodyType<IdeationRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  startIdeation(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartIdeationMutationResult = NonNullable<Awaited<ReturnType<typeof startIdeation>>>
+    export type StartIdeationMutationBody = BodyType<IdeationRequest>
+    export type StartIdeationMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Start an async ideation job producing 5-10 concept briefs
+ */
+export const useStartIdeation = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startIdeation>>, TError,{data: BodyType<IdeationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof startIdeation>>,
+        TError,
+        {data: BodyType<IdeationRequest>},
+        TContext
+      > => {
+      return useMutation(getStartIdeationMutationOptions(options));
+    }
+
+export const getListBriefsUrl = (params?: ListBriefsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/briefs?${stringifiedParams}` : `/api/briefs`
+}
+
+/**
+ * @summary List concept briefs, optionally filtered by status
+ */
+export const listBriefs = async (params?: ListBriefsParams, options?: RequestInit): Promise<ContentBrief[]> => {
+
+  return customFetch<ContentBrief[]>(getListBriefsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListBriefsQueryKey = (params?: ListBriefsParams,) => {
+    return [
+    `/api/briefs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListBriefsQueryOptions = <TData = Awaited<ReturnType<typeof listBriefs>>, TError = ErrorType<ErrorMessage>>(params?: ListBriefsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBriefs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListBriefsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listBriefs>>> = ({ signal }) => listBriefs(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listBriefs>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListBriefsQueryResult = NonNullable<Awaited<ReturnType<typeof listBriefs>>>
+export type ListBriefsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary List concept briefs, optionally filtered by status
+ */
+
+export function useListBriefs<TData = Awaited<ReturnType<typeof listBriefs>>, TError = ErrorType<ErrorMessage>>(
+ params?: ListBriefsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listBriefs>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListBriefsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateBriefUrl = (id: number,) => {
+
+
+
+
+  return `/api/briefs/${id}`
+}
+
+/**
+ * @summary Accept or reject a concept brief
+ */
+export const updateBrief = async (id: number,
+    briefUpdate: BriefUpdate, options?: RequestInit): Promise<ContentBrief> => {
+
+  return customFetch<ContentBrief>(getUpdateBriefUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(briefUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateBriefMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBrief>>, TError,{id: number;data: BodyType<BriefUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateBrief>>, TError,{id: number;data: BodyType<BriefUpdate>}, TContext> => {
+
+const mutationKey = ['updateBrief'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateBrief>>, {id: number;data: BodyType<BriefUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateBrief(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateBriefMutationResult = NonNullable<Awaited<ReturnType<typeof updateBrief>>>
+    export type UpdateBriefMutationBody = BodyType<BriefUpdate>
+    export type UpdateBriefMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Accept or reject a concept brief
+ */
+export const useUpdateBrief = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateBrief>>, TError,{id: number;data: BodyType<BriefUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateBrief>>,
+        TError,
+        {id: number;data: BodyType<BriefUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateBriefMutationOptions(options));
+    }
+
+export const getDeleteBriefUrl = (id: number,) => {
+
+
+
+
+  return `/api/briefs/${id}`
+}
+
+/**
+ * @summary Delete a concept brief
+ */
+export const deleteBrief = async (id: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getDeleteBriefUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteBriefMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBrief>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteBrief>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteBrief'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteBrief>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteBrief(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteBriefMutationResult = NonNullable<Awaited<ReturnType<typeof deleteBrief>>>
+
+    export type DeleteBriefMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Delete a concept brief
+ */
+export const useDeleteBrief = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteBrief>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteBrief>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteBriefMutationOptions(options));
+    }
+
+export const getDraftFromBriefUrl = (id: number,) => {
+
+
+
+
+  return `/api/briefs/${id}/draft`
+}
+
+/**
+ * @summary Start an async copywriter job turning a brief into a pending-review draft
+ */
+export const draftFromBrief = async (id: number, options?: RequestInit): Promise<EngineJob> => {
+
+  return customFetch<EngineJob>(getDraftFromBriefUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDraftFromBriefMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof draftFromBrief>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof draftFromBrief>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['draftFromBrief'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof draftFromBrief>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  draftFromBrief(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DraftFromBriefMutationResult = NonNullable<Awaited<ReturnType<typeof draftFromBrief>>>
+
+    export type DraftFromBriefMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Start an async copywriter job turning a brief into a pending-review draft
+ */
+export const useDraftFromBrief = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof draftFromBrief>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof draftFromBrief>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDraftFromBriefMutationOptions(options));
+    }
+
+export const getListSocialVariantsUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/social-variants`
+}
+
+/**
+ * @summary List social post variants generated for an article
+ */
+export const listSocialVariants = async (id: number, options?: RequestInit): Promise<SocialVariant[]> => {
+
+  return customFetch<SocialVariant[]>(getListSocialVariantsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSocialVariantsQueryKey = (id: number,) => {
+    return [
+    `/api/drafts/${id}/social-variants`
+    ] as const;
+    }
+
+
+export const getListSocialVariantsQueryOptions = <TData = Awaited<ReturnType<typeof listSocialVariants>>, TError = ErrorType<ErrorMessage>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSocialVariants>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSocialVariantsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSocialVariants>>> = ({ signal }) => listSocialVariants(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSocialVariants>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSocialVariantsQueryResult = NonNullable<Awaited<ReturnType<typeof listSocialVariants>>>
+export type ListSocialVariantsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary List social post variants generated for an article
+ */
+
+export function useListSocialVariants<TData = Awaited<ReturnType<typeof listSocialVariants>>, TError = ErrorType<ErrorMessage>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSocialVariants>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSocialVariantsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRepurposeDraftUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/social-variants`
+}
+
+/**
+ * @summary Generate social post variants for an article (replaces the previous batch)
+ */
+export const repurposeDraft = async (id: number,
+    repurposeRequest: RepurposeRequest, options?: RequestInit): Promise<SocialVariant[]> => {
+
+  return customFetch<SocialVariant[]>(getRepurposeDraftUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(repurposeRequest)
+  }
+);}
+
+
+
+
+
+export const getRepurposeDraftMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof repurposeDraft>>, TError,{id: number;data: BodyType<RepurposeRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof repurposeDraft>>, TError,{id: number;data: BodyType<RepurposeRequest>}, TContext> => {
+
+const mutationKey = ['repurposeDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof repurposeDraft>>, {id: number;data: BodyType<RepurposeRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  repurposeDraft(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RepurposeDraftMutationResult = NonNullable<Awaited<ReturnType<typeof repurposeDraft>>>
+    export type RepurposeDraftMutationBody = BodyType<RepurposeRequest>
+    export type RepurposeDraftMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Generate social post variants for an article (replaces the previous batch)
+ */
+export const useRepurposeDraft = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof repurposeDraft>>, TError,{id: number;data: BodyType<RepurposeRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof repurposeDraft>>,
+        TError,
+        {id: number;data: BodyType<RepurposeRequest>},
+        TContext
+      > => {
+      return useMutation(getRepurposeDraftMutationOptions(options));
+    }
+
+export const getExportSocialVariantsCsvUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/social-variants/export`
+}
+
+/**
+ * @summary Export an article's social variants as CSV
+ */
+export const exportSocialVariantsCsv = async (id: number, options?: RequestInit): Promise<string> => {
+
+  return customFetch<string>(getExportSocialVariantsCsvUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getExportSocialVariantsCsvQueryKey = (id: number,) => {
+    return [
+    `/api/drafts/${id}/social-variants/export`
+    ] as const;
+    }
+
+
+export const getExportSocialVariantsCsvQueryOptions = <TData = Awaited<ReturnType<typeof exportSocialVariantsCsv>>, TError = ErrorType<ErrorMessage>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportSocialVariantsCsv>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportSocialVariantsCsvQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportSocialVariantsCsv>>> = ({ signal }) => exportSocialVariantsCsv(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportSocialVariantsCsv>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ExportSocialVariantsCsvQueryResult = NonNullable<Awaited<ReturnType<typeof exportSocialVariantsCsv>>>
+export type ExportSocialVariantsCsvQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Export an article's social variants as CSV
+ */
+
+export function useExportSocialVariantsCsv<TData = Awaited<ReturnType<typeof exportSocialVariantsCsv>>, TError = ErrorType<ErrorMessage>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof exportSocialVariantsCsv>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getExportSocialVariantsCsvQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSeoOptimizeDraftUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/seo-optimize`
+}
+
+/**
+ * @summary Propose SEO/AEO improvements for an article (metadata guardrails + validated internal links)
+ */
+export const seoOptimizeDraft = async (id: number, options?: RequestInit): Promise<SeoOptimization> => {
+
+  return customFetch<SeoOptimization>(getSeoOptimizeDraftUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getSeoOptimizeDraftMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof seoOptimizeDraft>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof seoOptimizeDraft>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['seoOptimizeDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof seoOptimizeDraft>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  seoOptimizeDraft(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SeoOptimizeDraftMutationResult = NonNullable<Awaited<ReturnType<typeof seoOptimizeDraft>>>
+
+    export type SeoOptimizeDraftMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Propose SEO/AEO improvements for an article (metadata guardrails + validated internal links)
+ */
+export const useSeoOptimizeDraft = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof seoOptimizeDraft>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof seoOptimizeDraft>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getSeoOptimizeDraftMutationOptions(options));
     }
 

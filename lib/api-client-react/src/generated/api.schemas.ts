@@ -376,6 +376,342 @@ export interface SeoScanResult {
   skipped: boolean;
 }
 
+export interface BrandVoice {
+  id: number;
+  brandName: string;
+  description: string;
+  audience: string;
+  tone: string;
+  styleGuidelines: string;
+  positioning: string;
+  /** @nullable */
+  preferredPhrases: string[] | null;
+  /** @nullable */
+  forbiddenPhrases: string[] | null;
+  updatedAt: string;
+}
+
+export interface BrandVoiceInput {
+  /** @maxLength 200 */
+  brandName?: string;
+  /** @maxLength 5000 */
+  description?: string;
+  /** @maxLength 2000 */
+  audience?: string;
+  /** @maxLength 2000 */
+  tone?: string;
+  /** @maxLength 5000 */
+  styleGuidelines?: string;
+  /** @maxLength 2000 */
+  positioning?: string;
+  preferredPhrases?: string[];
+  forbiddenPhrases?: string[];
+}
+
+export type GroundingDocumentContextTag = typeof GroundingDocumentContextTag[keyof typeof GroundingDocumentContextTag];
+
+
+export const GroundingDocumentContextTag = {
+  general: 'general',
+  messaging_framework: 'messaging_framework',
+  style_guide: 'style_guide',
+  product: 'product',
+} as const;
+
+export interface GroundingDocument {
+  id: number;
+  name: string;
+  content: string;
+  contextTag: GroundingDocumentContextTag;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type GroundingDocumentInputContextTag = typeof GroundingDocumentInputContextTag[keyof typeof GroundingDocumentInputContextTag];
+
+
+export const GroundingDocumentInputContextTag = {
+  general: 'general',
+  messaging_framework: 'messaging_framework',
+  style_guide: 'style_guide',
+  product: 'product',
+} as const;
+
+export interface GroundingDocumentInput {
+  /**
+     * @minLength 1
+     * @maxLength 300
+     */
+  name: string;
+  /**
+     * @minLength 1
+     * @maxLength 100000
+     */
+  content: string;
+  contextTag?: GroundingDocumentInputContextTag;
+}
+
+export type EngineJobKind = typeof EngineJobKind[keyof typeof EngineJobKind];
+
+
+export const EngineJobKind = {
+  research: 'research',
+  ideation: 'ideation',
+  copywrite: 'copywrite',
+} as const;
+
+export type EngineJobStatus = typeof EngineJobStatus[keyof typeof EngineJobStatus];
+
+
+export const EngineJobStatus = {
+  queued: 'queued',
+  running: 'running',
+  completed: 'completed',
+  failed: 'failed',
+} as const;
+
+/**
+ * @nullable
+ */
+export type EngineJobInput = { [key: string]: unknown } | null;
+
+/**
+ * @nullable
+ */
+export type EngineJobResult = { [key: string]: unknown } | null;
+
+export interface EngineJob {
+  id: number;
+  kind: EngineJobKind;
+  status: EngineJobStatus;
+  /** @nullable */
+  input: EngineJobInput;
+  /** @nullable */
+  result: EngineJobResult;
+  /** @nullable */
+  error: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResearchRequest {
+  /**
+     * The topic to research
+     * @minLength 1
+     * @maxLength 500
+     */
+  topic: string;
+  /**
+     * Optional seed URL to crawl for grounding content
+     * @maxLength 2000
+     */
+  url?: string;
+}
+
+/**
+ * @nullable
+ */
+export type ResearchBriefingSources = { [key: string]: unknown } | null;
+
+export interface ResearchBriefing {
+  id: number;
+  topic: string;
+  /** @nullable */
+  url: string | null;
+  briefing: string;
+  /** @nullable */
+  sources: ResearchBriefingSources;
+  /** @nullable */
+  model: string | null;
+  createdAt: string;
+}
+
+export interface IdeationRequest {
+  /**
+     * What this content push should achieve
+     * @minLength 1
+     * @maxLength 2000
+     */
+  goal: string;
+  /**
+     * General themes to push
+     * @items.maxLength 200
+     */
+  themes?: string[];
+  /**
+     * Optional audience override (defaults to brand voice audience)
+     * @maxLength 1000
+     */
+  audience?: string;
+  /** @maxLength 5000 */
+  notes?: string;
+  /**
+     * How many concept briefs to generate (5-10)
+     * @minimum 5
+     * @maximum 10
+     */
+  briefCount?: number;
+  /** Research briefings to ground the ideation in */
+  briefingIds?: number[];
+}
+
+export type FitAssessmentVoiceFit = typeof FitAssessmentVoiceFit[keyof typeof FitAssessmentVoiceFit];
+
+
+export const FitAssessmentVoiceFit = {
+  strong: 'strong',
+  moderate: 'moderate',
+  weak: 'weak',
+} as const;
+
+export type FitAssessmentTopicFit = typeof FitAssessmentTopicFit[keyof typeof FitAssessmentTopicFit];
+
+
+export const FitAssessmentTopicFit = {
+  strong: 'strong',
+  moderate: 'moderate',
+  weak: 'weak',
+} as const;
+
+export type FitAssessmentRecommendation = typeof FitAssessmentRecommendation[keyof typeof FitAssessmentRecommendation];
+
+
+export const FitAssessmentRecommendation = {
+  keep: 'keep',
+  reject: 'reject',
+} as const;
+
+export interface FitAssessment {
+  voiceFit: FitAssessmentVoiceFit;
+  topicFit: FitAssessmentTopicFit;
+  recommendation: FitAssessmentRecommendation;
+  rationale: string;
+}
+
+export type ContentBriefStatus = typeof ContentBriefStatus[keyof typeof ContentBriefStatus];
+
+
+export const ContentBriefStatus = {
+  proposed: 'proposed',
+  accepted: 'accepted',
+  rejected: 'rejected',
+  drafted: 'drafted',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ContentBriefInterview = { [key: string]: unknown } | null;
+
+export interface ContentBrief {
+  id: number;
+  title: string;
+  summary: string;
+  angle: string;
+  /** @nullable */
+  keyPoints: string[] | null;
+  audience: string;
+  category: string;
+  fitAssessment: FitAssessment | null;
+  status: ContentBriefStatus;
+  /** @nullable */
+  interview: ContentBriefInterview;
+  /** @nullable */
+  briefingId: number | null;
+  /** @nullable */
+  articleId: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type BriefUpdateStatus = typeof BriefUpdateStatus[keyof typeof BriefUpdateStatus];
+
+
+export const BriefUpdateStatus = {
+  accepted: 'accepted',
+  rejected: 'rejected',
+} as const;
+
+export interface BriefUpdate {
+  status: BriefUpdateStatus;
+}
+
+export type SocialVariantPlatform = typeof SocialVariantPlatform[keyof typeof SocialVariantPlatform];
+
+
+export const SocialVariantPlatform = {
+  linkedin: 'linkedin',
+  twitter: 'twitter',
+  instagram: 'instagram',
+  facebook: 'facebook',
+} as const;
+
+export interface SocialVariant {
+  id: number;
+  articleId: number;
+  platform: SocialVariantPlatform;
+  content: string;
+  /** @nullable */
+  angle: string | null;
+  charCount: number;
+  createdAt: string;
+}
+
+export type RepurposeRequestPlatformsItem = typeof RepurposeRequestPlatformsItem[keyof typeof RepurposeRequestPlatformsItem];
+
+
+export const RepurposeRequestPlatformsItem = {
+  linkedin: 'linkedin',
+  twitter: 'twitter',
+  instagram: 'instagram',
+  facebook: 'facebook',
+} as const;
+
+export interface RepurposeRequest {
+  /** @minItems 1 */
+  platforms: RepurposeRequestPlatformsItem[];
+  /**
+     * Variants per platform (default 1)
+     * @minimum 1
+     * @maximum 3
+     */
+  perPlatform?: number;
+}
+
+export interface InternalLinkSuggestion {
+  anchorText: string;
+  targetArticleId: number;
+  targetSlug: string;
+  targetTitle: string;
+  reason: string;
+}
+
+export interface OptimizationQA {
+  question: string;
+  answer: string;
+}
+
+export interface SeoOptimization {
+  /**
+     * Proposed title, clamped to 60 chars
+     * @nullable
+     */
+  seoTitle: string | null;
+  /**
+     * Proposed meta description, clamped to 155 chars
+     * @nullable
+     */
+  metaDescription: string | null;
+  /** @nullable */
+  slug: string | null;
+  /** @nullable */
+  targetKeyword: string | null;
+  keywords: string[];
+  faq: OptimizationQA[];
+  internalLinks: InternalLinkSuggestion[];
+  contentGaps: string[];
+}
+
 export type ListArticlesParams = {
 category?: string;
 };
@@ -399,4 +735,26 @@ kind?: string;
 bucket?: string;
 limit?: number;
 };
+
+export type ListEngineJobsParams = {
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+};
+
+export type ListBriefsParams = {
+status?: ListBriefsStatus;
+};
+
+export type ListBriefsStatus = typeof ListBriefsStatus[keyof typeof ListBriefsStatus];
+
+
+export const ListBriefsStatus = {
+  proposed: 'proposed',
+  accepted: 'accepted',
+  rejected: 'rejected',
+  drafted: 'drafted',
+} as const;
 

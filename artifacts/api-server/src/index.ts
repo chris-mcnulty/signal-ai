@@ -3,6 +3,7 @@ import { logger } from "./lib/logger";
 import { startSeoNotifier } from "./lib/indexnow";
 import { logSeoBootStatus } from "./lib/seoSubmit";
 import { startCoverageScheduler } from "./lib/seoCoverage";
+import { initEngine } from "./engine";
 
 const rawPort = process.env["PORT"];
 
@@ -28,4 +29,5 @@ app.listen(port, (err) => {
   logSeoBootStatus();
   startSeoNotifier();
   startCoverageScheduler();
+  initEngine();
 });

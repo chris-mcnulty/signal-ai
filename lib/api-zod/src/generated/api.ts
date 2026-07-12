@@ -621,3 +621,440 @@ export const RunSeoCoverageScanResponse = zod.object({
 })
 
 
+/**
+ * @summary Get the publication's brand voice profile
+ */
+export const GetBrandVoiceResponse = zod.object({
+  "id": zod.number(),
+  "brandName": zod.string(),
+  "description": zod.string(),
+  "audience": zod.string(),
+  "tone": zod.string(),
+  "styleGuidelines": zod.string(),
+  "positioning": zod.string(),
+  "preferredPhrases": zod.array(zod.string()).nullable(),
+  "forbiddenPhrases": zod.array(zod.string()).nullable(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Update the publication's brand voice profile
+ */
+export const updateBrandVoiceBodyBrandNameMax = 200;
+
+export const updateBrandVoiceBodyDescriptionMax = 5000;
+
+export const updateBrandVoiceBodyAudienceMax = 2000;
+
+export const updateBrandVoiceBodyToneMax = 2000;
+
+export const updateBrandVoiceBodyStyleGuidelinesMax = 5000;
+
+export const updateBrandVoiceBodyPositioningMax = 2000;
+
+
+
+export const UpdateBrandVoiceBody = zod.object({
+  "brandName": zod.string().max(updateBrandVoiceBodyBrandNameMax).optional(),
+  "description": zod.string().max(updateBrandVoiceBodyDescriptionMax).optional(),
+  "audience": zod.string().max(updateBrandVoiceBodyAudienceMax).optional(),
+  "tone": zod.string().max(updateBrandVoiceBodyToneMax).optional(),
+  "styleGuidelines": zod.string().max(updateBrandVoiceBodyStyleGuidelinesMax).optional(),
+  "positioning": zod.string().max(updateBrandVoiceBodyPositioningMax).optional(),
+  "preferredPhrases": zod.array(zod.string()).optional(),
+  "forbiddenPhrases": zod.array(zod.string()).optional()
+})
+
+export const UpdateBrandVoiceResponse = zod.object({
+  "id": zod.number(),
+  "brandName": zod.string(),
+  "description": zod.string(),
+  "audience": zod.string(),
+  "tone": zod.string(),
+  "styleGuidelines": zod.string(),
+  "positioning": zod.string(),
+  "preferredPhrases": zod.array(zod.string()).nullable(),
+  "forbiddenPhrases": zod.array(zod.string()).nullable(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List grounding documents that steer AI generation
+ */
+export const ListGroundingDocumentsResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "content": zod.string(),
+  "contextTag": zod.enum(['general', 'messaging_framework', 'style_guide', 'product']),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListGroundingDocumentsResponse = zod.array(ListGroundingDocumentsResponseItem)
+
+
+/**
+ * @summary Add a grounding document (pasted text)
+ */
+export const createGroundingDocumentBodyNameMax = 300;
+
+export const createGroundingDocumentBodyContentMax = 100000;
+
+
+
+export const CreateGroundingDocumentBody = zod.object({
+  "name": zod.string().min(1).max(createGroundingDocumentBodyNameMax),
+  "content": zod.string().min(1).max(createGroundingDocumentBodyContentMax),
+  "contextTag": zod.enum(['general', 'messaging_framework', 'style_guide', 'product']).optional()
+})
+
+export const CreateGroundingDocumentResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "content": zod.string(),
+  "contextTag": zod.enum(['general', 'messaging_framework', 'style_guide', 'product']),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a grounding document
+ */
+export const DeleteGroundingDocumentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteGroundingDocumentResponse = zod.void()
+
+
+/**
+ * @summary Start an async research job (crawl + news scan + AI briefing)
+ */
+export const startResearchBodyTopicMax = 500;
+
+export const startResearchBodyUrlMax = 2000;
+
+
+
+export const StartResearchBody = zod.object({
+  "topic": zod.string().min(1).max(startResearchBodyTopicMax).describe('The topic to research'),
+  "url": zod.string().max(startResearchBodyUrlMax).optional().describe('Optional seed URL to crawl for grounding content')
+})
+
+export const StartResearchResponse = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['research', 'ideation', 'copywrite']),
+  "status": zod.enum(['queued', 'running', 'completed', 'failed']),
+  "input": zod.record(zod.string(), zod.unknown()).nullable(),
+  "result": zod.record(zod.string(), zod.unknown()).nullable(),
+  "error": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List completed research briefings
+ */
+export const ListBriefingsResponseItem = zod.object({
+  "id": zod.number(),
+  "topic": zod.string(),
+  "url": zod.string().nullable(),
+  "briefing": zod.string(),
+  "sources": zod.record(zod.string(), zod.unknown()).nullable(),
+  "model": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+})
+export const ListBriefingsResponse = zod.array(ListBriefingsResponseItem)
+
+
+/**
+ * @summary Get a research briefing
+ */
+export const GetBriefingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetBriefingResponse = zod.object({
+  "id": zod.number(),
+  "topic": zod.string(),
+  "url": zod.string().nullable(),
+  "briefing": zod.string(),
+  "sources": zod.record(zod.string(), zod.unknown()).nullable(),
+  "model": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a research briefing
+ */
+export const DeleteBriefingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteBriefingResponse = zod.void()
+
+
+/**
+ * @summary List recent engine jobs
+ */
+export const listEngineJobsQueryLimitMax = 100;
+
+
+
+export const ListEngineJobsQueryParams = zod.object({
+  "limit": zod.coerce.number().min(1).max(listEngineJobsQueryLimitMax).optional()
+})
+
+export const ListEngineJobsResponseItem = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['research', 'ideation', 'copywrite']),
+  "status": zod.enum(['queued', 'running', 'completed', 'failed']),
+  "input": zod.record(zod.string(), zod.unknown()).nullable(),
+  "result": zod.record(zod.string(), zod.unknown()).nullable(),
+  "error": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListEngineJobsResponse = zod.array(ListEngineJobsResponseItem)
+
+
+/**
+ * @summary Poll an engine job's status and result
+ */
+export const GetEngineJobParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetEngineJobResponse = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['research', 'ideation', 'copywrite']),
+  "status": zod.enum(['queued', 'running', 'completed', 'failed']),
+  "input": zod.record(zod.string(), zod.unknown()).nullable(),
+  "result": zod.record(zod.string(), zod.unknown()).nullable(),
+  "error": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Start an async ideation job producing 5-10 concept briefs
+ */
+export const startIdeationBodyGoalMax = 2000;
+
+export const startIdeationBodyThemesItemMax = 200;
+
+export const startIdeationBodyAudienceMax = 1000;
+
+export const startIdeationBodyNotesMax = 5000;
+
+export const startIdeationBodyBriefCountMin = 5;
+export const startIdeationBodyBriefCountMax = 10;
+
+
+
+export const StartIdeationBody = zod.object({
+  "goal": zod.string().min(1).max(startIdeationBodyGoalMax).describe('What this content push should achieve'),
+  "themes": zod.array(zod.string().max(startIdeationBodyThemesItemMax)).optional().describe('General themes to push'),
+  "audience": zod.string().max(startIdeationBodyAudienceMax).optional().describe('Optional audience override (defaults to brand voice audience)'),
+  "notes": zod.string().max(startIdeationBodyNotesMax).optional(),
+  "briefCount": zod.number().min(startIdeationBodyBriefCountMin).max(startIdeationBodyBriefCountMax).optional().describe('How many concept briefs to generate (5-10)'),
+  "briefingIds": zod.array(zod.number()).optional().describe('Research briefings to ground the ideation in')
+})
+
+export const StartIdeationResponse = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['research', 'ideation', 'copywrite']),
+  "status": zod.enum(['queued', 'running', 'completed', 'failed']),
+  "input": zod.record(zod.string(), zod.unknown()).nullable(),
+  "result": zod.record(zod.string(), zod.unknown()).nullable(),
+  "error": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List concept briefs, optionally filtered by status
+ */
+export const ListBriefsQueryParams = zod.object({
+  "status": zod.enum(['proposed', 'accepted', 'rejected', 'drafted']).optional()
+})
+
+export const ListBriefsResponseItem = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string(),
+  "angle": zod.string(),
+  "keyPoints": zod.array(zod.string()).nullable(),
+  "audience": zod.string(),
+  "category": zod.string(),
+  "fitAssessment": zod.union([zod.object({
+  "voiceFit": zod.enum(['strong', 'moderate', 'weak']),
+  "topicFit": zod.enum(['strong', 'moderate', 'weak']),
+  "recommendation": zod.enum(['keep', 'reject']),
+  "rationale": zod.string()
+}),zod.null()]),
+  "status": zod.enum(['proposed', 'accepted', 'rejected', 'drafted']),
+  "interview": zod.record(zod.string(), zod.unknown()).nullable(),
+  "briefingId": zod.number().nullable(),
+  "articleId": zod.number().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListBriefsResponse = zod.array(ListBriefsResponseItem)
+
+
+/**
+ * @summary Accept or reject a concept brief
+ */
+export const UpdateBriefParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateBriefBody = zod.object({
+  "status": zod.enum(['accepted', 'rejected'])
+})
+
+export const UpdateBriefResponse = zod.object({
+  "id": zod.number(),
+  "title": zod.string(),
+  "summary": zod.string(),
+  "angle": zod.string(),
+  "keyPoints": zod.array(zod.string()).nullable(),
+  "audience": zod.string(),
+  "category": zod.string(),
+  "fitAssessment": zod.union([zod.object({
+  "voiceFit": zod.enum(['strong', 'moderate', 'weak']),
+  "topicFit": zod.enum(['strong', 'moderate', 'weak']),
+  "recommendation": zod.enum(['keep', 'reject']),
+  "rationale": zod.string()
+}),zod.null()]),
+  "status": zod.enum(['proposed', 'accepted', 'rejected', 'drafted']),
+  "interview": zod.record(zod.string(), zod.unknown()).nullable(),
+  "briefingId": zod.number().nullable(),
+  "articleId": zod.number().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a concept brief
+ */
+export const DeleteBriefParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteBriefResponse = zod.void()
+
+
+/**
+ * @summary Start an async copywriter job turning a brief into a pending-review draft
+ */
+export const DraftFromBriefParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DraftFromBriefResponse = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['research', 'ideation', 'copywrite']),
+  "status": zod.enum(['queued', 'running', 'completed', 'failed']),
+  "input": zod.record(zod.string(), zod.unknown()).nullable(),
+  "result": zod.record(zod.string(), zod.unknown()).nullable(),
+  "error": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List social post variants generated for an article
+ */
+export const ListSocialVariantsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListSocialVariantsResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "platform": zod.enum(['linkedin', 'twitter', 'instagram', 'facebook']),
+  "content": zod.string(),
+  "angle": zod.string().nullable(),
+  "charCount": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const ListSocialVariantsResponse = zod.array(ListSocialVariantsResponseItem)
+
+
+/**
+ * @summary Generate social post variants for an article (replaces the previous batch)
+ */
+export const RepurposeDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+export const repurposeDraftBodyPerPlatformMax = 3;
+
+
+
+export const RepurposeDraftBody = zod.object({
+  "platforms": zod.array(zod.enum(['linkedin', 'twitter', 'instagram', 'facebook'])).min(1),
+  "perPlatform": zod.number().min(1).max(repurposeDraftBodyPerPlatformMax).optional().describe('Variants per platform (default 1)')
+})
+
+export const RepurposeDraftResponseItem = zod.object({
+  "id": zod.number(),
+  "articleId": zod.number(),
+  "platform": zod.enum(['linkedin', 'twitter', 'instagram', 'facebook']),
+  "content": zod.string(),
+  "angle": zod.string().nullable(),
+  "charCount": zod.number(),
+  "createdAt": zod.coerce.date()
+})
+export const RepurposeDraftResponse = zod.array(RepurposeDraftResponseItem)
+
+
+/**
+ * @summary Export an article's social variants as CSV
+ */
+export const ExportSocialVariantsCsvParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ExportSocialVariantsCsvResponse = zod.unknown()
+
+
+/**
+ * @summary Propose SEO/AEO improvements for an article (metadata guardrails + validated internal links)
+ */
+export const SeoOptimizeDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SeoOptimizeDraftResponse = zod.object({
+  "seoTitle": zod.string().nullable().describe('Proposed title, clamped to 60 chars'),
+  "metaDescription": zod.string().nullable().describe('Proposed meta description, clamped to 155 chars'),
+  "slug": zod.string().nullable(),
+  "targetKeyword": zod.string().nullable(),
+  "keywords": zod.array(zod.string()),
+  "faq": zod.array(zod.object({
+  "question": zod.string(),
+  "answer": zod.string()
+})),
+  "internalLinks": zod.array(zod.object({
+  "anchorText": zod.string(),
+  "targetArticleId": zod.number(),
+  "targetSlug": zod.string(),
+  "targetTitle": zod.string(),
+  "reason": zod.string()
+})),
+  "contentGaps": zod.array(zod.string())
+})
+
+

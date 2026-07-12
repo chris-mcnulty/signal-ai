@@ -60,6 +60,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DraftEnginePanel } from "@/components/DraftEnginePanel";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -510,6 +511,17 @@ export default function DraftEditor() {
 
                 </div>
               </div>
+            )}
+
+            {!isNew && draft && draftId && (
+              <DraftEnginePanel
+                draftId={draftId}
+                onApplySeo={(proposal) => {
+                  if (proposal.seoTitle) {
+                    form.setValue("title", proposal.seoTitle, { shouldDirty: true });
+                  }
+                }}
+              />
             )}
 
             {isNew && (

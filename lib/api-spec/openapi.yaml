@@ -18,6 +18,8 @@ tags:
     description: Editorial draft review queue and external draft submission
   - name: seo
     description: SEO administration (audit, search-engine submission, index coverage)
+  - name: engine
+    description: Research and content generation engine (voice, research, ideation, copywriting, repurposing, SEO)
 paths:
   /healthz:
     get:
@@ -648,6 +650,592 @@ paths:
                 $ref: "#/components/schemas/SeoScanResult"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /voice:
+    get:
+      operationId: getBrandVoice
+      tags: [engine]
+      summary: Get the publication's brand voice profile
+      responses:
+        "200":
+          description: Brand voice profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandVoice"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    put:
+      operationId: updateBrandVoice
+      tags: [engine]
+      summary: Update the publication's brand voice profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BrandVoiceInput"
+      responses:
+        "200":
+          description: Updated brand voice profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandVoice"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /grounding-documents:
+    get:
+      operationId: listGroundingDocuments
+      tags: [engine]
+      summary: List grounding documents that steer AI generation
+      responses:
+        "200":
+          description: Grounding documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroundingDocument"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    post:
+      operationId: createGroundingDocument
+      tags: [engine]
+      summary: Add a grounding document (pasted text)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroundingDocumentInput"
+      responses:
+        "201":
+          description: Created grounding document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroundingDocument"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /grounding-documents/{id}:
+    delete:
+      operationId: deleteGroundingDocument
+      tags: [engine]
+      summary: Delete a grounding document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /research:
+    post:
+      operationId: startResearch
+      tags: [engine]
+      summary: Start an async research job (crawl + news scan + AI briefing)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchRequest"
+      responses:
+        "202":
+          description: Research job accepted; poll GET /jobs/{id}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngineJob"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /research/briefings:
+    get:
+      operationId: listBriefings
+      tags: [engine]
+      summary: List completed research briefings
+      responses:
+        "200":
+          description: Research briefings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResearchBriefing"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /research/briefings/{id}:
+    get:
+      operationId: getBriefing
+      tags: [engine]
+      summary: Get a research briefing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Research briefing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchBriefing"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    delete:
+      operationId: deleteBriefing
+      tags: [engine]
+      summary: Delete a research briefing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /jobs:
+    get:
+      operationId: listEngineJobs
+      tags: [engine]
+      summary: List recent engine jobs
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: Recent jobs, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EngineJob"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /jobs/{id}:
+    get:
+      operationId: getEngineJob
+      tags: [engine]
+      summary: Poll an engine job's status and result
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngineJob"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /ideation:
+    post:
+      operationId: startIdeation
+      tags: [engine]
+      summary: Start an async ideation job producing 5-10 concept briefs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdeationRequest"
+      responses:
+        "202":
+          description: Ideation job accepted; poll GET /jobs/{id}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngineJob"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /briefs:
+    get:
+      operationId: listBriefs
+      tags: [engine]
+      summary: List concept briefs, optionally filtered by status
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [proposed, accepted, rejected, drafted]
+      responses:
+        "200":
+          description: Concept briefs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentBrief"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /briefs/{id}:
+    patch:
+      operationId: updateBrief
+      tags: [engine]
+      summary: Accept or reject a concept brief
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BriefUpdate"
+      responses:
+        "200":
+          description: Updated brief
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentBrief"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    delete:
+      operationId: deleteBrief
+      tags: [engine]
+      summary: Delete a concept brief
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /briefs/{id}/draft:
+    post:
+      operationId: draftFromBrief
+      tags: [engine]
+      summary: Start an async copywriter job turning a brief into a pending-review draft
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "202":
+          description: Copywriter job accepted; poll GET /jobs/{id}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EngineJob"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "409":
+          description: Brief already drafted or rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/social-variants:
+    get:
+      operationId: listSocialVariants
+      tags: [engine]
+      summary: List social post variants generated for an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Social variants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SocialVariant"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    post:
+      operationId: repurposeDraft
+      tags: [engine]
+      summary: Generate social post variants for an article (replaces the previous batch)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RepurposeRequest"
+      responses:
+        "201":
+          description: Generated variants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SocialVariant"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "502":
+          description: AI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/social-variants/export:
+    get:
+      operationId: exportSocialVariantsCsv
+      tags: [engine]
+      summary: Export an article's social variants as CSV
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: CSV export
+          content:
+            text/csv:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/seo-optimize:
+    post:
+      operationId: seoOptimizeDraft
+      tags: [engine]
+      summary: Propose SEO/AEO improvements for an article (metadata guardrails + validated internal links)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Optimization proposal (apply via PATCH /drafts/{id})
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeoOptimization"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "502":
+          description: AI generation failed
           content:
             application/json:
               schema:
@@ -1288,3 +1876,373 @@ components:
           type: boolean
         skipped:
           type: boolean
+    BrandVoice:
+      type: object
+      required:
+        [
+          id,
+          brandName,
+          description,
+          audience,
+          tone,
+          styleGuidelines,
+          positioning,
+          preferredPhrases,
+          forbiddenPhrases,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        brandName:
+          type: string
+        description:
+          type: string
+        audience:
+          type: string
+        tone:
+          type: string
+        styleGuidelines:
+          type: string
+        positioning:
+          type: string
+        preferredPhrases:
+          type: ["array", "null"]
+          items:
+            type: string
+        forbiddenPhrases:
+          type: ["array", "null"]
+          items:
+            type: string
+        updatedAt:
+          type: string
+          format: date-time
+    BrandVoiceInput:
+      type: object
+      properties:
+        brandName:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 5000
+        audience:
+          type: string
+          maxLength: 2000
+        tone:
+          type: string
+          maxLength: 2000
+        styleGuidelines:
+          type: string
+          maxLength: 5000
+        positioning:
+          type: string
+          maxLength: 2000
+        preferredPhrases:
+          type: array
+          items:
+            type: string
+        forbiddenPhrases:
+          type: array
+          items:
+            type: string
+    GroundingDocument:
+      type: object
+      required: [id, name, content, contextTag, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        content:
+          type: string
+        contextTag:
+          type: string
+          enum: [general, messaging_framework, style_guide, product]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    GroundingDocumentInput:
+      type: object
+      required: [name, content]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 300
+        content:
+          type: string
+          minLength: 1
+          maxLength: 100000
+        contextTag:
+          type: string
+          enum: [general, messaging_framework, style_guide, product]
+    EngineJob:
+      type: object
+      required: [id, kind, status, input, result, error, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        kind:
+          type: string
+          enum: [research, ideation, copywrite]
+        status:
+          type: string
+          enum: [queued, running, completed, failed]
+        input:
+          type: ["object", "null"]
+          additionalProperties: true
+        result:
+          type: ["object", "null"]
+          additionalProperties: true
+        error:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ResearchRequest:
+      type: object
+      required: [topic]
+      properties:
+        topic:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: The topic to research
+        url:
+          type: string
+          maxLength: 2000
+          description: Optional seed URL to crawl for grounding content
+    ResearchBriefing:
+      type: object
+      required: [id, topic, url, briefing, sources, model, createdAt]
+      properties:
+        id:
+          type: integer
+        topic:
+          type: string
+        url:
+          type: ["string", "null"]
+        briefing:
+          type: string
+        sources:
+          type: ["object", "null"]
+          additionalProperties: true
+        model:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+    IdeationRequest:
+      type: object
+      required: [goal]
+      properties:
+        goal:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: What this content push should achieve
+        themes:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          description: General themes to push
+        audience:
+          type: string
+          maxLength: 1000
+          description: Optional audience override (defaults to brand voice audience)
+        notes:
+          type: string
+          maxLength: 5000
+        briefCount:
+          type: integer
+          minimum: 5
+          maximum: 10
+          description: How many concept briefs to generate (5-10)
+        briefingIds:
+          type: array
+          items:
+            type: integer
+          description: Research briefings to ground the ideation in
+    FitAssessment:
+      type: object
+      required: [voiceFit, topicFit, recommendation, rationale]
+      properties:
+        voiceFit:
+          type: string
+          enum: [strong, moderate, weak]
+        topicFit:
+          type: string
+          enum: [strong, moderate, weak]
+        recommendation:
+          type: string
+          enum: [keep, reject]
+        rationale:
+          type: string
+    ContentBrief:
+      type: object
+      required:
+        [
+          id,
+          title,
+          summary,
+          angle,
+          keyPoints,
+          audience,
+          category,
+          fitAssessment,
+          status,
+          interview,
+          briefingId,
+          articleId,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: string
+        angle:
+          type: string
+        keyPoints:
+          type: ["array", "null"]
+          items:
+            type: string
+        audience:
+          type: string
+        category:
+          type: string
+        fitAssessment:
+          oneOf:
+            - $ref: "#/components/schemas/FitAssessment"
+            - type: "null"
+        status:
+          type: string
+          enum: [proposed, accepted, rejected, drafted]
+        interview:
+          type: ["object", "null"]
+          additionalProperties: true
+        briefingId:
+          type: ["integer", "null"]
+        articleId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    BriefUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [accepted, rejected]
+    SocialVariant:
+      type: object
+      required: [id, articleId, platform, content, angle, charCount, createdAt]
+      properties:
+        id:
+          type: integer
+        articleId:
+          type: integer
+        platform:
+          type: string
+          enum: [linkedin, twitter, instagram, facebook]
+        content:
+          type: string
+        angle:
+          type: ["string", "null"]
+        charCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+    RepurposeRequest:
+      type: object
+      required: [platforms]
+      properties:
+        platforms:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum: [linkedin, twitter, instagram, facebook]
+        perPlatform:
+          type: integer
+          minimum: 1
+          maximum: 3
+          description: Variants per platform (default 1)
+    InternalLinkSuggestion:
+      type: object
+      required: [anchorText, targetArticleId, targetSlug, targetTitle, reason]
+      properties:
+        anchorText:
+          type: string
+        targetArticleId:
+          type: integer
+        targetSlug:
+          type: string
+        targetTitle:
+          type: string
+        reason:
+          type: string
+    OptimizationQA:
+      type: object
+      required: [question, answer]
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
+    SeoOptimization:
+      type: object
+      required:
+        [
+          seoTitle,
+          metaDescription,
+          slug,
+          targetKeyword,
+          keywords,
+          faq,
+          internalLinks,
+          contentGaps,
+        ]
+      properties:
+        seoTitle:
+          type: ["string", "null"]
+          description: Proposed title, clamped to 60 chars
+        metaDescription:
+          type: ["string", "null"]
+          description: Proposed meta description, clamped to 155 chars
+        slug:
+          type: ["string", "null"]
+        targetKeyword:
+          type: ["string", "null"]
+        keywords:
+          type: array
+          items:
+            type: string
+        faq:
+          type: array
+          items:
+            $ref: "#/components/schemas/OptimizationQA"
+        internalLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/InternalLinkSuggestion"
+        contentGaps:
+          type: array
+          items:
+            type: string

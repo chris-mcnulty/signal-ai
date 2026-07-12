@@ -11,6 +11,8 @@ import Home from "./pages/Home";
 import Queue from "./pages/Queue";
 import DraftEditor from "./pages/DraftEditor";
 import Seo from "./pages/Seo";
+import Engine from "./pages/Engine";
+import VoiceSettings from "./pages/VoiceSettings";
 import { queryClient } from "./lib/queryClient";
 
 const clerkPubKey = publishableKeyFromHost(
@@ -167,6 +169,16 @@ function ClerkProviderWithRoutes() {
 
             <Route path="/seo">
               <Show when="signed-in"><Seo /></Show>
+              <Show when="signed-out"><Redirect to="/" /></Show>
+            </Route>
+
+            <Route path="/engine">
+              <Show when="signed-in"><Engine /></Show>
+              <Show when="signed-out"><Redirect to="/" /></Show>
+            </Route>
+
+            <Route path="/voice">
+              <Show when="signed-in"><VoiceSettings /></Show>
               <Show when="signed-out"><Redirect to="/" /></Show>
             </Route>
 

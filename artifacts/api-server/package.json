@@ -11,12 +11,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@resvg/resvg-js": "^2.6.2",
     "@clerk/express": "^2.1.39",
     "@clerk/shared": "^4.25.2",
+    "@resvg/resvg-js": "^2.6.2",
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/integrations-openai-ai-server": "workspace:*",
+    "cheerio": "^1.2.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "drizzle-orm": "catalog:",

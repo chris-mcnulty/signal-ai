@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useClerk, useUser } from "@clerk/react";
-import { LogOut, LayoutDashboard, Plus, PenSquare, Globe } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, PenSquare, Globe, Sparkles, Mic2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -38,6 +38,24 @@ export function AppLayout({ children }: { children: ReactNode }) {
             >
               <Globe className="w-4 h-4" />
               SEO
+            </Link>
+            <Link 
+              href="/engine" 
+              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
+                location === "/engine" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              Engine
+            </Link>
+            <Link 
+              href="/voice" 
+              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
+                location === "/voice" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              }`}
+            >
+              <Mic2 className="w-4 h-4" />
+              Voice
             </Link>
           </nav>
         </div>
