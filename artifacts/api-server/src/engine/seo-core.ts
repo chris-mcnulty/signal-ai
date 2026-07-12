@@ -188,7 +188,7 @@ export function buildSeoPrompt(input: {
     : "## Published articles available for internal links\n(none yet — return an empty internalLinks array)";
 
   return [
-    `Optimize the article below for SEO and answer-engine visibility (AEO). Propose improved search metadata and useful internal links. All output — including FAQ answers, meta descriptions, and keyword suggestions — must use American English spelling and conventions, never British variants.`,
+    `Optimize the article below for SEO and answer-engine visibility (AEO). Propose improved search metadata and useful internal links. All output — including FAQ answers, meta descriptions, and keyword suggestions — must use American English spelling and conventions, never British variants. Write in a professional journalist's register: clear, precise, and authoritative.`,
     inventoryBlock,
     `## Article (current slug: ${input.currentSlug})\n# ${input.title}\n\n${input.body.slice(0, 12000)}`,
     `## Output format

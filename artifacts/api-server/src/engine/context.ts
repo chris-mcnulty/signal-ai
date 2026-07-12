@@ -67,6 +67,16 @@ function renderDocumentBlocks(documents: GroundingDocument[]): string {
 }
 
 /**
+ * Language and voice standards block injected into every engine system prompt.
+ * Exported so tests can assert the exact wording without mocking the database.
+ */
+export const LANGUAGE_STANDARDS =
+  "## Language and voice standards\n" +
+  "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose. " +
+  "Use American English spelling and idioms throughout — never British variants (use 'program' not 'programme', 'organization' not 'organisation', 'standardization' not 'standardisation', 'color' not 'colour', etc.). " +
+  "Maintain a clear, authoritative register appropriate for a professional editorial publication.";
+
+/**
  * Resolve the brand voice and grounding documents into a system prompt
  * block. When `tags` is provided, only documents with those context tags are
  * included (documents tagged "general" are always included).
@@ -88,11 +98,7 @@ export async function resolvePromptContext(
       : db.select().from(groundingDocumentsTable),
   ]);
 
-  const languageStandards =
-    "## Language and voice standards\n" +
-    "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose. " +
-    "Use American English spelling and idioms throughout — never British variants (use 'program' not 'programme', 'organization' not 'organisation', 'standardization' not 'standardisation', 'color' not 'colour', etc.). " +
-    "Maintain a clear, authoritative register appropriate for a professional editorial publication.";
+  const languageStandards = LANGUAGE_STANDARDS;
 
   const sections = [renderVoiceBlock(voice), renderDocumentBlocks(documents), languageStandards]
     .filter(Boolean)

@@ -9,21 +9,28 @@ export interface GeneratedArticle {
   model: string;
 }
 
+/**
+ * Static system prompt for article draft generation.
+ * Exported so tests can assert American English and journalist-register
+ * requirements without making live AI calls.
+ */
+export const AI_DRAFTING_SYSTEM_PROMPT = [
+  "You are an editorial writer for SignalAI, a publication covering AI and technology.",
+  "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose.",
+  "Use American English spelling and idioms throughout — never British variants (e.g. 'program' not 'programme', 'organization' not 'organisation', 'color' not 'colour').",
+  "Write a complete, well-structured article draft in Markdown.",
+  "Respond ONLY with a JSON object with these keys:",
+  '- "title": a compelling headline (string)',
+  '- "body": the full article body in Markdown, 500-900 words (string)',
+  '- "category": a short one-or-two-word category for the article (string)',
+].join("\n");
+
 export async function generateArticleDraft(
   topic: string,
   category?: string,
   instructions?: string,
 ): Promise<GeneratedArticle> {
-  const systemPrompt = [
-    "You are an editorial writer for SignalAI, a publication covering AI and technology.",
-    "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose.",
-    "Use American English spelling and idioms throughout — never British variants (e.g. 'program' not 'programme', 'organization' not 'organisation', 'color' not 'colour').",
-    "Write a complete, well-structured article draft in Markdown.",
-    "Respond ONLY with a JSON object with these keys:",
-    '- "title": a compelling headline (string)',
-    '- "body": the full article body in Markdown, 500-900 words (string)',
-    '- "category": a short one-or-two-word category for the article (string)',
-  ].join("\n");
+  const systemPrompt = AI_DRAFTING_SYSTEM_PROMPT;
 
   const userPrompt = [
     `Topic: ${topic}`,

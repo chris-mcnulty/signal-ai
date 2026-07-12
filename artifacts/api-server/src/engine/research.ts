@@ -18,6 +18,14 @@ import { logger } from "../lib/logger";
  * completed briefings are stored.
  */
 
+/**
+ * Static base of the research system prompt.
+ * Exported so tests can assert American English and journalist-register
+ * requirements without mocking the database or calling the AI provider.
+ */
+export const RESEARCH_SYSTEM_PROMPT_BASE =
+  "You are a research analyst for an editorial team. You synthesize crawled pages and news headlines into precise, source-grounded briefings. Write in American English — never British spellings or idioms. Use a professional journalist's register: third-person, attribution-based, and factually precise.";
+
 export interface ResearchJobInput {
   topic: string;
   url?: string;
@@ -76,7 +84,7 @@ export async function runResearch(
     .join("\n\n");
 
   const systemPrompt = [
-    "You are a research analyst for an editorial team. You synthesize crawled pages and news headlines into precise, source-grounded briefings. Write in American English — never British spellings or idioms. Use a professional journalist's register: third-person, attribution-based, and factually precise.",
+    RESEARCH_SYSTEM_PROMPT_BASE,
     context.systemPrompt,
   ]
     .filter(Boolean)
