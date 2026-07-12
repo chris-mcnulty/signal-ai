@@ -473,3 +473,151 @@ export const UnpublishDraftResponse = zod.object({
 })
 
 
+/**
+ * @summary Audit published content for missing SEO fields
+ */
+export const GetSeoAuditResponse = zod.object({
+  "generatedAt": zod.string(),
+  "totals": zod.object({
+  "article": zod.object({
+  "total": zod.number(),
+  "missing": zod.number()
+}).optional(),
+  "case-study": zod.object({
+  "total": zod.number(),
+  "missing": zod.number()
+}).optional()
+}),
+  "findings": zod.array(zod.object({
+  "kind": zod.enum(['article', 'case-study']),
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "path": zod.string(),
+  "missing": zod.array(zod.string()),
+  "suggested": zod.object({
+  "seoTitle": zod.string().optional(),
+  "seoDescription": zod.string().optional()
+})
+}))
+})
+
+
+/**
+ * @summary Fill blank SEO title/description fields with audit suggestions
+ */
+export const AutofillSeoAuditBody = zod.object({
+  "ids": zod.array(zod.number()).optional()
+})
+
+export const AutofillSeoAuditResponse = zod.object({
+  "updated": zod.number(),
+  "skipped": zod.number()
+})
+
+
+/**
+ * @summary Submit URLs to search engines (IndexNow, Google, Bing)
+ */
+export const SubmitSeoUrlsBody = zod.object({
+  "urls": zod.array(zod.string()).optional(),
+  "mode": zod.enum(['publish', 'delete']).optional()
+})
+
+export const SubmitSeoUrlsResponse = zod.object({
+  "origin": zod.string(),
+  "mode": zod.enum(['publish', 'delete']),
+  "urls": zod.array(zod.string()),
+  "results": zod.array(zod.object({
+  "target": zod.enum(['indexnow', 'google-indexing', 'bing-webmaster']),
+  "ok": zod.boolean(),
+  "status": zod.number().optional(),
+  "submitted": zod.number(),
+  "error": zod.string().optional()
+}))
+})
+
+
+/**
+ * @summary Recent search-engine submission ledger rows
+ */
+export const ListSeoSubmissionsResponseItem = zod.object({
+  "id": zod.number(),
+  "trigger": zod.string(),
+  "mode": zod.string(),
+  "target": zod.string(),
+  "ok": zod.boolean(),
+  "httpStatus": zod.number().nullish(),
+  "submitted": zod.number(),
+  "error": zod.string().nullish(),
+  "urls": zod.array(zod.string()).nullish(),
+  "createdAt": zod.string()
+})
+export const ListSeoSubmissionsResponse = zod.array(ListSeoSubmissionsResponseItem)
+
+
+/**
+ * @summary Index-coverage overview grouped by page kind
+ */
+export const GetSeoCoverageResponse = zod.object({
+  "lastRun": zod.union([zod.object({
+  "id": zod.number(),
+  "trigger": zod.string(),
+  "startedAt": zod.string(),
+  "finishedAt": zod.string().nullish(),
+  "urlCount": zod.number(),
+  "googleChecked": zod.number(),
+  "bingChecked": zod.number()
+}),zod.null()]),
+  "googleConfigured": zod.boolean(),
+  "bingConfigured": zod.boolean(),
+  "byKind": zod.array(zod.object({
+  "kind": zod.string(),
+  "total": zod.number(),
+  "indexed": zod.number(),
+  "discoveredNotIndexed": zod.number(),
+  "crawlError": zod.number(),
+  "soft404": zod.number(),
+  "unknown": zod.number()
+})),
+  "scanRunning": zod.boolean(),
+  "googleAuthWarning": zod.boolean(),
+  "googleLastError": zod.string().nullable()
+})
+
+
+/**
+ * @summary Per-URL index-coverage rows
+ */
+export const ListSeoCoverageUrlsQueryParams = zod.object({
+  "kind": zod.coerce.string().optional(),
+  "bucket": zod.coerce.string().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListSeoCoverageUrlsResponseItem = zod.object({
+  "url": zod.string(),
+  "path": zod.string(),
+  "pageKind": zod.string(),
+  "googleBucket": zod.string().nullish(),
+  "googleCoverageState": zod.string().nullish(),
+  "bingBucket": zod.string().nullish(),
+  "bingHttpStatus": zod.number().nullish(),
+  "lastCheckedAt": zod.string().nullish()
+})
+export const ListSeoCoverageUrlsResponse = zod.array(ListSeoCoverageUrlsResponseItem)
+
+
+/**
+ * @summary Trigger a manual index-coverage rescan
+ */
+export const RunSeoCoverageScanResponse = zod.object({
+  "urlCount": zod.number(),
+  "googleChecked": zod.number(),
+  "bingChecked": zod.number(),
+  "googleConfigured": zod.boolean(),
+  "bingConfigured": zod.boolean(),
+  "skipped": zod.boolean()
+})
+
+

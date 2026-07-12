@@ -15,7 +15,11 @@ type ServiceAccountKey = {
 let invalidKeyLogged = false;
 
 export function getGoogleServiceAccount(): ServiceAccountKey | null {
-  const raw = process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_KEY;
+  // GOOGLE_INDEXING_SA_JSON is the documented name; the legacy
+  // GOOGLE_INDEXING_SERVICE_ACCOUNT_KEY is kept as a fallback.
+  const raw =
+    process.env.GOOGLE_INDEXING_SA_JSON ??
+    process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_KEY;
   if (!raw || raw.trim() === "" || !raw.trim().startsWith("{")) {
     // Missing or a placeholder value (e.g. "Skip") — treat as not configured.
     return null;
@@ -115,9 +119,22 @@ async function getAccessToken(account: ServiceAccountKey): Promise<string> {
   return data.access_token;
 }
 
+/**
+ * Build the Google Indexing API notification body. Exported so unit tests can
+ * pin the payload (notably URL_DELETED for the unpublish path) without live
+ * credentials.
+ */
+export function googleNotifyPayload(
+  url: string,
+  mode: "publish" | "delete" = "publish",
+): { url: string; type: "URL_UPDATED" | "URL_DELETED" } {
+  return { url, type: mode === "delete" ? "URL_DELETED" : "URL_UPDATED" };
+}
+
 export async function submitUrlToGoogle(
   account: ServiceAccountKey,
   url: string,
+  mode: "publish" | "delete" = "publish",
 ): Promise<{ ok: boolean; status: number; body: string }> {
   const token = await getAccessToken(account);
   const response = await fetch(GOOGLE_INDEXING_ENDPOINT, {
@@ -126,8 +143,55 @@ export async function submitUrlToGoogle(
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ url, type: "URL_UPDATED" }),
+    body: JSON.stringify(googleNotifyPayload(url, mode)),
   });
   const body = await response.text();
   return { ok: response.ok, status: response.status, body };
+}
+
+/**
+ * Mint a Google OAuth access token for an arbitrary scope (used by the
+ * Search Console URL Inspection client, which needs webmasters.readonly
+ * rather than the indexing scope). Tokens are not cached here — coverage
+ * scans run at most daily.
+ */
+export async function getGoogleAccessTokenForScope(
+  account: ServiceAccountKey,
+  scope: string,
+): Promise<string> {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claims = base64UrlEncode(
+    JSON.stringify({
+      iss: account.clientEmail,
+      scope,
+      aud: GOOGLE_TOKEN_URL,
+      iat: nowSeconds,
+      exp: nowSeconds + 3600,
+    }),
+  );
+  const signingInput = `${header}.${claims}`;
+  const signature = createSign("RSA-SHA256")
+    .update(signingInput)
+    .sign(account.privateKey);
+  const jwt = `${signingInput}.${base64UrlEncode(signature)}`;
+  const response = await fetch(GOOGLE_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: jwt,
+    }),
+  });
+  const body = await response.text();
+  if (!response.ok) {
+    throw new Error(
+      `Google token request failed (HTTP ${response.status}): ${body.slice(0, 300)}`,
+    );
+  }
+  const data = JSON.parse(body) as { access_token?: string };
+  if (!data.access_token) {
+    throw new Error("Google token response missing access_token");
+  }
+  return data.access_token;
 }

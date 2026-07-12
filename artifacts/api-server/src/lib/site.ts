@@ -8,6 +8,12 @@ export const SITE = {
 };
 
 export function getPublicBaseUrl(): string | null {
+  // Explicit canonical origin wins (e.g. a custom domain). Set SITE_URL when
+  // the site is served from a domain other than the Replit deployment domain.
+  const siteUrl = process.env.SITE_URL?.trim();
+  if (siteUrl) {
+    return siteUrl.replace(/\/+$/, "");
+  }
   const domains = process.env.REPLIT_DOMAINS;
   if (domains) {
     const first = domains.split(",")[0]?.trim();

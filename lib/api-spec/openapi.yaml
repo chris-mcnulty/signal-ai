@@ -16,6 +16,8 @@ tags:
     description: Company case studies
   - name: drafts
     description: Editorial draft review queue and external draft submission
+  - name: seo
+    description: SEO administration (audit, search-engine submission, index coverage)
 paths:
   /healthz:
     get:
@@ -492,6 +494,164 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/audit:
+    get:
+      operationId: getSeoAudit
+      tags: [seo]
+      summary: Audit published content for missing SEO fields
+      responses:
+        "200":
+          description: Audit report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeoAuditReport"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/audit/autofill:
+    post:
+      operationId: autofillSeoAudit
+      tags: [seo]
+      summary: Fill blank SEO title/description fields with audit suggestions
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeoAutofillRequest"
+      responses:
+        "200":
+          description: Autofill result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeoAutofillResult"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/submit:
+    post:
+      operationId: submitSeoUrls
+      tags: [seo]
+      summary: Submit URLs to search engines (IndexNow, Google, Bing)
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeoSubmitRequest"
+      responses:
+        "200":
+          description: Per-channel submission results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeoSubmitBundle"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/submissions:
+    get:
+      operationId: listSeoSubmissions
+      tags: [seo]
+      summary: Recent search-engine submission ledger rows
+      responses:
+        "200":
+          description: Submission ledger rows (most recent first)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SeoSubmissionRow"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/coverage:
+    get:
+      operationId: getSeoCoverage
+      tags: [seo]
+      summary: Index-coverage overview grouped by page kind
+      responses:
+        "200":
+          description: Coverage overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeoCoverageOverview"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/coverage/urls:
+    get:
+      operationId: listSeoCoverageUrls
+      tags: [seo]
+      summary: Per-URL index-coverage rows
+      parameters:
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Coverage rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SeoCoverageUrlRow"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /seo/admin/coverage/scan:
+    post:
+      operationId: runSeoCoverageScan
+      tags: [seo]
+      summary: Trigger a manual index-coverage rescan
+      responses:
+        "200":
+          description: Scan result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeoScanResult"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -890,3 +1050,241 @@ components:
           type: integer
         total:
           type: integer
+    SeoAuditFinding:
+      type: object
+      required: [kind, id, slug, title, path, missing, suggested]
+      properties:
+        kind:
+          type: string
+          enum: [article, case-study]
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        path:
+          type: string
+        missing:
+          type: array
+          items:
+            type: string
+        suggested:
+          type: object
+          properties:
+            seoTitle:
+              type: string
+            seoDescription:
+              type: string
+    SeoAuditTotals:
+      type: object
+      required: [total, missing]
+      properties:
+        total:
+          type: integer
+        missing:
+          type: integer
+    SeoAuditReport:
+      type: object
+      required: [generatedAt, totals, findings]
+      properties:
+        generatedAt:
+          type: string
+        totals:
+          type: object
+          properties:
+            article:
+              $ref: "#/components/schemas/SeoAuditTotals"
+            case-study:
+              $ref: "#/components/schemas/SeoAuditTotals"
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeoAuditFinding"
+    SeoAutofillRequest:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+    SeoAutofillResult:
+      type: object
+      required: [updated, skipped]
+      properties:
+        updated:
+          type: integer
+        skipped:
+          type: integer
+    SeoSubmitRequest:
+      type: object
+      properties:
+        urls:
+          type: array
+          items:
+            type: string
+        mode:
+          type: string
+          enum: [publish, delete]
+    SeoSubmitResult:
+      type: object
+      required: [target, ok, submitted]
+      properties:
+        target:
+          type: string
+          enum: [indexnow, google-indexing, bing-webmaster]
+        ok:
+          type: boolean
+        status:
+          type: integer
+        submitted:
+          type: integer
+        error:
+          type: string
+    SeoSubmitBundle:
+      type: object
+      required: [origin, mode, urls, results]
+      properties:
+        origin:
+          type: string
+        mode:
+          type: string
+          enum: [publish, delete]
+        urls:
+          type: array
+          items:
+            type: string
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeoSubmitResult"
+    SeoSubmissionRow:
+      type: object
+      required: [id, trigger, mode, target, ok, submitted, createdAt]
+      properties:
+        id:
+          type: integer
+        trigger:
+          type: string
+        mode:
+          type: string
+        target:
+          type: string
+        ok:
+          type: boolean
+        httpStatus:
+          type: integer
+          nullable: true
+        submitted:
+          type: integer
+        error:
+          type: string
+          nullable: true
+        urls:
+          type: array
+          items:
+            type: string
+          nullable: true
+        createdAt:
+          type: string
+    SeoCoverageRun:
+      type: object
+      required: [id, trigger, startedAt, urlCount, googleChecked, bingChecked]
+      properties:
+        id:
+          type: integer
+        trigger:
+          type: string
+        startedAt:
+          type: string
+        finishedAt:
+          type: string
+          nullable: true
+        urlCount:
+          type: integer
+        googleChecked:
+          type: integer
+        bingChecked:
+          type: integer
+    SeoKindBuckets:
+      type: object
+      required: [kind, total, indexed, discoveredNotIndexed, crawlError, soft404, unknown]
+      properties:
+        kind:
+          type: string
+        total:
+          type: integer
+        indexed:
+          type: integer
+        discoveredNotIndexed:
+          type: integer
+        crawlError:
+          type: integer
+        soft404:
+          type: integer
+        unknown:
+          type: integer
+    SeoCoverageOverview:
+      type: object
+      required: [lastRun, googleConfigured, bingConfigured, byKind, scanRunning, googleAuthWarning, googleLastError]
+      properties:
+        lastRun:
+          oneOf:
+            - $ref: "#/components/schemas/SeoCoverageRun"
+            - type: "null"
+        googleConfigured:
+          type: boolean
+        bingConfigured:
+          type: boolean
+        byKind:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeoKindBuckets"
+        scanRunning:
+          type: boolean
+        googleAuthWarning:
+          type: boolean
+        googleLastError:
+          type: string
+          nullable: true
+    SeoCoverageUrlRow:
+      type: object
+      required: [url, path, pageKind]
+      properties:
+        url:
+          type: string
+        path:
+          type: string
+        pageKind:
+          type: string
+        googleBucket:
+          type: string
+          nullable: true
+        googleCoverageState:
+          type: string
+          nullable: true
+        bingBucket:
+          type: string
+          nullable: true
+        bingHttpStatus:
+          type: integer
+          nullable: true
+        lastCheckedAt:
+          type: string
+          nullable: true
+    SeoScanResult:
+      type: object
+      required: [urlCount, googleChecked, bingChecked, googleConfigured, bingConfigured, skipped]
+      properties:
+        urlCount:
+          type: integer
+        googleChecked:
+          type: integer
+        bingChecked:
+          type: integer
+        googleConfigured:
+          type: boolean
+        bingConfigured:
+          type: boolean
+        skipped:
+          type: boolean

@@ -8,6 +8,7 @@ import Home from "@/pages/home";
 import Article from "@/pages/article";
 import CaseStudies from "@/pages/case-studies";
 import CaseStudy from "@/pages/case-study";
+import { SeoHead } from "@/lib/seo";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +35,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <SeoHead />
           <Router />
         </WouterRouter>
         <Toaster />

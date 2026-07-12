@@ -31,8 +31,30 @@ import { rateLimit } from "../middlewares/rateLimit";
 import { requireAuth } from "../middlewares/requireAuth";
 import { promoteDueArticles, uniqueSlug } from "../lib/articles";
 import { generateArticleDraft } from "../lib/aiDrafting";
+import { submitUrls, type SubmitTrigger } from "../lib/seoSubmit";
+import { pathForArticle } from "../lib/seoContent";
+import { getBaseUrl } from "../lib/site";
+import type { Request } from "express";
 
 const router: IRouter = Router();
+
+/**
+ * #SEO: fire-and-forget search-engine notification when an article's public
+ * visibility changes. Never blocks or fails the editorial response — errors
+ * are logged by the submit pipeline and recorded in the seo_submissions
+ * ledger. No-ops outside production unless INDEXNOW_ENABLED=true.
+ */
+function notifySearchEngines(
+  req: Request,
+  article: { slug: string; category: string },
+  mode: "publish" | "delete",
+  trigger: SubmitTrigger,
+): void {
+  const url = `${getBaseUrl(req)}${pathForArticle(article)}`;
+  submitUrls(getBaseUrl(req), [url], { mode, trigger }).catch((err) => {
+    req.log.error({ err, url, mode }, "seo.submit hook failed");
+  });
+}
 
 // AI generation is expensive: require the drafts API key and throttle
 // repeated calls (per client IP) so a leaked URL can't run up AI costs.
@@ -231,6 +253,9 @@ router.delete("/drafts/:id", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Draft not found" });
     return;
   }
+  if (article.status === "published") {
+    notifySearchEngines(req, article, "delete", "unpublish-hook");
+  }
   res.sendStatus(204);
 });
 
@@ -262,6 +287,9 @@ router.post("/drafts/:id/approve", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Draft not found" });
     return;
   }
+  if (article.status === "published") {
+    notifySearchEngines(req, article, "publish", "publish-hook");
+  }
   res.json(ApproveDraftResponse.parse(article));
 });
 
@@ -276,6 +304,10 @@ router.post("/drafts/:id/reject", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+  const [before] = await db
+    .select({ status: articlesTable.status })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, params.data.id));
   const [article] = await db
     .update(articlesTable)
     .set({
@@ -289,6 +321,9 @@ router.post("/drafts/:id/reject", async (req, res): Promise<void> => {
   if (!article) {
     res.status(404).json({ error: "Draft not found" });
     return;
+  }
+  if (before?.status === "published") {
+    notifySearchEngines(req, article, "delete", "unpublish-hook");
   }
   res.json(RejectDraftResponse.parse(article));
 });
@@ -308,6 +343,7 @@ router.post("/drafts/:id/publish", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Draft not found" });
     return;
   }
+  notifySearchEngines(req, article, "publish", "publish-hook");
   res.json(PublishDraftResponse.parse(article));
 });
 
@@ -326,6 +362,7 @@ router.post("/drafts/:id/unpublish", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Draft not found" });
     return;
   }
+  notifySearchEngines(req, article, "delete", "unpublish-hook");
   res.json(UnpublishDraftResponse.parse(article));
 });
 

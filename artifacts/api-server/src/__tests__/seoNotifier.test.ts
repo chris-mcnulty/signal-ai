@@ -3,6 +3,7 @@ import { generateKeyPairSync, createVerify } from "node:crypto";
 import { db, pool, articlesTable, caseStudiesTable, seoNotificationsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { notifyNewCaseStudies, TARGET_INDEXNOW, TARGET_GOOGLE } from "../lib/indexnow";
+import { acquireSeoTestLock, releaseSeoTestLock } from "./testDbLock";
 
 const TEST_SLUG = `seo-notifier-test-${Date.now()}`;
 
@@ -49,6 +50,7 @@ function installFetchMock(): void {
 let articleId: number;
 
 beforeAll(async () => {
+  await acquireSeoTestLock();
   vi.stubEnv("INDEXNOW_ENABLED", "true");
   vi.stubEnv("GOOGLE_INDEXING_SERVICE_ACCOUNT_KEY", "");
   installFetchMock();
@@ -76,12 +78,13 @@ beforeAll(async () => {
     headquarters: "Nowhere",
     companySummary: "test",
   });
-});
+}, 120_000);
 
 afterAll(async () => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
   await db.delete(articlesTable).where(eq(articlesTable.id, articleId));
+  await releaseSeoTestLock();
   await pool.end();
 });
 

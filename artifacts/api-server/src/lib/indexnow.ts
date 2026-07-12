@@ -5,6 +5,8 @@ import { logger } from "./logger";
 import { getPublicBaseUrl } from "./site";
 import { getGoogleServiceAccount, submitUrlToGoogle } from "./googleIndexing";
 
+// Legacy fixed alias; the canonical key file is served at `/{key}.txt`
+// (see getIndexNowKeyPath) per the IndexNow protocol convention.
 export const INDEXNOW_KEY_PATH = "/indexnow-key.txt";
 
 export const TARGET_INDEXNOW = "indexnow";
@@ -16,8 +18,24 @@ const INDEXNOW_ENDPOINT =
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 
 export function getIndexNowKey(): string {
+  // Explicit INDEXNOW_KEY takes precedence. IndexNow keys must be 8–128 hex
+  // chars: hex values pass through verbatim, anything else is hashed to
+  // conform. Falls back to a stable key derived from the Repl identity so
+  // IndexNow works with zero configuration.
+  const raw = process.env.INDEXNOW_KEY?.trim();
+  if (raw) {
+    if (/^[a-f0-9]{8,128}$/i.test(raw)) {
+      return raw.toLowerCase();
+    }
+    return createHash("sha256").update(raw).digest("hex");
+  }
   const seed = process.env.INDEXNOW_KEY_SEED ?? process.env.REPL_ID ?? "signalai";
   return createHash("sha256").update(`${seed}:indexnow-key`).digest("hex");
+}
+
+/** Canonical key-validation file path: `/{key}.txt`. */
+export function getIndexNowKeyPath(): string {
+  return `/${getIndexNowKey()}.txt`;
 }
 
 export function isSeoNotifierEnabled(): boolean {
@@ -41,7 +59,7 @@ async function submitToIndexNow(
     body: JSON.stringify({
       host,
       key: getIndexNowKey(),
-      keyLocation: `${baseUrl}${INDEXNOW_KEY_PATH}`,
+      keyLocation: `${baseUrl}${getIndexNowKeyPath()}`,
       urlList: urls,
     }),
   });

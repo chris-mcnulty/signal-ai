@@ -34,6 +34,8 @@ export const articlesTable = pgTable(
     sourceUrls: text("source_urls").array(),
     readingMinutes: integer("reading_minutes").notNull().default(5),
     imageUrl: text("image_url"),
+    seoTitle: text("seo_title"),
+    seoDescription: text("seo_description"),
     status: text("status", { enum: ARTICLE_STATUSES })
       .notNull()
       .default("pending"),

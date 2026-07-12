@@ -220,6 +220,162 @@ export interface DraftsSummary {
   total: number;
 }
 
+export type SeoAuditFindingKind = typeof SeoAuditFindingKind[keyof typeof SeoAuditFindingKind];
+
+
+export const SeoAuditFindingKind = {
+  article: 'article',
+  'case-study': 'case-study',
+} as const;
+
+export type SeoAuditFindingSuggested = {
+  seoTitle?: string;
+  seoDescription?: string;
+};
+
+export interface SeoAuditFinding {
+  kind: SeoAuditFindingKind;
+  id: number;
+  slug: string;
+  title: string;
+  path: string;
+  missing: string[];
+  suggested: SeoAuditFindingSuggested;
+}
+
+export interface SeoAuditTotals {
+  total: number;
+  missing: number;
+}
+
+export type SeoAuditReportTotals = {
+  article?: SeoAuditTotals;
+  'case-study'?: SeoAuditTotals;
+};
+
+export interface SeoAuditReport {
+  generatedAt: string;
+  totals: SeoAuditReportTotals;
+  findings: SeoAuditFinding[];
+}
+
+export interface SeoAutofillRequest {
+  ids?: number[];
+}
+
+export interface SeoAutofillResult {
+  updated: number;
+  skipped: number;
+}
+
+export type SeoSubmitRequestMode = typeof SeoSubmitRequestMode[keyof typeof SeoSubmitRequestMode];
+
+
+export const SeoSubmitRequestMode = {
+  publish: 'publish',
+  delete: 'delete',
+} as const;
+
+export interface SeoSubmitRequest {
+  urls?: string[];
+  mode?: SeoSubmitRequestMode;
+}
+
+export type SeoSubmitResultTarget = typeof SeoSubmitResultTarget[keyof typeof SeoSubmitResultTarget];
+
+
+export const SeoSubmitResultTarget = {
+  indexnow: 'indexnow',
+  'google-indexing': 'google-indexing',
+  'bing-webmaster': 'bing-webmaster',
+} as const;
+
+export interface SeoSubmitResult {
+  target: SeoSubmitResultTarget;
+  ok: boolean;
+  status?: number;
+  submitted: number;
+  error?: string;
+}
+
+export type SeoSubmitBundleMode = typeof SeoSubmitBundleMode[keyof typeof SeoSubmitBundleMode];
+
+
+export const SeoSubmitBundleMode = {
+  publish: 'publish',
+  delete: 'delete',
+} as const;
+
+export interface SeoSubmitBundle {
+  origin: string;
+  mode: SeoSubmitBundleMode;
+  urls: string[];
+  results: SeoSubmitResult[];
+}
+
+export interface SeoSubmissionRow {
+  id: number;
+  trigger: string;
+  mode: string;
+  target: string;
+  ok: boolean;
+  httpStatus?: number | null;
+  submitted: number;
+  error?: string | null;
+  urls?: string[] | null;
+  createdAt: string;
+}
+
+export interface SeoCoverageRun {
+  id: number;
+  trigger: string;
+  startedAt: string;
+  finishedAt?: string | null;
+  urlCount: number;
+  googleChecked: number;
+  bingChecked: number;
+}
+
+export interface SeoKindBuckets {
+  kind: string;
+  total: number;
+  indexed: number;
+  discoveredNotIndexed: number;
+  crawlError: number;
+  soft404: number;
+  unknown: number;
+}
+
+export interface SeoCoverageOverview {
+  lastRun: SeoCoverageRun | null;
+  googleConfigured: boolean;
+  bingConfigured: boolean;
+  byKind: SeoKindBuckets[];
+  scanRunning: boolean;
+  googleAuthWarning: boolean;
+  googleLastError: string | null;
+}
+
+export interface SeoCoverageUrlRow {
+  url: string;
+  path: string;
+  pageKind: string;
+  googleBucket?: string | null;
+  googleCoverageState?: string | null;
+  bingBucket?: string | null;
+  bingHttpStatus?: number | null;
+  lastCheckedAt?: string | null;
+}
+
+export interface SeoScanResult {
+  urlCount: number;
+  googleChecked: number;
+  bingChecked: number;
+  googleConfigured: boolean;
+  bingConfigured: boolean;
+  skipped: boolean;
+}
+
 export type ListArticlesParams = {
 category?: string;
 };
@@ -237,4 +393,10 @@ export const ListDraftsStatus = {
   published: 'published',
   rejected: 'rejected',
 } as const;
+
+export type ListSeoCoverageUrlsParams = {
+kind?: string;
+bucket?: string;
+limit?: number;
+};
 

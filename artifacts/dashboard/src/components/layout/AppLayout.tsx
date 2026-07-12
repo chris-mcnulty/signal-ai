@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { useClerk, useUser } from "@clerk/react";
-import { LogOut, LayoutDashboard, Plus, PenSquare } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, PenSquare, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -29,6 +29,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
             >
               <LayoutDashboard className="w-4 h-4" />
               Queue
+            </Link>
+            <Link
+              href="/seo"
+              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
+                location === "/seo" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              SEO
             </Link>
           </nav>
         </div>

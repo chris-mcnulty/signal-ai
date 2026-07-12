@@ -3,6 +3,7 @@ import request from "supertest";
 import app from "../app";
 import { pool } from "@workspace/db";
 import { listCaseStudiesWithArticles } from "../lib/content";
+import { acquireSeoTestLock, releaseSeoTestLock } from "./testDbLock";
 
 type JsonLd = Record<string, unknown>;
 
@@ -36,15 +37,20 @@ const REQUIRED_ARTICLE_FIELDS = [
 let slugs: string[] = [];
 
 beforeAll(async () => {
+  // This suite only reads, but indexnow.test.ts temporarily unpublishes a
+  // seeded case study; hold the same cross-process lock so a concurrent
+  // validation run can't hide the case study mid-assertion.
+  await acquireSeoTestLock();
   const entries = await listCaseStudiesWithArticles();
   slugs = entries.map(({ article }) => article.slug);
   expect(
     slugs.length,
     "at least one case study must exist in the database for SEO tests",
   ).toBeGreaterThan(0);
-});
+}, 120_000);
 
 afterAll(async () => {
+  await releaseSeoTestLock();
   await pool.end();
 });
 

@@ -59,6 +59,26 @@ export type PageMeta = {
   modifiedTime?: string;
 };
 
+/**
+ * Search-engine site-verification meta tags, rendered on every SSR page when
+ * the corresponding env vars are set (Search Console / Bing Webmaster
+ * "HTML tag" verification method).
+ */
+export function verificationMetaTags(): string {
+  const tags: string[] = [];
+  const google = process.env.GOOGLE_SITE_VERIFICATION?.trim();
+  if (google) {
+    tags.push(
+      `<meta name="google-site-verification" content="${escapeHtml(google)}">`,
+    );
+  }
+  const bing = process.env.BING_SITE_VERIFICATION?.trim();
+  if (bing) {
+    tags.push(`<meta name="msvalidate.01" content="${escapeHtml(bing)}">`);
+  }
+  return tags.join("\n");
+}
+
 export function renderPage(meta: PageMeta, bodyHtml: string): string {
   const articleMeta =
     meta.ogType === "article"
@@ -73,6 +93,7 @@ export function renderPage(meta: PageMeta, bodyHtml: string): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(meta.title)}</title>
 <meta name="description" content="${escapeHtml(meta.description)}">
+${verificationMetaTags()}
 <link rel="canonical" href="${escapeHtml(meta.canonicalUrl)}">
 <link rel="icon" type="image/png" href="/case-studies/static/signalai-logo.png">
 <meta property="og:site_name" content="${escapeHtml(SITE.name)}">

@@ -10,6 +10,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/Home";
 import Queue from "./pages/Queue";
 import DraftEditor from "./pages/DraftEditor";
+import Seo from "./pages/Seo";
 import { queryClient } from "./lib/queryClient";
 
 const clerkPubKey = publishableKeyFromHost(
@@ -161,6 +162,11 @@ function ClerkProviderWithRoutes() {
 
             <Route path="/drafts/:id">
               <Show when="signed-in"><DraftEditor /></Show>
+              <Show when="signed-out"><Redirect to="/" /></Show>
+            </Route>
+
+            <Route path="/seo">
+              <Show when="signed-in"><Seo /></Show>
               <Show when="signed-out"><Redirect to="/" /></Show>
             </Route>
 

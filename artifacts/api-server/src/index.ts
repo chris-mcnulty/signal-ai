@@ -1,6 +1,8 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { startSeoNotifier } from "./lib/indexnow";
+import { logSeoBootStatus } from "./lib/seoSubmit";
+import { startCoverageScheduler } from "./lib/seoCoverage";
 
 const rawPort = process.env["PORT"];
 
@@ -23,5 +25,7 @@ app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+  logSeoBootStatus();
   startSeoNotifier();
+  startCoverageScheduler();
 });

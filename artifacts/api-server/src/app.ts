@@ -47,14 +47,36 @@ app.use(express.urlencoded({ extended: true }));
 // Resolve the publishable key from the incoming request host so the same
 // server can serve multiple Clerk custom domains. Falls back to
 // CLERK_PUBLISHABLE_KEY when the host doesn't map to a custom domain.
-app.use(
-  clerkMiddleware((req) => ({
-    publishableKey: publishableKeyFromHost(
-      getClerkProxyHost(req) ?? "",
-      process.env.CLERK_PUBLISHABLE_KEY,
-    ),
-  })),
-);
+const clerk = clerkMiddleware((req) => ({
+  publishableKey: publishableKeyFromHost(
+    getClerkProxyHost(req) ?? "",
+    process.env.CLERK_PUBLISHABLE_KEY,
+  ),
+}));
+
+// Public SEO surfaces must bypass Clerk entirely: its handshake logic
+// 307-redirects document requests (Accept: text/html) from cookie-less
+// clients — exactly what search/AI crawlers and the site's prerender proxy
+// look like. None of these routes use auth.
+const CLERK_EXEMPT = [
+  /^\/api\/seo\/(page|prerender)(\/|$)/,
+  /^\/api\/og(\/|$)/,
+  /^\/case-studies(\/|$)/,
+  /^\/sitemap\.xml$/,
+  /^\/robots\.txt$/,
+  /^\/llms\.txt$/,
+  /^\/indexnow-key\.txt$/,
+  // IndexNow key-validation file at /{key}.txt (hex key, IndexNow spec)
+  /^\/[a-f0-9]{8,128}\.txt$/,
+];
+
+app.use((req, res, next) => {
+  if (CLERK_EXEMPT.some((re) => re.test(req.path))) {
+    next();
+    return;
+  }
+  clerk(req, res, next);
+});
 
 app.use("/api", router);
 

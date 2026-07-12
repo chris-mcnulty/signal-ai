@@ -8,6 +8,7 @@ import {
 } from "@workspace/db";
 import { eq, and, isNull } from "drizzle-orm";
 import { findPendingCaseStudies, TARGET_INDEXNOW, findPendingRemovals } from "../lib/indexnow";
+import { acquireSeoTestLock, releaseSeoTestLock } from "./testDbLock";
 
 type LedgerRow = typeof seoNotificationsTable.$inferSelect;
 
@@ -32,15 +33,31 @@ async function setLedger(row: {
   status?: string;
 }): Promise<void> {
   await clearIndexNowLedger();
-  await db.insert(seoNotificationsTable).values({
-    articleId,
-    target: TARGET_INDEXNOW,
-    url: `https://example.com/case-studies/test`,
-    status: row.status ?? "submitted",
-    detail: "test",
-    notifiedAt: row.notifiedAt,
-    notifiedUpdatedAt: row.notifiedUpdatedAt,
-  });
+  // Upsert instead of plain insert: two copies of this suite can run
+  // concurrently against the shared dev DB (e.g. validation runs the
+  // api-tests and seo-tests workflows in parallel), so a row for
+  // (articleId, indexnow) may reappear between the delete and the insert.
+  await db
+    .insert(seoNotificationsTable)
+    .values({
+      articleId,
+      target: TARGET_INDEXNOW,
+      url: `https://example.com/case-studies/test`,
+      status: row.status ?? "submitted",
+      detail: "test",
+      notifiedAt: row.notifiedAt,
+      notifiedUpdatedAt: row.notifiedUpdatedAt,
+    })
+    .onConflictDoUpdate({
+      target: [seoNotificationsTable.articleId, seoNotificationsTable.target],
+      set: {
+        url: `https://example.com/case-studies/test`,
+        status: row.status ?? "submitted",
+        detail: "test",
+        notifiedAt: row.notifiedAt,
+        notifiedUpdatedAt: row.notifiedUpdatedAt,
+      },
+    });
 }
 
 async function isPending(): Promise<boolean> {
@@ -49,6 +66,7 @@ async function isPending(): Promise<boolean> {
 }
 
 beforeAll(async () => {
+  await acquireSeoTestLock();
   const [row] = await db
     .select({
       articleId: articlesTable.id,
@@ -68,7 +86,7 @@ beforeAll(async () => {
     .select()
     .from(seoNotificationsTable)
     .where(eq(seoNotificationsTable.articleId, articleId));
-});
+}, 120_000);
 
 afterAll(async () => {
   await db
@@ -79,9 +97,24 @@ afterAll(async () => {
     .delete(seoNotificationsTable)
     .where(isNull(seoNotificationsTable.articleId));
   if (originalLedgerRows.length > 0) {
-    await db
-      .insert(seoNotificationsTable)
-      .values(originalLedgerRows.map(({ id: _id, ...rest }) => rest));
+    for (const { id: _id, ...rest } of originalLedgerRows) {
+      await db
+        .insert(seoNotificationsTable)
+        .values(rest)
+        .onConflictDoUpdate({
+          target: [
+            seoNotificationsTable.articleId,
+            seoNotificationsTable.target,
+          ],
+          set: {
+            url: rest.url,
+            status: rest.status,
+            detail: rest.detail,
+            notifiedAt: rest.notifiedAt,
+            notifiedUpdatedAt: rest.notifiedUpdatedAt,
+          },
+        });
+    }
   }
   // The "unpublished article" tests call db.update(articlesTable) to set
   // publishedAt in the future, which triggers Drizzle's $onUpdate hook and
@@ -98,6 +131,7 @@ afterAll(async () => {
       .set({ notifiedUpdatedAt: current.updatedAt })
       .where(eq(seoNotificationsTable.articleId, articleId));
   }
+  await releaseSeoTestLock();
   await pool.end();
 });
 

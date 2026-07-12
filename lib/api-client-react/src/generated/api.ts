@@ -36,7 +36,17 @@ import type {
   HealthStatus,
   ListArticlesParams,
   ListDraftsParams,
+  ListSeoCoverageUrlsParams,
   RejectionOptions,
+  SeoAuditReport,
+  SeoAutofillRequest,
+  SeoAutofillResult,
+  SeoCoverageOverview,
+  SeoCoverageUrlRow,
+  SeoScanResult,
+  SeoSubmissionRow,
+  SeoSubmitBundle,
+  SeoSubmitRequest,
   SubmitDraftRequest
 } from './api.schemas';
 
@@ -1340,5 +1350,533 @@ export const useUnpublishDraft = <TError = ErrorType<ErrorMessage>,
         TContext
       > => {
       return useMutation(getUnpublishDraftMutationOptions(options));
+    }
+
+export const getGetSeoAuditUrl = () => {
+
+
+
+
+  return `/api/seo/admin/audit`
+}
+
+/**
+ * @summary Audit published content for missing SEO fields
+ */
+export const getSeoAudit = async ( options?: RequestInit): Promise<SeoAuditReport> => {
+
+  return customFetch<SeoAuditReport>(getGetSeoAuditUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSeoAuditQueryKey = () => {
+    return [
+    `/api/seo/admin/audit`
+    ] as const;
+    }
+
+
+export const getGetSeoAuditQueryOptions = <TData = Awaited<ReturnType<typeof getSeoAudit>>, TError = ErrorType<ErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSeoAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSeoAuditQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSeoAudit>>> = ({ signal }) => getSeoAudit({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSeoAudit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSeoAuditQueryResult = NonNullable<Awaited<ReturnType<typeof getSeoAudit>>>
+export type GetSeoAuditQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Audit published content for missing SEO fields
+ */
+
+export function useGetSeoAudit<TData = Awaited<ReturnType<typeof getSeoAudit>>, TError = ErrorType<ErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSeoAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSeoAuditQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAutofillSeoAuditUrl = () => {
+
+
+
+
+  return `/api/seo/admin/audit/autofill`
+}
+
+/**
+ * @summary Fill blank SEO title/description fields with audit suggestions
+ */
+export const autofillSeoAudit = async (seoAutofillRequest?: SeoAutofillRequest, options?: RequestInit): Promise<SeoAutofillResult> => {
+
+  return customFetch<SeoAutofillResult>(getAutofillSeoAuditUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(seoAutofillRequest)
+  }
+);}
+
+
+
+
+
+export const getAutofillSeoAuditMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof autofillSeoAudit>>, TError,{data?: BodyType<SeoAutofillRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof autofillSeoAudit>>, TError,{data?: BodyType<SeoAutofillRequest>}, TContext> => {
+
+const mutationKey = ['autofillSeoAudit'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof autofillSeoAudit>>, {data?: BodyType<SeoAutofillRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  autofillSeoAudit(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AutofillSeoAuditMutationResult = NonNullable<Awaited<ReturnType<typeof autofillSeoAudit>>>
+    export type AutofillSeoAuditMutationBody = BodyType<SeoAutofillRequest> | undefined
+    export type AutofillSeoAuditMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Fill blank SEO title/description fields with audit suggestions
+ */
+export const useAutofillSeoAudit = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof autofillSeoAudit>>, TError,{data?: BodyType<SeoAutofillRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof autofillSeoAudit>>,
+        TError,
+        {data?: BodyType<SeoAutofillRequest>},
+        TContext
+      > => {
+      return useMutation(getAutofillSeoAuditMutationOptions(options));
+    }
+
+export const getSubmitSeoUrlsUrl = () => {
+
+
+
+
+  return `/api/seo/admin/submit`
+}
+
+/**
+ * @summary Submit URLs to search engines (IndexNow, Google, Bing)
+ */
+export const submitSeoUrls = async (seoSubmitRequest?: SeoSubmitRequest, options?: RequestInit): Promise<SeoSubmitBundle> => {
+
+  return customFetch<SeoSubmitBundle>(getSubmitSeoUrlsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(seoSubmitRequest)
+  }
+);}
+
+
+
+
+
+export const getSubmitSeoUrlsMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitSeoUrls>>, TError,{data?: BodyType<SeoSubmitRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitSeoUrls>>, TError,{data?: BodyType<SeoSubmitRequest>}, TContext> => {
+
+const mutationKey = ['submitSeoUrls'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitSeoUrls>>, {data?: BodyType<SeoSubmitRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitSeoUrls(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitSeoUrlsMutationResult = NonNullable<Awaited<ReturnType<typeof submitSeoUrls>>>
+    export type SubmitSeoUrlsMutationBody = BodyType<SeoSubmitRequest> | undefined
+    export type SubmitSeoUrlsMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Submit URLs to search engines (IndexNow, Google, Bing)
+ */
+export const useSubmitSeoUrls = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitSeoUrls>>, TError,{data?: BodyType<SeoSubmitRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitSeoUrls>>,
+        TError,
+        {data?: BodyType<SeoSubmitRequest>},
+        TContext
+      > => {
+      return useMutation(getSubmitSeoUrlsMutationOptions(options));
+    }
+
+export const getListSeoSubmissionsUrl = () => {
+
+
+
+
+  return `/api/seo/admin/submissions`
+}
+
+/**
+ * @summary Recent search-engine submission ledger rows
+ */
+export const listSeoSubmissions = async ( options?: RequestInit): Promise<SeoSubmissionRow[]> => {
+
+  return customFetch<SeoSubmissionRow[]>(getListSeoSubmissionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSeoSubmissionsQueryKey = () => {
+    return [
+    `/api/seo/admin/submissions`
+    ] as const;
+    }
+
+
+export const getListSeoSubmissionsQueryOptions = <TData = Awaited<ReturnType<typeof listSeoSubmissions>>, TError = ErrorType<ErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSeoSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSeoSubmissionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSeoSubmissions>>> = ({ signal }) => listSeoSubmissions({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSeoSubmissions>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSeoSubmissionsQueryResult = NonNullable<Awaited<ReturnType<typeof listSeoSubmissions>>>
+export type ListSeoSubmissionsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Recent search-engine submission ledger rows
+ */
+
+export function useListSeoSubmissions<TData = Awaited<ReturnType<typeof listSeoSubmissions>>, TError = ErrorType<ErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSeoSubmissions>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSeoSubmissionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetSeoCoverageUrl = () => {
+
+
+
+
+  return `/api/seo/admin/coverage`
+}
+
+/**
+ * @summary Index-coverage overview grouped by page kind
+ */
+export const getSeoCoverage = async ( options?: RequestInit): Promise<SeoCoverageOverview> => {
+
+  return customFetch<SeoCoverageOverview>(getGetSeoCoverageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSeoCoverageQueryKey = () => {
+    return [
+    `/api/seo/admin/coverage`
+    ] as const;
+    }
+
+
+export const getGetSeoCoverageQueryOptions = <TData = Awaited<ReturnType<typeof getSeoCoverage>>, TError = ErrorType<ErrorMessage>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSeoCoverage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSeoCoverageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSeoCoverage>>> = ({ signal }) => getSeoCoverage({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSeoCoverage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSeoCoverageQueryResult = NonNullable<Awaited<ReturnType<typeof getSeoCoverage>>>
+export type GetSeoCoverageQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Index-coverage overview grouped by page kind
+ */
+
+export function useGetSeoCoverage<TData = Awaited<ReturnType<typeof getSeoCoverage>>, TError = ErrorType<ErrorMessage>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSeoCoverage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSeoCoverageQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListSeoCoverageUrlsUrl = (params?: ListSeoCoverageUrlsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/seo/admin/coverage/urls?${stringifiedParams}` : `/api/seo/admin/coverage/urls`
+}
+
+/**
+ * @summary Per-URL index-coverage rows
+ */
+export const listSeoCoverageUrls = async (params?: ListSeoCoverageUrlsParams, options?: RequestInit): Promise<SeoCoverageUrlRow[]> => {
+
+  return customFetch<SeoCoverageUrlRow[]>(getListSeoCoverageUrlsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSeoCoverageUrlsQueryKey = (params?: ListSeoCoverageUrlsParams,) => {
+    return [
+    `/api/seo/admin/coverage/urls`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListSeoCoverageUrlsQueryOptions = <TData = Awaited<ReturnType<typeof listSeoCoverageUrls>>, TError = ErrorType<ErrorMessage>>(params?: ListSeoCoverageUrlsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSeoCoverageUrls>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSeoCoverageUrlsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSeoCoverageUrls>>> = ({ signal }) => listSeoCoverageUrls(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSeoCoverageUrls>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSeoCoverageUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof listSeoCoverageUrls>>>
+export type ListSeoCoverageUrlsQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Per-URL index-coverage rows
+ */
+
+export function useListSeoCoverageUrls<TData = Awaited<ReturnType<typeof listSeoCoverageUrls>>, TError = ErrorType<ErrorMessage>>(
+ params?: ListSeoCoverageUrlsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSeoCoverageUrls>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSeoCoverageUrlsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRunSeoCoverageScanUrl = () => {
+
+
+
+
+  return `/api/seo/admin/coverage/scan`
+}
+
+/**
+ * @summary Trigger a manual index-coverage rescan
+ */
+export const runSeoCoverageScan = async ( options?: RequestInit): Promise<SeoScanResult> => {
+
+  return customFetch<SeoScanResult>(getRunSeoCoverageScanUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRunSeoCoverageScanMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runSeoCoverageScan>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runSeoCoverageScan>>, TError,void, TContext> => {
+
+const mutationKey = ['runSeoCoverageScan'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runSeoCoverageScan>>, void> = () => {
+
+
+          return  runSeoCoverageScan(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunSeoCoverageScanMutationResult = NonNullable<Awaited<ReturnType<typeof runSeoCoverageScan>>>
+
+    export type RunSeoCoverageScanMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Trigger a manual index-coverage rescan
+ */
+export const useRunSeoCoverageScan = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runSeoCoverageScan>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof runSeoCoverageScan>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRunSeoCoverageScanMutationOptions(options));
     }
 
