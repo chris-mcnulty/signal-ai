@@ -9,6 +9,8 @@ import Article from "@/pages/article";
 import CaseStudies from "@/pages/case-studies";
 import CaseStudy from "@/pages/case-study";
 import News from "@/pages/news";
+import UseCases from "@/pages/use-cases";
+import Opinion from "@/pages/opinion";
 import About from "@/pages/about";
 import { SeoHead } from "@/lib/seo";
 
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/case-studies" component={CaseStudies} />
       <Route path="/case-studies/:slug" component={CaseStudy} />
       <Route path="/news" component={News} />
+      <Route path="/use-cases" component={UseCases} />
+      <Route path="/opinion" component={Opinion} />
       <Route path="/about" component={About} />
       <Route component={NotFound} />
     </Switch>

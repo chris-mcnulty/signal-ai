@@ -64,9 +64,9 @@ export default function Home() {
       <div className="border-b border-news py-2 px-6 md:px-12 flex justify-between items-center text-xs font-mono text-news-secondary uppercase tracking-wider animate-fade-in-up delay-100 overflow-x-auto">
         <div className="shrink-0">{today}</div>
         <div className="hidden md:flex gap-6 shrink-0">
-          <span className="hover-dim cursor-pointer">Use Cases</span>
+          <Link href="/use-cases" className="hover-dim cursor-pointer text-accent font-bold transition-colors">Use Cases</Link>
           <Link href="/news" className="hover-dim cursor-pointer text-accent font-bold transition-colors">Industry News</Link>
-          <span className="hover-dim cursor-pointer">Opinion</span>
+          <Link href="/opinion" className="hover-dim cursor-pointer text-accent font-bold transition-colors">Opinion</Link>
           <Link href="/case-studies" className="hover-dim cursor-pointer text-accent font-bold transition-colors">
             Case Studies
           </Link>
