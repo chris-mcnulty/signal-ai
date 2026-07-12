@@ -8,6 +8,7 @@
     "seed-content": "tsx ./src/seed-content.ts",
     "seed-news": "tsx ./src/seed-news.ts",
     "correct-british-english": "tsx ./src/correct-british-english.ts",
+    "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "vitest": "^4.1.10"
   }
 }
