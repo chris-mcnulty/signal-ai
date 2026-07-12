@@ -84,6 +84,13 @@ export default function CaseStudyDetail() {
             {study.dek}
           </p>
 
+          {/* Hero Image */}
+          {study.heroImageUrl && (
+            <div className="w-full aspect-[21/9] overflow-hidden mb-12 border border-news">
+              <img src={study.heroImageUrl} alt={study.title} className="w-full h-full object-cover" />
+            </div>
+          )}
+
           {/* Company Context Bar */}
           <div className="bg-white border border-news p-6 md:p-8 flex flex-col md:flex-row gap-8 justify-between items-start md:items-center">
             <div className="flex items-center gap-4">
@@ -157,6 +164,25 @@ export default function CaseStudyDetail() {
                     <div className="font-mono text-xs text-news-secondary uppercase">{q.role}</div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {study.sourceUrls && study.sourceUrls.length > 0 && (
+              <div className="border-t-4 border-news pt-4">
+                <div className="font-mono text-sm uppercase tracking-widest text-news-secondary mb-4">Sources</div>
+                <ol className="space-y-3 list-decimal list-inside">
+                  {study.sourceUrls.map((url, i) => {
+                    let label = url;
+                    try { label = new URL(url).hostname.replace(/^www\./, ''); } catch {}
+                    return (
+                      <li key={i} className="font-mono text-xs text-news-secondary">
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="hover:text-accent hover:underline break-all">
+                          {label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ol>
               </div>
             )}
           </aside>

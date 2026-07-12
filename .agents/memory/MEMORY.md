@@ -1,10 +1,3 @@
-- [SEO pages are SSR'd from the api-server](seo-ssr-pages.md) — /case-studies, /sitemap.xml, /robots.txt are api-server SSR routes claimed at the proxy; the future React site must not shadow them.
-- [Drafts API conventions](drafts-api.md) — review-queue statuses, API-key auth pattern, and where the external docs live; keep new submission paths consistent.
-- [OpenAI template typecheck fix](openai-template-quirk.md) — the copied integrations-openai-ai-server template fails `typecheck:libs` (`response.data` possibly undefined); needs optional chaining.
-- [Env vars are committed to the repo](env-vars-in-replit-file.md) — shared/development env vars land in `.replit` (tracked); anything sensitive must be a Replit Secret.
-- [OG share card rendering](og-share-cards.md) — share images use satori+resvg with vendored fonts; keep @resvg/* external in esbuild; platforms cache images by URL.
-- [IndexNow notifier](indexnow-notifier.md) — new case studies auto-pinged via DB-polled IndexNow ledger; key file at /indexnow-key.txt is a claimed proxy path; publish flows need no extra wiring.
-- [SEO notifier tests & dev-DB state](seo-notifier-tests-db-state.md) — seo-tests assert exact call counts against the real dev DB and need ≥1 published case study; missing seo_notifications ledger rows cause false failures, backfill instead of editing code.
-- [GNews API integration](gnews-api.md) — GNews v4 auth param is `apikey` (not legacy `token`); "did not provide an API key" 400 usually means wrong param name or a placeholder key.
-- [Source Repositories](source-repositories.md) — synozur-orbit (AI marketing/content engine, source of SignalAI's engine/) and synozur-webbase (baseline monorepo, source of SEO stack); check these before building AI or SEO features from scratch.
-- [Admin Accounts](admin-accounts.md) — chris.mcnulty@synozur.com and admin@synozur.com are permanent full admins; must survive any auth changes.
+- [Dual rendering for case studies](case-study-rendering.md) — /case-studies/* is proxied to SSR (api-server), not the React SPA; both layers must be kept in sync.
+- [Admin accounts](admin-accounts.md) — permanent admin credentials for dashboard login
+- [Source repositories](source-repositories.md) — upstream repos this project derives from

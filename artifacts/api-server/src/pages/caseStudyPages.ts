@@ -229,12 +229,35 @@ ${relatedCaseStudies
 </section>`
     : "";
 
+  const heroImageHtml = article.heroImageUrl
+    ? `<div class="hero-image"><img src="${escapeHtml(article.heroImageUrl)}" alt="${escapeHtml(article.title)}" loading="eager" /></div>`
+    : "";
+
+  const sourcesHtml =
+    article.sourceUrls && article.sourceUrls.length > 0
+      ? `<aside class="sources">
+<h3 class="mono">Sources</h3>
+<ol>
+${article.sourceUrls
+  .map((url) => {
+    let label = url;
+    try {
+      label = new URL(url).hostname.replace(/^www\./, "");
+    } catch {}
+    return `<li><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a></li>`;
+  })
+  .join("\n")}
+</ol>
+</aside>`
+      : "";
+
   const body = `<main>
 <article>
 <span class="kicker mono">Case Study</span><span class="meta mono">${escapeHtml(formatDate(article.publishedAt ?? article.createdAt))} · ${article.readingMinutes} min read</span>
 <h1 class="headline">${escapeHtml(article.title)}</h1>
 <p class="dek">${escapeHtml(article.dek)}</p>
 <div class="byline mono">By ${escapeHtml(article.author)} · ${escapeHtml(SITE.name)}</div>
+${heroImageHtml}
 <aside class="company-card">
 <h2 class="mono">Company profile</h2>
 <div class="company-name">${escapeHtml(caseStudy.companyName)}</div>
@@ -251,6 +274,7 @@ ${metricsHtml}
 ${renderArticleBody(article.body)}
 ${quotesHtml}
 </div>
+${sourcesHtml}
 </article>
 ${relatedHtml}
 <p style="margin-top:40px"><a class="mono" style="font-size:12px" href="/case-studies">← All case studies</a></p>

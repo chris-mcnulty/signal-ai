@@ -1502,6 +1502,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CaseStudyQuote"
+        heroImageUrl:
+          type: string
+          nullable: true
+        sourceUrls:
+          type: array
+          nullable: true
+          items:
+            type: string
         relatedArticles:
           type: array
           items:

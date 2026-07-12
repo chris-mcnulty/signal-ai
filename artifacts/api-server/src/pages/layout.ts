@@ -16,6 +16,14 @@ main{max-width:800px;margin:0 auto;padding:48px 24px 80px}
 h1.headline{font-size:clamp(34px,6vw,54px);line-height:1.07;letter-spacing:-.01em;margin:20px 0 16px;font-weight:800}
 .dek{font-size:21px;color:var(--muted);line-height:1.5;margin-bottom:28px}
 .byline{font-size:13px;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:36px}
+.hero-image{margin:0 0 36px;overflow:hidden;border:1px solid var(--line)}
+.hero-image img{width:100%;max-height:420px;object-fit:cover;display:block}
+.sources{border-top:1px solid var(--line);margin-top:36px;padding-top:20px}
+.sources h3{font-size:11px;color:var(--muted);margin-bottom:12px}
+.sources ol{padding-left:20px;font-size:13px;color:var(--muted)}
+.sources li{margin-bottom:6px}
+.sources a{color:var(--muted);text-decoration:none}
+.sources a:hover{color:var(--accent);text-decoration:underline}
 .company-card{border:1px solid var(--line);background:#fffdf9;padding:24px;margin:0 0 36px}
 .company-card h2{font-size:13px;margin-bottom:14px;color:var(--accent)}
 .company-card .company-name{font-size:22px;font-weight:800;margin-bottom:6px}

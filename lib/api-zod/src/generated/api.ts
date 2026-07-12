@@ -124,6 +124,8 @@ export const GetCaseStudyResponse = zod.object({
   "attribution": zod.string(),
   "role": zod.string()
 })),
+  "heroImageUrl": zod.string().nullish(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "relatedArticles": zod.array(zod.object({
   "id": zod.number(),
   "slug": zod.string(),
