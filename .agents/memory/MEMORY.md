@@ -7,3 +7,4 @@
 - [SEO notifier tests & dev-DB state](seo-notifier-tests-db-state.md) — seo-tests assert exact call counts against the real dev DB and need ≥1 published case study; missing seo_notifications ledger rows cause false failures, backfill instead of editing code.
 - [Clerk handshake breaks public HTML endpoints](clerk-handshake-public-html.md) — cookie-less `Accept: text/html` GETs get 307'd by clerkMiddleware; public SEO/SSR routes must be in the CLERK_EXEMPT list in app.ts.
 - [GNews API integration](gnews-api.md) — GNews v4 auth param is `apikey` (not legacy `token`); "did not provide an API key" 400 usually means wrong param name or a placeholder key.
+- [Admin Accounts](admin-accounts.md) — chris.mcnulty@synozur.com and admin@synozur.com are permanent full admins; must survive any auth changes.
