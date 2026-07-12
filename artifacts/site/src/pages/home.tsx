@@ -65,7 +65,7 @@ export default function Home() {
         <div className="shrink-0">{today}</div>
         <div className="hidden md:flex gap-6 shrink-0">
           <span className="hover-dim cursor-pointer">Use Cases</span>
-          <span className="hover-dim cursor-pointer">Industry News</span>
+          <Link href="/news" className="hover-dim cursor-pointer text-accent font-bold transition-colors">Industry News</Link>
           <span className="hover-dim cursor-pointer">Opinion</span>
           <Link href="/case-studies" className="hover-dim cursor-pointer text-accent font-bold transition-colors">
             Case Studies
