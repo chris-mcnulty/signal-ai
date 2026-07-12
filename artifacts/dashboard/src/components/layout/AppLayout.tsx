@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2 } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
@@ -28,6 +28,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
             >
               <LayoutDashboard className="w-4 h-4" />
               Queue
+            </Link>
+            <Link
+              href="/schedule"
+              className={`h-9 px-4 inline-flex items-center gap-2 text-sm font-medium rounded-md transition-colors ${
+                location === "/schedule" ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              }`}
+            >
+              <CalendarDays className="w-4 h-4" />
+              Scheduled
             </Link>
             <Link
               href="/seo"

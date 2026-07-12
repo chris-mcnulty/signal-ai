@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 import Home from "./pages/Home";
 import Queue from "./pages/Queue";
+import Schedule from "./pages/Schedule";
 import DraftEditor from "./pages/DraftEditor";
 import Seo from "./pages/Seo";
 import Engine from "./pages/Engine";
@@ -26,6 +27,10 @@ function Routes() {
 
       <Route path="/queue">
         <ProtectedRoute component={Queue} />
+      </Route>
+
+      <Route path="/schedule">
+        <ProtectedRoute component={Schedule} />
       </Route>
 
       <Route path="/drafts/:id">
