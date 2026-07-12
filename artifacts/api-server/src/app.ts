@@ -3,6 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import caseStudyPagesRouter from "./pages/caseStudyPages";
+import articlePagesRouter from "./pages/articlePages";
 import sitemapRouter from "./pages/sitemap";
 import { logger } from "./lib/logger";
 
@@ -39,6 +40,7 @@ app.use("/api", router);
 
 // Server-rendered, SEO-optimized public pages (proxied at root paths)
 app.use(caseStudyPagesRouter);
+app.use(articlePagesRouter);
 app.use(sitemapRouter);
 
 export default app;

@@ -10,6 +10,13 @@ export function caseStudyOgImageUrl(
   return `${baseUrl}/case-studies/og/${article.slug}.png?v=${article.updatedAt.getTime()}`;
 }
 
+export function articleOgImageUrl(
+  baseUrl: string,
+  article: Pick<Article, "slug" | "updatedAt">,
+): string {
+  return `${baseUrl}/og/articles/${article.slug}.png?v=${article.updatedAt.getTime()}`;
+}
+
 export function publisherJsonLd(baseUrl: string): JsonLd {
   return {
     "@type": "Organization",

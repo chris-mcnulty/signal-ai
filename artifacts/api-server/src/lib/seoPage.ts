@@ -1,6 +1,7 @@
 import type { Article } from "@workspace/db";
 import { SITE } from "./site";
 import {
+  articleOgImageUrl,
   caseStudyOgImageUrl,
   publisherJsonLd,
   caseStudyArticleJsonLd,
@@ -57,7 +58,7 @@ function articleTitle(article: Article): string {
   return article.seoTitle?.trim() || article.title;
 }
 
-async function getPublishedArticleBySlug(
+export async function getPublishedArticleBySlug(
   slug: string,
 ): Promise<Article | null> {
   await promoteDueArticles();
@@ -222,7 +223,7 @@ export async function resolveSeoPage(
       title: `${articleTitle(article)} — ${SITE.name}`,
       description: articleDescription(article),
       canonicalUrl,
-      ogImageUrl: article.heroImageUrl ?? defaultOgImage(baseUrl),
+      ogImageUrl: articleOgImageUrl(baseUrl, article),
       ogType: "article",
       publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
