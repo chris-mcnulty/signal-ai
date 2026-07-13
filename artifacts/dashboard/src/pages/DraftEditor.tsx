@@ -312,11 +312,31 @@ export default function DraftEditor() {
         toast({ title: "Failed to save image to article. Try again.", variant: "destructive" });
         return;
       }
+      form.setValue("imageUrl", pathToAssign, { shouldDirty: false });
+      setGenOpen(false);
+      setGenPreview(null);
+      invalidateAndRefresh();
+      if (draft?.status !== "published") {
+        const currentValues = form.getValues();
+        updateMutation.mutate(
+          { id: draftId, data: { ...currentValues, imageUrl: pathToAssign } },
+          {
+            onSuccess: () => {
+              toast({ title: "Cover image saved" });
+              queryClient.invalidateQueries({ queryKey: getGetDraftQueryKey(draftId) });
+            },
+            onError: () => toast({ title: "Cover image assigned — save failed, try saving manually.", variant: "destructive" }),
+          }
+        );
+      } else {
+        toast({ title: "Cover image updated" });
+      }
+    } else {
+      form.setValue("imageUrl", pathToAssign, { shouldDirty: true });
+      setGenOpen(false);
+      setGenPreview(null);
+      toast({ title: "Image set — save the draft to persist it" });
     }
-    form.setValue("imageUrl", pathToAssign, { shouldDirty: true });
-    setGenOpen(false);
-    setGenPreview(null);
-    toast({ title: "Image set — save the draft to persist it" });
   };
 
   if (!isNew && isDraftLoading) {
@@ -344,7 +364,7 @@ export default function DraftEditor() {
             className="gap-2"
           >
             <Save className="w-4 h-4" />
-            Save Draft
+            {draft?.status === "published" ? "Save Changes" : "Save Draft"}
           </Button>
         </div>
       </div>
