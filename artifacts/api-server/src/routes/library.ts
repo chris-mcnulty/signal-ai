@@ -67,7 +67,7 @@ router.post(
     const ext = file.mimetype === "image/svg+xml" ? ".svg" : ".png";
     const slug = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
     const filePath = path.join(LIBRARY_DIR, slug);
-    const publicPath = `/static/library/${slug}`;
+    const publicPath = `/api/static/library/${slug}`;
 
     await mkdir(LIBRARY_DIR, { recursive: true });
     await writeFile(filePath, file.buffer);

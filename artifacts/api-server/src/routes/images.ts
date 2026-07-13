@@ -19,7 +19,7 @@ async function generateAndSave(prompt: string): Promise<string> {
   const filename = `${randomUUID()}.png`;
   const filePath = path.join(GENERATED_DIR, filename);
   await writeFile(filePath, buffer);
-  return `/static/generated/${filename}`;
+  return `/api/static/generated/${filename}`;
 }
 
 router.post("/images/generate", requireEditor, async (req, res): Promise<void> => {

@@ -24,7 +24,7 @@ export async function seedLibraryIfEmpty(): Promise<void> {
 
     const values = SEED.map((s) => ({
       filename: s.filename,
-      path: `/static/library/${s.filename}`,
+      path: `/api/static/library/${s.filename}`,
       category: s.category,
       label: s.label,
     }));

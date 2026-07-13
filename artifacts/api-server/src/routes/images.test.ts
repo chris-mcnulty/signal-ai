@@ -141,7 +141,7 @@ describe("POST /api/images/generate", () => {
     expect(generateRes.status).toBe(200);
     const publicPath = generateRes.body.path as string;
 
-    // The static middleware should serve the file at its /static/generated URL.
+    // The static middleware should serve the file at its /api/static/generated URL.
     const serveRes = await request(app).get(publicPath);
     expect(serveRes.status).toBe(200);
     expect(serveRes.headers["content-type"]).toMatch(/image\/png|application\/octet-stream/);

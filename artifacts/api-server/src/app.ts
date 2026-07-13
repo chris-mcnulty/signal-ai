@@ -42,11 +42,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
-// Static library images
-app.use("/static/library", express.static(path.join(__dirname, "../public/static/library")));
+// Static library images — served under /api/static/library so the Replit proxy
+// forwards these requests to the API server (the proxy only routes /api/* here).
+app.use("/api/static/library", express.static(path.join(__dirname, "../public/static/library")));
 
 // AI-generated images
-app.use("/static/generated", express.static(path.join(__dirname, "../public/static/generated")));
+app.use("/api/static/generated", express.static(path.join(__dirname, "../public/static/generated")));
 
 // Server-rendered, SEO-optimized public pages (proxied at root paths)
 app.use(caseStudyPagesRouter);
