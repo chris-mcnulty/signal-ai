@@ -2,6 +2,11 @@ import { Router, type IRouter } from "express";
 import { getBaseUrl, escapeXml, SITE } from "../lib/site";
 import { listPublicSeoPages } from "../lib/seoContent";
 import { getIndexNowKey, INDEXNOW_KEY_PATH } from "../lib/indexnow";
+import { db, articlesTable } from "@workspace/db";
+import { desc } from "drizzle-orm";
+import { publishedArticleFilter, pathForArticle } from "../lib/seoContent";
+import { CASE_STUDY_CATEGORY } from "../lib/content";
+import { promoteDueArticles } from "../lib/articles";
 
 // IndexNow key-validation file. Canonical location is `/{key}.txt` per the
 // IndexNow protocol; the fixed `/indexnow-key.txt` alias is kept for
@@ -36,6 +41,64 @@ ${urls.join("\n")}
   );
 });
 
+router.get("/feed.xml", async (req, res): Promise<void> => {
+  const baseUrl = getBaseUrl(req);
+  await promoteDueArticles();
+  const articles = await db
+    .select({
+      slug: articlesTable.slug,
+      title: articlesTable.title,
+      excerpt: articlesTable.excerpt,
+      author: articlesTable.author,
+      category: articlesTable.category,
+      publishedAt: articlesTable.publishedAt,
+    })
+    .from(articlesTable)
+    .where(publishedArticleFilter())
+    .orderBy(desc(articlesTable.publishedAt));
+
+  const feedArticles = articles.filter(
+    (a) => a.category !== CASE_STUDY_CATEGORY,
+  );
+
+  const items = feedArticles.map((a) => {
+    const path = pathForArticle(a);
+    const link = escapeXml(`${baseUrl}${path}`);
+    const title = escapeXml(a.title);
+    const description = escapeXml(a.excerpt ?? "");
+    const author = escapeXml(a.author);
+    const pubDate = a.publishedAt
+      ? a.publishedAt.toUTCString()
+      : new Date().toUTCString();
+    return [
+      `  <item>`,
+      `    <title>${title}</title>`,
+      `    <link>${link}</link>`,
+      `    <guid isPermaLink="true">${link}</guid>`,
+      `    <pubDate>${pubDate}</pubDate>`,
+      `    <description>${description}</description>`,
+      `    <author>${author}</author>`,
+      `  </item>`,
+    ].join("\n");
+  });
+
+  res.setHeader("Content-Type", "application/rss+xml; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=300");
+  res.send(
+    `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>${escapeXml(SITE.name)}</title>
+    <link>${escapeXml(baseUrl)}</link>
+    <description>${escapeXml(SITE.description)}</description>
+    <language>en-us</language>
+    <atom:link href="${escapeXml(`${baseUrl}/feed.xml`)}" rel="self" type="application/rss+xml"/>
+${items.join("\n")}
+  </channel>
+</rss>`,
+  );
+});
+
 router.get("/robots.txt", (req, res): void => {
   const baseUrl = getBaseUrl(req);
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
@@ -45,6 +108,7 @@ Allow: /
 Disallow: /dashboard
 
 Sitemap: ${baseUrl}/sitemap.xml
+Feed: ${baseUrl}/feed.xml
 # LLM/AIO crawler guide: ${baseUrl}/llms.txt
 `);
 });
