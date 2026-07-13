@@ -348,6 +348,13 @@ export function Footer() {
             About
           </Link>
           <a
+            href="/dashboard/"
+            className="hover:text-accent transition-colors"
+            data-testid="link-editorial"
+          >
+            Editorial Login
+          </a>
+          <a
             href="/rss.xml"
             className="hover:text-accent transition-colors flex items-center gap-1.5"
             data-testid="link-rss"
