@@ -28,6 +28,10 @@ if (!basePath) {
 
 export default defineConfig({
   base: basePath,
+  define: {
+    "import.meta.env.VITE_ENTRA_CLIENT_ID": JSON.stringify(process.env.ENTRA_CLIENT_ID ?? ""),
+    "import.meta.env.VITE_ENTRA_TENANT_ID": JSON.stringify(process.env.ENTRA_TENANT_ID ?? "common"),
+  },
   plugins: [
     react(),
     tailwindcss(),
