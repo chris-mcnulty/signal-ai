@@ -83,6 +83,7 @@ router.get("/feed.xml", async (req, res): Promise<void> => {
   });
 
   res.setHeader("Content-Type", "application/rss+xml; charset=utf-8");
+  res.setHeader("Content-Disposition", "inline; filename=\"feed.xml\"");
   res.setHeader("Cache-Control", "public, max-age=300");
   res.send(
     `<?xml version="1.0" encoding="UTF-8"?>
