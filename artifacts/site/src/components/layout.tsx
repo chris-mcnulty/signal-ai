@@ -346,7 +346,7 @@ export function Footer() {
             About
           </Link>
           <a
-            href="/feed.xml"
+            href="/rss.xml"
             className="hover:text-accent transition-colors flex items-center gap-1.5"
             data-testid="link-rss"
           >

@@ -73,7 +73,7 @@ export default function Home() {
         </div>
         <div className="shrink-0 flex items-center gap-4">
           <a
-            href="/feed.xml"
+            href="/rss.xml"
             className="hover-dim flex items-center gap-1 text-news-secondary hover:text-accent transition-colors"
             title="Subscribe via RSS"
           >

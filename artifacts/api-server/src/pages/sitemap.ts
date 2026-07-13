@@ -41,7 +41,7 @@ ${urls.join("\n")}
   );
 });
 
-router.get("/feed.xml", async (req, res): Promise<void> => {
+router.get("/rss.xml", async (req, res): Promise<void> => {
   const baseUrl = getBaseUrl(req);
   await promoteDueArticles();
   const articles = await db
@@ -83,7 +83,7 @@ router.get("/feed.xml", async (req, res): Promise<void> => {
   });
 
   res.setHeader("Content-Type", "application/rss+xml; charset=utf-8");
-  res.setHeader("Content-Disposition", "inline; filename=\"feed.xml\"");
+  res.setHeader("Content-Disposition", "inline; filename=\"rss.xml\"");
   res.setHeader("Cache-Control", "public, max-age=300");
   res.send(
     `<?xml version="1.0" encoding="UTF-8"?>
@@ -93,7 +93,7 @@ router.get("/feed.xml", async (req, res): Promise<void> => {
     <link>${escapeXml(baseUrl)}</link>
     <description>${escapeXml(SITE.description)}</description>
     <language>en-us</language>
-    <atom:link href="${escapeXml(`${baseUrl}/feed.xml`)}" rel="self" type="application/rss+xml"/>
+    <atom:link href="${escapeXml(`${baseUrl}/rss.xml`)}" rel="self" type="application/rss+xml"/>
 ${items.join("\n")}
   </channel>
 </rss>`,
@@ -109,7 +109,7 @@ Allow: /
 Disallow: /dashboard
 
 Sitemap: ${baseUrl}/sitemap.xml
-Feed: ${baseUrl}/feed.xml
+Feed: ${baseUrl}/rss.xml
 # LLM/AIO crawler guide: ${baseUrl}/llms.txt
 `);
 });
