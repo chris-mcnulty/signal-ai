@@ -24,6 +24,14 @@ const msalConfig: Configuration = {
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
+// Initialize eagerly so the instance is ready before the user clicks the
+// sign-in button. If initialize() is called inside the click handler the
+// browser may lose track of the user gesture by the time loginPopup() runs,
+// causing the popup to be silently blocked.
+msalInstance.initialize().catch((err) => {
+  console.warn("[MSAL] eager initialization failed:", err);
+});
+
 export const loginRequest: PopupRequest = {
   scopes: ["openid", "profile", "email"],
 };

@@ -8,10 +8,13 @@ import jwt from "jsonwebtoken";
 const router: IRouter = Router();
 
 const ENTRA_CLIENT_ID = process.env["ENTRA_CLIENT_ID"];
-const ENTRA_TENANT_ID = process.env["ENTRA_TENANT_ID"] ?? "common";
 
+// Use the common JWKS endpoint so tokens issued for any tenant (including
+// tenants other than the registering tenant) can have their signatures
+// verified. Microsoft publishes the same signing keys at both the
+// tenant-specific and common endpoints.
 const jwks = jwksClient({
-  jwksUri: `https://login.microsoftonline.com/${ENTRA_TENANT_ID}/discovery/v2.0/keys`,
+  jwksUri: "https://login.microsoftonline.com/common/discovery/v2.0/keys",
   cache: true,
   cacheMaxAge: 600_000,
 });

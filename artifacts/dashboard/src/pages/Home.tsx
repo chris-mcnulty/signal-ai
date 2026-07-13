@@ -54,7 +54,6 @@ export default function Home() {
     setError("");
     setMsalLoading(true);
     try {
-      await msalInstance.initialize();
       const result = await msalInstance.loginPopup(loginRequest);
       const idToken = result.idToken;
 
