@@ -7,6 +7,7 @@ import seoRouter from "./seo";
 import engineRouter from "./engine";
 import authRouter from "./auth";
 import libraryRouter from "./library";
+import imagesRouter from "./images";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(engineRouter);
 router.use(draftsRouter);
 router.use(seoRouter);
 router.use(libraryRouter);
+router.use(imagesRouter);
 
 export default router;

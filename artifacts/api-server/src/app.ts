@@ -45,6 +45,9 @@ app.use("/api", router);
 // Static library images
 app.use("/static/library", express.static(path.join(__dirname, "../public/static/library")));
 
+// AI-generated images
+app.use("/static/generated", express.static(path.join(__dirname, "../public/static/generated")));
+
 // Server-rendered, SEO-optimized public pages (proxied at root paths)
 app.use(caseStudyPagesRouter);
 app.use(articlePagesRouter);

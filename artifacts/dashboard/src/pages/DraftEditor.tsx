@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, Wand2, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, Wand2, Loader2, ImagePlus, RefreshCw, Check } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -253,6 +253,72 @@ export default function DraftEditor() {
   const [isApproveOpen, setIsApproveOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
 
+  const [genOpen, setGenOpen] = useState(false);
+  const [genPrompt, setGenPrompt] = useState("");
+  const [genLoading, setGenLoading] = useState(false);
+  const [genPreview, setGenPreview] = useState<string | null>(null);
+
+  const openGenerator = () => {
+    const title = form.getValues("title");
+    const category = form.getValues("category");
+    const parts: string[] = [];
+    if (title) parts.push(`titled '${title}'`);
+    if (category) parts.push(`in the '${category}' category`);
+    const defaultPrompt = parts.length
+      ? `Editorial cover image for an article ${parts.join(" ")}. Professional, high-quality photograph.`
+      : "Editorial cover image. Professional, high-quality photograph.";
+    setGenPrompt(defaultPrompt);
+    setGenPreview(null);
+    setGenOpen(true);
+  };
+
+  const handleGenerate = async () => {
+    if (!genPrompt.trim()) return;
+    setGenLoading(true);
+    setGenPreview(null);
+    try {
+      const apiKey = localStorage.getItem("apiKey") ?? "";
+      const res = await fetch(`${API_BASE}/images/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+        body: JSON.stringify({ prompt: genPrompt.trim() }),
+      });
+      if (!res.ok) throw new Error("Generation failed");
+      const { path } = await res.json() as { path: string };
+      setGenPreview(path);
+    } catch {
+      toast({ title: "Image generation failed. Try again.", variant: "destructive" });
+    } finally {
+      setGenLoading(false);
+    }
+  };
+
+  const handleAcceptGenerated = async () => {
+    if (!genPreview) return;
+    const pathToAssign = genPreview;
+    if (draftId) {
+      const apiKey = localStorage.getItem("apiKey") ?? "";
+      try {
+        const res = await fetch(`${API_BASE}/images/assign`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+          body: JSON.stringify({ path: pathToAssign, articleId: draftId }),
+        });
+        if (!res.ok) {
+          toast({ title: "Failed to save image to article. Try again.", variant: "destructive" });
+          return;
+        }
+      } catch {
+        toast({ title: "Failed to save image to article. Try again.", variant: "destructive" });
+        return;
+      }
+    }
+    form.setValue("imageUrl", pathToAssign, { shouldDirty: true });
+    setGenOpen(false);
+    setGenPreview(null);
+    toast({ title: "Image set — save the draft to persist it" });
+  };
+
   if (!isNew && isDraftLoading) {
     return <AppLayout><div className="animate-pulse h-96 bg-muted rounded-xl"></div></AppLayout>;
   }
@@ -339,7 +405,17 @@ export default function DraftEditor() {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cover Image <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Cover Image <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                      <button
+                        type="button"
+                        onClick={openGenerator}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ImagePlus className="w-3.5 h-3.5" />
+                        Generate image
+                      </button>
+                    </div>
                     <FormControl>
                       <ImagePicker
                         value={field.value || null}
@@ -347,6 +423,81 @@ export default function DraftEditor() {
                         apiBase={API_BASE}
                       />
                     </FormControl>
+
+                    {/* Inline generator panel */}
+                    {genOpen && (
+                      <div className="mt-3 border border-border rounded-xl overflow-hidden">
+                        <div className="px-4 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">AI Image Generator</span>
+                          <button
+                            type="button"
+                            onClick={() => { setGenOpen(false); setGenPreview(null); }}
+                            className="text-muted-foreground hover:text-foreground transition-colors text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <div className="p-4 space-y-3">
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Prompt</label>
+                            <Textarea
+                              value={genPrompt}
+                              onChange={(e) => setGenPrompt(e.target.value)}
+                              placeholder="Describe the image you want…"
+                              className="resize-none h-20 text-sm"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={handleGenerate}
+                            disabled={genLoading || !genPrompt.trim()}
+                            className="gap-2"
+                          >
+                            {genLoading ? (
+                              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating…</>
+                            ) : (
+                              <><Wand2 className="w-3.5 h-3.5" /> Generate</>
+                            )}
+                          </Button>
+
+                          {genPreview && (
+                            <div className="space-y-3">
+                              <div className="rounded-lg overflow-hidden border border-border aspect-video bg-muted">
+                                <img
+                                  src={genPreview}
+                                  alt="Generated preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  onClick={handleAcceptGenerated}
+                                  className="gap-2 flex-1"
+                                >
+                                  <Check className="w-3.5 h-3.5" />
+                                  Accept
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleGenerate}
+                                  disabled={genLoading}
+                                  className="gap-2 flex-1"
+                                >
+                                  <RefreshCw className="w-3.5 h-3.5" />
+                                  Try again
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <FormMessage />
                   </FormItem>
                 )}
