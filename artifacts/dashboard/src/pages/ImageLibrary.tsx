@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Loader2, ImageIcon } from "lucide-react";
+import { Upload, Loader2, ImageIcon, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { LibraryImage } from "@workspace/image-library";
 
@@ -21,6 +21,8 @@ const CATEGORIES = [
 ];
 
 const API_BASE = "/api";
+
+const ADMIN_EMAILS = ["chris.mcnulty@synozur.com", "admin@synozur.com"];
 
 function useLibraryImages() {
   const [images, setImages] = useState<LibraryImage[] | null>(null);
@@ -46,8 +48,9 @@ function useLibraryImages() {
 
 export default function ImageLibrary() {
   const { toast } = useToast();
-  const { } = useAuth();
+  const { editorEmail } = useAuth();
   const sessionKey = sessionStorage.getItem("dashboard_api_key");
+  const isAdmin = !!editorEmail && ADMIN_EMAILS.includes(editorEmail.toLowerCase());
 
   const { images, loading, error, fetchImages } = useLibraryImages();
   const [uploading, setUploading] = useState(false);
@@ -56,6 +59,8 @@ export default function ImageLibrary() {
   const [file, setFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [fetched, setFetched] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [confirmingId, setConfirmingId] = useState<number | null>(null);
 
   if (!fetched) {
     setFetched(true);
@@ -98,6 +103,40 @@ export default function ImageLibrary() {
       toast({ title: `Upload failed: ${String(e)}`, variant: "destructive" });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!sessionKey) {
+      toast({ title: "Not authenticated", variant: "destructive" });
+      return;
+    }
+    setDeletingId(id);
+    setConfirmingId(null);
+    try {
+      const res = await fetch(`${API_BASE}/library/images/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${sessionKey}` },
+      });
+      if (res.status === 204) {
+        toast({ title: "Image deleted" });
+        await fetchImages();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        const msg = (body as { error?: string; articles?: string[] }).error ?? `HTTP ${res.status}`;
+        const articles = (body as { articles?: string[] }).articles;
+        toast({
+          title: "Cannot delete image",
+          description: articles?.length
+            ? `${msg}\n\nArticles using it: ${articles.slice(0, 3).join(", ")}${articles.length > 3 ? ` +${articles.length - 3} more` : ""}`
+            : msg,
+          variant: "destructive",
+        });
+      }
+    } catch (e) {
+      toast({ title: `Delete failed: ${String(e)}`, variant: "destructive" });
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -187,13 +226,52 @@ export default function ImageLibrary() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {images.map((img) => (
                   <div key={img.id} className="space-y-1.5">
-                    <div className="rounded-lg overflow-hidden border border-border bg-muted aspect-video">
+                    <div className="relative rounded-lg overflow-hidden border border-border bg-muted aspect-video group">
                       <img
                         src={img.path}
                         alt={img.label}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
+                      {isAdmin && (
+                        <div className="absolute inset-0 flex items-end justify-end p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {confirmingId === img.id ? (
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="h-7 px-2 text-xs"
+                                disabled={deletingId === img.id}
+                                onClick={() => handleDelete(img.id)}
+                              >
+                                {deletingId === img.id ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  "Confirm"
+                                )}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2 text-xs bg-background"
+                                onClick={() => setConfirmingId(null)}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 w-7 p-0"
+                              title="Delete image"
+                              onClick={() => setConfirmingId(img.id)}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div>
                       <p className="text-xs font-medium truncate" title={img.label}>{img.label}</p>
