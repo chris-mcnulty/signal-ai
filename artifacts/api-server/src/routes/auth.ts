@@ -7,8 +7,6 @@ import jwt from "jsonwebtoken";
 
 const router: IRouter = Router();
 
-const ENTRA_CLIENT_ID = process.env["ENTRA_CLIENT_ID"];
-
 // Use the common JWKS endpoint so tokens issued for any tenant (including
 // tenants other than the registering tenant) can have their signatures
 // verified. Microsoft publishes the same signing keys at both the
@@ -29,6 +27,7 @@ function getSigningKey(header: jwt.JwtHeader): Promise<string> {
 }
 
 async function verifyEntraToken(idToken: string): Promise<{ email: string; tid: string }> {
+  const ENTRA_CLIENT_ID = process.env["ENTRA_CLIENT_ID"];
   if (!ENTRA_CLIENT_ID) {
     throw new Error("ENTRA_CLIENT_ID is not configured");
   }
