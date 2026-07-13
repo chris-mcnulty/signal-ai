@@ -64,7 +64,7 @@ import { DraftEnginePanel } from "@/components/DraftEnginePanel";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
-  author: z.string().min(1, "Author is required"),
+  author: z.string().optional().default("SignalAI Staff"),
   excerpt: z.string().optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   body: z.string().min(1, "Body is required"),
@@ -298,7 +298,7 @@ export default function DraftEditor() {
                     <FormItem>
                       <FormLabel>Author</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Jane Smith" {...field} />
+                        <Input placeholder="SignalAI Staff" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
