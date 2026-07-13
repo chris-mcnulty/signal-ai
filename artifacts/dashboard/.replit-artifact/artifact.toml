@@ -18,7 +18,7 @@ localPort = 23183
 run = "pnpm --filter @workspace/dashboard run dev"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/dashboard", "run", "build" ]
+build = ["sh", "-c", "pnpm --filter @workspace/api-spec run codegen && pnpm --filter @workspace/dashboard run build"]
 publicDir = "artifacts/dashboard/dist/public"
 serve = "static"
 
