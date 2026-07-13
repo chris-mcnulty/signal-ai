@@ -171,7 +171,9 @@ export function useSearch() {
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/news", label: "News" },
+  { href: "/news", label: "Industry News" },
+  { href: "/use-cases", label: "Use Cases" },
+  { href: "/opinion", label: "Opinion" },
   { href: "/case-studies", label: "Case Studies" },
   { href: "/about", label: "About" },
 ];
