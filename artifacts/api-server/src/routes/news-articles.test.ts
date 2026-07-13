@@ -28,7 +28,18 @@ function makeNewsArticle(overrides: {
   };
 }
 
+const TEST_SLUGS = [
+  "news-test-newest-article",
+  "news-test-middle-article",
+  "news-test-oldest-article",
+  "news-test-other-category-article",
+];
+
 beforeAll(async () => {
+  await db
+    .delete(articlesTable)
+    .where(inArray(articlesTable.slug, TEST_SLUGS));
+
   const now = new Date();
   const rows = await db
     .insert(articlesTable)
