@@ -2,11 +2,6 @@ import { Link, useLocation } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useListArticles } from "@workspace/api-client-react";
-import {
-  Sheet,
-  SheetContent,
-  SheetClose,
-} from "@/components/ui/sheet";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -182,27 +177,50 @@ const NAV_LINKS = [
 ];
 
 function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [location, navigate] = useLocation();
+  const [location] = useLocation();
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
   return (
-    <Sheet open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <SheetContent
-        side="left"
-        className="bg-news border-r-4 border-news p-0 w-72 sm:max-w-72 flex flex-col"
+    <>
+      {/* Backdrop */}
+      <div
+        className={`nav-drawer-backdrop${open ? " open" : ""}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      {/* Panel */}
+      <div
+        className={`nav-drawer-panel${open ? " open" : ""}`}
+        role="dialog"
+        aria-modal="true"
         aria-label="Navigation menu"
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-news">
           <span className="font-serif text-2xl font-black tracking-tight">
             Signal<span className="text-accent">AI</span>
           </span>
-          <SheetClose asChild>
-            <button
-              className="mobile-menu-btn text-news-primary"
-              aria-label="Close menu"
-            >
-              <X size={22} />
-            </button>
-          </SheetClose>
+          <button
+            className="mobile-menu-btn text-news-primary"
+            aria-label="Close menu"
+            onClick={onClose}
+          >
+            <X size={22} />
+          </button>
         </div>
 
         <nav className="flex flex-col flex-1 px-6 py-8 gap-1" role="navigation" aria-label="Main navigation">
@@ -231,8 +249,8 @@ function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
             Separating the signal<br />from the AI noise
           </p>
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </>
   );
 }
 
