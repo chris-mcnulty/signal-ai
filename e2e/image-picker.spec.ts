@@ -11,6 +11,10 @@
  *   2. Empty library state — ImagePicker shows an informative "no images"
  *      message and does not crash.
  *   3. Image Library page — upload form and library grid section are present.
+ *   4. Upload a PNG via the Image Library form — the new image appears in
+ *      the grid immediately without a page refresh.
+ *   5. After an upload, the ImagePicker in a draft editor shows the new image
+ *      without a full page reload.
  *
  * Auth strategy: inject sessionStorage keys via page.addInitScript before any
  * page load so that AuthProvider finds an active session on init.  All draft
@@ -25,6 +29,25 @@ import { test, expect, type Page } from "@playwright/test";
 
 const MOCK_DRAFT_ID = 9001;
 const DASHBOARD_BASE = "/dashboard";
+
+/**
+ * A minimal 1×1 white PNG (base64-encoded) used as the upload payload.
+ * Small enough that multer's memory-storage limit is never hit, and the
+ * MIME type ("image/png") passes the server-side fileFilter.
+ */
+const MINIMAL_PNG_B64 =
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhf" +
+  "DwAChwGA60e6kgAAAABJRU5ErkJggg==";
+
+/** The image record returned by the mocked POST /api/library/images. */
+const UPLOADED_IMAGE = {
+  id: 99,
+  filename: "e2e-upload-99.png",
+  path: "/static/library/e2e-upload-99.png",
+  category: "Technology",
+  label: "E2E Uploaded Image",
+  uploadedAt: "2026-07-13T00:00:00.000Z",
+};
 
 const MOCK_IMAGES = [
   {
@@ -252,4 +275,157 @@ test("image library page — upload form and library grid are present", async ({
   // Both image labels should appear in the grid.
   await expect(page.getByText("Tech Abstract")).toBeVisible();
   await expect(page.getByText("Finance Grid")).toBeVisible();
+});
+
+// ---------------------------------------------------------------------------
+// Test 4 — Upload a PNG and confirm the new image appears without page refresh
+// ---------------------------------------------------------------------------
+
+test("image library — uploaded image appears in grid immediately without page refresh", async ({
+  page,
+}) => {
+  await injectAuth(page);
+
+  // Track whether the POST has been received so the GET mock can switch
+  // between the pre-upload list and the post-upload list.
+  let uploadReceived = false;
+
+  await page.route("**/api/library/images", async (route) => {
+    const method = route.request().method();
+
+    if (method === "GET") {
+      // Return the base list before upload; extended list after upload.
+      const images = uploadReceived
+        ? [...MOCK_IMAGES, UPLOADED_IMAGE]
+        : MOCK_IMAGES;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(images),
+      });
+    } else {
+      // POST — acknowledge upload and flip the flag so the next GET returns
+      // the updated list (mirrors what fetchImages() calls after a real POST).
+      uploadReceived = true;
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(UPLOADED_IMAGE),
+      });
+    }
+  });
+
+  await page.goto(`${DASHBOARD_BASE}/image-library`);
+
+  // Confirm initial state: 2 images.
+  await expect(page.getByText("2 images")).toBeVisible({ timeout: 10_000 });
+
+  // Set the file input to a minimal PNG without opening the OS file picker.
+  await page.setInputFiles('input[type="file"]', {
+    name: "e2e-test.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(MINIMAL_PNG_B64, "base64"),
+  });
+
+  // Trigger the upload and wait for the POST response.
+  const postDone = page.waitForResponse(
+    (resp) =>
+      resp.url().includes("/api/library/images") &&
+      resp.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: /upload image/i }).click();
+  await postDone;
+
+  // The component calls fetchImages() after a successful POST, so the grid
+  // must update in-place — no reload required.
+  await expect(page.getByText("3 images")).toBeVisible({ timeout: 10_000 });
+
+  // The new image label must appear in the grid.
+  await expect(page.getByText("E2E Uploaded Image")).toBeVisible();
+});
+
+// ---------------------------------------------------------------------------
+// Test 5 — ImagePicker in draft editor shows the new image without page reload
+// ---------------------------------------------------------------------------
+
+test("image picker — draft editor picker shows uploaded image without full page reload", async ({
+  page,
+}) => {
+  await injectAuth(page);
+
+  // Phase 1: visit the Image Library page and upload an image.
+  // After upload the mocked GET will include UPLOADED_IMAGE.
+  let uploadReceived = false;
+
+  await page.route("**/api/library/images", async (route) => {
+    const method = route.request().method();
+    if (method === "GET") {
+      const images = uploadReceived
+        ? [...MOCK_IMAGES, UPLOADED_IMAGE]
+        : MOCK_IMAGES;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(images),
+      });
+    } else {
+      uploadReceived = true;
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify(UPLOADED_IMAGE),
+      });
+    }
+  });
+
+  // Also mock the draft endpoint so the editor page loads cleanly.
+  await page.route(`**/api/drafts/${MOCK_DRAFT_ID}`, (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(mockDraft()),
+    });
+  });
+
+  // ── Step 1: visit Image Library and upload ────────────────────────────────
+  await page.goto(`${DASHBOARD_BASE}/image-library`);
+  await expect(page.getByText("2 images")).toBeVisible({ timeout: 10_000 });
+
+  await page.setInputFiles('input[type="file"]', {
+    name: "e2e-test.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(MINIMAL_PNG_B64, "base64"),
+  });
+
+  const postDone = page.waitForResponse(
+    (resp) =>
+      resp.url().includes("/api/library/images") &&
+      resp.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: /upload image/i }).click();
+  await postDone;
+
+  // Confirm the upload registered on the library page.
+  await expect(page.getByText("3 images")).toBeVisible({ timeout: 10_000 });
+
+  // ── Step 2: navigate to the draft editor (no page reload) ─────────────────
+  // page.goto() navigates via the SPA router — there is no manual browser
+  // refresh, so the original page process and intercepted routes stay active.
+  await page.goto(`${DASHBOARD_BASE}/drafts/${MOCK_DRAFT_ID}`);
+
+  // The ImagePicker mounts and issues its own GET /api/library/images.  Since
+  // uploadReceived is now true, the mock returns all three images.
+  // We assert all three appear in the picker grid (buttons with title attr).
+  await expect(
+    page.locator('button[title="Tech Abstract (Technology)"]'),
+  ).toBeVisible({ timeout: 10_000 });
+
+  await expect(
+    page.locator('button[title="Finance Grid (Finance)"]'),
+  ).toBeVisible();
+
+  // The newly uploaded image must be present — this is the regression guard.
+  await expect(
+    page.locator(`button[title="E2E Uploaded Image (Technology)"]`),
+  ).toBeVisible();
 });
