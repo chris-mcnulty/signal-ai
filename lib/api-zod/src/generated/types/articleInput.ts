@@ -13,6 +13,8 @@ export interface ArticleInput {
   body: string;
   /** @minLength 1 */
   category: string;
+  /** @minLength 1 */
+  author?: string;
   excerpt?: string;
   imageUrl?: string;
 }

@@ -64,6 +64,7 @@ import { DraftEnginePanel } from "@/components/DraftEnginePanel";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
+  author: z.string().min(1, "Author is required"),
   excerpt: z.string().optional(),
   imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   body: z.string().min(1, "Body is required"),
@@ -96,6 +97,7 @@ export default function DraftEditor() {
     defaultValues: {
       title: "",
       category: "",
+      author: "SignalAI Staff",
       excerpt: "",
       imageUrl: "",
       body: "",
@@ -110,6 +112,7 @@ export default function DraftEditor() {
       form.reset({
         title: draft.title,
         category: draft.category,
+        author: draft.author || "SignalAI Staff",
         excerpt: draft.excerpt || "",
         imageUrl: draft.imageUrl || "",
         body: draft.body,
@@ -122,6 +125,7 @@ export default function DraftEditor() {
       const data = {
         title: values.title,
         category: values.category,
+        author: values.author || undefined,
         excerpt: values.excerpt || undefined,
         imageUrl: values.imageUrl || undefined,
         body: values.body,
@@ -289,18 +293,32 @@ export default function DraftEditor() {
 
                 <FormField
                   control={form.control}
-                  name="imageUrl"
+                  name="author"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cover Image URL <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                      <FormLabel>Author</FormLabel>
                       <FormControl>
-                        <Input placeholder="https://..." {...field} />
+                        <Input placeholder="e.g. Jane Smith" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cover Image URL <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}

@@ -166,6 +166,7 @@ export const SubmitDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -203,6 +204,7 @@ export const GenerateDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -229,6 +231,7 @@ export const ListDraftsResponseItem = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -250,10 +253,12 @@ export const ListDraftsResponse = zod.array(ListDraftsResponseItem)
 
 
 
+
 export const CreateDraftBody = zod.object({
   "title": zod.string().min(1),
   "body": zod.string().min(1),
   "category": zod.string().min(1),
+  "author": zod.string().min(1).optional(),
   "excerpt": zod.string().optional(),
   "imageUrl": zod.string().optional()
 })
@@ -265,6 +270,7 @@ export const CreateDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -303,6 +309,7 @@ export const GetDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -327,10 +334,12 @@ export const UpdateDraftParams = zod.object({
 
 
 
+
 export const UpdateDraftBody = zod.object({
   "title": zod.string().min(1).optional(),
   "body": zod.string().min(1).optional(),
   "category": zod.string().min(1).optional(),
+  "author": zod.string().min(1).optional(),
   "excerpt": zod.string().nullish(),
   "imageUrl": zod.string().nullish()
 })
@@ -342,6 +351,7 @@ export const UpdateDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -382,6 +392,7 @@ export const ApproveDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -412,6 +423,7 @@ export const RejectDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -438,6 +450,7 @@ export const PublishDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),
@@ -464,6 +477,7 @@ export const UnpublishDraftResponse = zod.object({
   "excerpt": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
+  "author": zod.string(),
   "imageUrl": zod.string().nullable(),
   "status": zod.enum(['pending', 'approved', 'published', 'rejected']),
   "source": zod.string().describe('Where the draft came from (manual, api, ai)'),

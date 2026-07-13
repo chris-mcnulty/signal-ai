@@ -165,6 +165,7 @@ router.post("/drafts", async (req, res): Promise<void> => {
       title: parsed.data.title,
       body: parsed.data.body,
       category: parsed.data.category,
+      ...(parsed.data.author ? { author: parsed.data.author } : {}),
       excerpt: parsed.data.excerpt ?? null,
       imageUrl: parsed.data.imageUrl ?? null,
       slug,

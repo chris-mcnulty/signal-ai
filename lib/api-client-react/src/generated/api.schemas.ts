@@ -158,6 +158,7 @@ export interface Article {
   excerpt: string | null;
   body: string;
   category: string;
+  author: string;
   /** @nullable */
   imageUrl: string | null;
   status: ArticleStatus;
@@ -185,6 +186,8 @@ export interface ArticleInput {
   body: string;
   /** @minLength 1 */
   category: string;
+  /** @minLength 1 */
+  author?: string;
   excerpt?: string;
   imageUrl?: string;
 }
@@ -196,6 +199,8 @@ export interface ArticleUpdate {
   body?: string;
   /** @minLength 1 */
   category?: string;
+  /** @minLength 1 */
+  author?: string;
   /** @nullable */
   excerpt?: string | null;
   /** @nullable */

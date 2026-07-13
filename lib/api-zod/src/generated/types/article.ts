@@ -16,6 +16,7 @@ export interface Article {
   excerpt: string | null;
   body: string;
   category: string;
+  author: string;
   /** @nullable */
   imageUrl: string | null;
   status: ArticleStatus;

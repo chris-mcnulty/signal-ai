@@ -1543,6 +1543,7 @@ components:
           slug,
           body,
           category,
+          author,
           status,
           source,
           excerpt,
@@ -1566,6 +1567,8 @@ components:
         body:
           type: string
         category:
+          type: string
+        author:
           type: string
         imageUrl:
           type: ["string", "null"]
@@ -1606,6 +1609,9 @@ components:
         category:
           type: string
           minLength: 1
+        author:
+          type: string
+          minLength: 1
         excerpt:
           type: string
         imageUrl:
@@ -1620,6 +1626,9 @@ components:
           type: string
           minLength: 1
         category:
+          type: string
+          minLength: 1
+        author:
           type: string
           minLength: 1
         excerpt:
