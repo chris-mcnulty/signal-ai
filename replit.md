@@ -11,7 +11,7 @@ SignalAI ("Separating the signal from the AI noise") is a tech publication cover
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - `pnpm --filter @workspace/scripts run seed-content` — seed articles + case studies (idempotent, skips if data exists)
-- Required env: `DATABASE_URL` — Postgres connection string; `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, `VITE_CLERK_PUBLISHABLE_KEY` — Clerk auth (managed by Replit)
+- Required env: `DATABASE_URL` — Postgres connection string; `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `AZURE_AD_TENANT_ID` — Microsoft Entra SSO; `DRAFTS_API_KEY` — per-editor API key auth for draft endpoints
 
 ## Stack
 
@@ -20,7 +20,7 @@ SignalAI ("Separating the signal from the AI noise") is a tech publication cover
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
-- Auth: Clerk (Replit-managed whitelabel; cookie-based on web, proxied through the API server)
+- Auth: Microsoft Entra SSO (dashboard login) + per-editor API keys (draft endpoints)
 - Frontend: React + Vite, wouter, Tailwind v4, TanStack Query
 - Build: esbuild (CJS bundle)
 
@@ -30,10 +30,10 @@ SignalAI ("Separating the signal from the AI noise") is a tech publication cover
 - API contract: `lib/api-spec/openapi.yaml` (source of truth; run codegen after edits)
 - API routes: `artifacts/api-server/src/routes/` (`articles.ts` public, `drafts.ts` auth-required editorial, `content.ts` case-study endpoints)
 - SEO/SSR pages: `artifacts/api-server/src/pages/` — server-rendered `/case-studies`, `/case-studies/:slug`, `/sitemap.xml`, `/robots.txt`
-- Auth middleware: `artifacts/api-server/src/middlewares/requireAuth.ts`, `clerkProxyMiddleware.ts`; Clerk wiring in `artifacts/api-server/src/app.ts`
+- Auth middleware: `artifacts/api-server/src/middlewares/requireEditor.ts`, `apiKeyAuth.ts`; Entra SSO wiring in `artifacts/api-server/src/app.ts`
 - SEO helpers (JSON-LD builders, base URL): `artifacts/api-server/src/lib/seo.ts`, `src/lib/site.ts`
 - Article helpers (slugs, scheduled publishing): `artifacts/api-server/src/lib/articles.ts`
-- Dashboard frontend: `artifacts/dashboard/src/` (pages: Home, Queue, DraftEditor; Clerk setup in `App.tsx`)
+- Dashboard frontend: `artifacts/dashboard/src/` (pages: Home, Queue, DraftEditor; AuthProvider in `App.tsx`, auth context in `src/lib/auth.tsx`)
 - Static brand assets (logo, OG image): `artifacts/api-server/public/static/`, served at `/case-studies/static/`
 - Design mockups (Broadsheet/SignalGrid/WarmEditorial): `artifacts/mockup-sandbox/src/components/mockups/signalai-home/`
 
@@ -45,12 +45,12 @@ SignalAI ("Separating the signal from the AI noise") is a tech publication cover
 - SSR visual style follows the "Broadsheet" mockup direction (newsprint cream, ink, red-orange accent, serif headlines).
 - Scheduled publishing is lazy: approving with a future `scheduledFor` keeps status `approved`; `promoteDueArticles()` runs before every article/draft read and promotes due articles to `published` (no cron/background job needed).
 - Approving without a schedule date publishes immediately (`status=published`, `publishedAt=now`).
-- Public site consumes `GET /api/articles` (published only, by slug); all `/api/drafts*` endpoints require a Clerk session (401 otherwise).
+- Public site consumes `GET /api/articles` (published only, by slug); all `/api/drafts*` endpoints require editor auth via API key (401 otherwise).
 - Draft `source` field distinguishes in-app (`manual`) vs externally submitted (`api`) drafts, ready for a future external submission API.
 
 ## Product
 
-- Editorial dashboard at `/dashboard/`: public landing page, Clerk sign-in/sign-up, review queue with status filters and counts, draft editor (title, body, category, excerpt, image URL), approve → publish now or schedule, reject with reason, publish/unpublish, delete.
+- Editorial dashboard at `/dashboard/`: public landing page, Microsoft Entra SSO login (editor allowlist), review queue with status filters and counts, draft editor (title, body, category, excerpt, image URL), approve → publish now or schedule, reject with reason, publish/unpublish, delete.
 - Public, SEO-optimized case-study pages at `/case-studies` and `/case-studies/<slug>`, listed in `/sitemap.xml`, with structured data for Google rich results.
 - JSON API for articles and case studies under `/api` for the future website/dashboard to consume (generated React Query hooks available in `@workspace/api-client-react`).
 
