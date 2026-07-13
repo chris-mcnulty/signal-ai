@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Redirect } from "wouter";
 import { useAuth } from "@/lib/auth";
 import type { EditorStatus } from "@/lib/auth";
+import { msalInstance, loginRequest } from "@/lib/msal";
 
 export default function Home() {
   const { isLoggedIn, editorStatus, login } = useAuth();
   const [key, setKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [msalLoading, setMsalLoading] = useState(false);
 
   if (isLoggedIn && editorStatus === "approved") {
     return <Redirect to="/queue" />;
@@ -48,6 +50,42 @@ export default function Home() {
     }
   }
 
+  async function handleMicrosoftLogin() {
+    setError("");
+    setMsalLoading(true);
+    try {
+      await msalInstance.initialize();
+      const result = await msalInstance.loginPopup(loginRequest);
+      const idToken = result.idToken;
+
+      const res = await fetch("/api/auth/microsoft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      if (res.ok) {
+        const data = await res.json() as { apiKey: string; email: string; id: number };
+        login(data.apiKey, data.email, "approved" as EditorStatus);
+      } else if (res.status === 403) {
+        setError("Your Microsoft account hasn't been approved yet. Contact an administrator.");
+      } else {
+        setError("Sign-in failed. Try again or use your editor key.");
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("user_cancelled") || msg.includes("popup_window_error")) {
+        // user closed the popup — no error needed
+      } else if (msg.includes("VITE_ENTRA_CLIENT_ID") || msg.includes("clientId")) {
+        setError("Microsoft sign-in is not configured yet. Use your editor key instead.");
+      } else {
+        setError("Microsoft sign-in failed. Try again or use your editor key.");
+      }
+    } finally {
+      setMsalLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary selection:text-white">
       <header className="px-6 h-16 flex items-center border-b border-border/50">
@@ -68,6 +106,39 @@ export default function Home() {
         <p className="text-lg text-muted-foreground mb-8 text-balance">
           Separate the signal from the AI noise. A high-density control center for reviewing, editing, and scheduling content.
         </p>
+
+        {/* Microsoft SSO */}
+        <div className="w-full max-w-sm flex flex-col gap-3 mb-6">
+          <button
+            type="button"
+            onClick={handleMicrosoftLogin}
+            disabled={msalLoading || loading}
+            className="h-10 px-4 bg-[#0078d4] hover:bg-[#106ebe] disabled:opacity-50 text-white font-medium rounded-md inline-flex items-center justify-center gap-2.5 transition-colors text-sm"
+          >
+            {msalLoading ? (
+              "Signing in…"
+            ) : (
+              <>
+                <svg width="16" height="16" viewBox="0 0 23 23" fill="none" aria-hidden="true">
+                  <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
+                  <rect x="12" y="1" width="10" height="10" fill="#7fba00"/>
+                  <rect x="1" y="12" width="10" height="10" fill="#00a4ef"/>
+                  <rect x="12" y="12" width="10" height="10" fill="#ffb900"/>
+                </svg>
+                Sign in with Microsoft
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full max-w-sm flex items-center gap-3 mb-6">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs text-muted-foreground uppercase tracking-wider">or use editor key</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        {/* API key fallback */}
         <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-3">
           <input
             type="password"
@@ -75,7 +146,6 @@ export default function Home() {
             value={key}
             onChange={(e) => setKey(e.target.value)}
             required
-            autoFocus
             className="h-10 px-3 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
