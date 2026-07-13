@@ -1075,3 +1075,22 @@ export const SeoOptimizeDraftResponse = zod.object({
 })
 
 
+/**
+ * Accepts raw notes, bullet points, or a partial story brief and returns a fully written article (title, body, category). Does not write to the database — the caller should populate the draft editor fields and save manually.
+ * @summary Expand raw notes or a story brief into a full article draft
+ */
+
+
+
+export const ExpandBriefBody = zod.object({
+  "brief": zod.string().min(1).describe('Raw notes, bullet points, or a partial story brief to expand into a full article'),
+  "category": zod.string().optional().describe('Optional preferred category (e.g. \"Industry News\"). AI will suggest one if omitted.')
+})
+
+export const ExpandBriefResponse = zod.object({
+  "title": zod.string().describe('Suggested article headline'),
+  "body": zod.string().describe('Full article body in Markdown'),
+  "category": zod.string().describe('Suggested category')
+})
+
+

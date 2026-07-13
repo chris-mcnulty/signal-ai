@@ -76,3 +76,62 @@ export async function generateArticleDraft(
 
   return { title, body, category: aiCategory, model: MODEL };
 }
+
+export const EXPAND_BRIEF_SYSTEM_PROMPT = [
+  "You are an editorial writer for SignalAI, a publication covering AI and technology.",
+  "The user will give you raw notes, bullet points, or a partial story brief.",
+  "Expand it into a complete, publication-ready news article in SignalAI's voice:",
+  "  - Third-person, attribution-based claims, precise fact-driven prose",
+  "  - Lead with the most newsworthy fact, not a question or rhetorical opener",
+  "  - Include a 'Why it matters' section and concrete executive takeaways",
+  "  - American English spelling (program, organization, color — never British variants)",
+  "  - 500–900 words in Markdown",
+  "Respond ONLY with a JSON object with these keys:",
+  '- "title": a compelling headline (string)',
+  '- "body": the full article body in Markdown (string)',
+  '- "category": a short one-or-two-word category (string)',
+].join("\n");
+
+export async function expandFromBrief(
+  brief: string,
+  category?: string,
+): Promise<GeneratedArticle> {
+  const userPrompt = [
+    `Brief / notes:\n${brief}`,
+    category ? `Preferred category: ${category}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const response = await openai.chat.completions.create({
+    model: MODEL,
+    max_completion_tokens: 8192,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: EXPAND_BRIEF_SYSTEM_PROMPT },
+      { role: "user", content: userPrompt },
+    ],
+  });
+
+  const content = response.choices[0]?.message?.content;
+  if (!content) throw new Error("AI returned an empty response");
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error("AI returned invalid JSON");
+  }
+
+  const obj = parsed as Record<string, unknown>;
+  const title = typeof obj.title === "string" ? obj.title.trim() : "";
+  const body = typeof obj.body === "string" ? obj.body.trim() : "";
+  const aiCategory =
+    typeof obj.category === "string" && obj.category.trim()
+      ? obj.category.trim()
+      : category ?? "Industry News";
+
+  if (!title || !body) throw new Error("AI response was missing a title or body");
+
+  return { title, body, category: aiCategory, model: MODEL };
+}

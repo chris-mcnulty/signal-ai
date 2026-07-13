@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, Wand2, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -36,6 +36,7 @@ import {
   useRejectDraft,
   usePublishDraft,
   useUnpublishDraft,
+  useExpandBrief,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListDraftsQueryKey, getGetDraftsSummaryQueryKey } from "@workspace/api-client-react";
@@ -91,6 +92,7 @@ export default function DraftEditor() {
   const rejectMutation = useRejectDraft();
   const publishMutation = usePublishDraft();
   const unpublishMutation = useUnpublishDraft();
+  const expandBriefMutation = useExpandBrief();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -219,6 +221,29 @@ export default function DraftEditor() {
     });
   };
 
+  const handleExpandBrief = () => {
+    const brief = form.getValues("body");
+    const category = form.getValues("category") || undefined;
+    if (!brief.trim()) {
+      toast({ title: "Paste your story notes into the Content field first", variant: "destructive" });
+      return;
+    }
+    expandBriefMutation.mutate(
+      { data: { brief, category } },
+      {
+        onSuccess: (result) => {
+          form.setValue("title", result.title, { shouldDirty: true });
+          form.setValue("body", result.body, { shouldDirty: true });
+          if (!form.getValues("category")) {
+            form.setValue("category", result.category, { shouldDirty: true });
+          }
+          toast({ title: "Brief expanded — review the article, then save" });
+        },
+        onError: () => toast({ title: "AI expansion failed. Try again.", variant: "destructive" }),
+      },
+    );
+  };
+
   const [scheduleDate, setScheduleDate] = useState<Date>();
   const [rejectionReason, setRejectionReason] = useState("");
   const [isRejectOpen, setIsRejectOpen] = useState(false);
@@ -343,10 +368,24 @@ export default function DraftEditor() {
                 name="body"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Content <span className="text-muted-foreground font-normal text-xs ml-1">Markdown</span></FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Content <span className="text-muted-foreground font-normal text-xs ml-1">Markdown</span></FormLabel>
+                      <button
+                        type="button"
+                        onClick={handleExpandBrief}
+                        disabled={expandBriefMutation.isPending}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {expandBriefMutation.isPending ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Expanding…</>
+                        ) : (
+                          <><Wand2 className="w-3.5 h-3.5" /> Expand from brief</>
+                        )}
+                      </button>
+                    </div>
                     <FormControl>
                       <Textarea 
-                        placeholder="Write your article here..." 
+                        placeholder="Paste your story notes, bullet points, or brief here — then click 'Expand from brief' above to turn them into a full article." 
                         className="min-h-[480px] font-mono text-sm leading-relaxed p-4 resize-y" 
                         {...field} 
                       />

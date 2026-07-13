@@ -35,6 +35,8 @@ export * from './engineJobResult';
 export * from './engineJobStatus';
 export * from './errorMessage';
 export * from './errorResponse';
+export * from './expandBriefRequest';
+export * from './expandedArticle';
 export * from './fitAssessment';
 export * from './fitAssessmentRecommendation';
 export * from './fitAssessmentTopicFit';

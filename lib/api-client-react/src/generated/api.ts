@@ -37,6 +37,8 @@ import type {
   EngineJob,
   ErrorMessage,
   ErrorResponse,
+  ExpandBriefRequest,
+  ExpandedArticle,
   GenerateDraftRequest,
   GroundingDocument,
   GroundingDocumentInput,
@@ -3383,5 +3385,77 @@ export const useSeoOptimizeDraft = <TError = ErrorType<ErrorMessage>,
         TContext
       > => {
       return useMutation(getSeoOptimizeDraftMutationOptions(options));
+    }
+
+export const getExpandBriefUrl = () => {
+
+
+
+
+  return `/api/drafts/expand-brief`
+}
+
+/**
+ * Accepts raw notes, bullet points, or a partial story brief and returns a fully written article (title, body, category). Does not write to the database — the caller should populate the draft editor fields and save manually.
+ * @summary Expand raw notes or a story brief into a full article draft
+ */
+export const expandBrief = async (expandBriefRequest: ExpandBriefRequest, options?: RequestInit): Promise<ExpandedArticle> => {
+
+  return customFetch<ExpandedArticle>(getExpandBriefUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(expandBriefRequest)
+  }
+);}
+
+
+
+
+
+export const getExpandBriefMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof expandBrief>>, TError,{data: BodyType<ExpandBriefRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof expandBrief>>, TError,{data: BodyType<ExpandBriefRequest>}, TContext> => {
+
+const mutationKey = ['expandBrief'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof expandBrief>>, {data: BodyType<ExpandBriefRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  expandBrief(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ExpandBriefMutationResult = NonNullable<Awaited<ReturnType<typeof expandBrief>>>
+    export type ExpandBriefMutationBody = BodyType<ExpandBriefRequest>
+    export type ExpandBriefMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Expand raw notes or a story brief into a full article draft
+ */
+export const useExpandBrief = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof expandBrief>>, TError,{data: BodyType<ExpandBriefRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof expandBrief>>,
+        TError,
+        {data: BodyType<ExpandBriefRequest>},
+        TContext
+      > => {
+      return useMutation(getExpandBriefMutationOptions(options));
     }
 

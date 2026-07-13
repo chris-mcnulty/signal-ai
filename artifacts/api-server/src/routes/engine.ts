@@ -46,6 +46,8 @@ import {
   ExportSocialVariantsCsvParams,
   SeoOptimizeDraftParams,
   SeoOptimizeDraftResponse,
+  ExpandBriefBody,
+  ExpandBriefResponse,
 } from "@workspace/api-zod";
 import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { requireEditor } from "../middlewares/requireEditor";
@@ -53,6 +55,7 @@ import { rateLimit } from "../middlewares/rateLimit";
 import { enqueueEngineJob } from "../engine/job-queue";
 import { repurposeArticle } from "../engine/repurpose";
 import { optimizeArticleSeo } from "../engine/seo";
+import { expandFromBrief } from "../lib/aiDrafting";
 import { buildVariantsCsv } from "../engine/repurpose-core";
 import { coercePlatform, type RepurposePlatform } from "../engine/repurpose-core";
 import { NewsConfigError } from "../engine/news";
@@ -489,6 +492,29 @@ router.post(
     } catch (err) {
       req.log.error({ err }, "SEO optimization failed");
       res.status(502).json({ error: "AI SEO optimization failed" });
+    }
+  },
+);
+
+// Must be registered BEFORE the drafts/:id routes in drafts.ts (engine router
+// is mounted first via routes/index.ts) so "/drafts/expand-brief" is not
+// accidentally matched as a draft ID.
+router.post(
+  "/drafts/expand-brief",
+  requireEditor,
+  aiRateLimit,
+  async (req, res): Promise<void> => {
+    const parsed = ExpandBriefBody.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.message });
+      return;
+    }
+    try {
+      const result = await expandFromBrief(parsed.data.brief, parsed.data.category);
+      res.json(ExpandBriefResponse.parse({ title: result.title, body: result.body, category: result.category ?? "Industry News" }));
+    } catch (err) {
+      req.log.error({ err }, "Brief expansion failed");
+      res.status(502).json({ error: "AI brief expansion failed" });
     }
   },
 );

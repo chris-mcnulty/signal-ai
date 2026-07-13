@@ -1246,6 +1246,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  /drafts/expand-brief:
+    post:
+      operationId: expandBrief
+      tags: [engine]
+      summary: Expand raw notes or a story brief into a full article draft
+      description: Accepts raw notes, bullet points, or a partial story brief and returns a fully written article (title, body, category). Does not write to the database — the caller should populate the draft editor fields and save manually.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpandBriefRequest"
+      responses:
+        "200":
+          description: Expanded article content ready to paste into the draft editor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExpandedArticle"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "502":
+          description: AI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -1280,6 +1323,30 @@ components:
       properties:
         error:
           type: string
+    ExpandBriefRequest:
+      type: object
+      required: [brief]
+      properties:
+        brief:
+          type: string
+          minLength: 1
+          description: Raw notes, bullet points, or a partial story brief to expand into a full article
+        category:
+          type: string
+          description: Optional preferred category (e.g. "Industry News"). AI will suggest one if omitted.
+    ExpandedArticle:
+      type: object
+      required: [title, body, category]
+      properties:
+        title:
+          type: string
+          description: Suggested article headline
+        body:
+          type: string
+          description: Full article body in Markdown
+        category:
+          type: string
+          description: Suggested category
     SubmitDraftRequest:
       type: object
       properties:

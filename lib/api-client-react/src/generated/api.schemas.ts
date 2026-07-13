@@ -21,6 +21,25 @@ export interface ErrorMessage {
   error: string;
 }
 
+export interface ExpandBriefRequest {
+  /**
+     * Raw notes, bullet points, or a partial story brief to expand into a full article
+     * @minLength 1
+     */
+  brief: string;
+  /** Optional preferred category (e.g. "Industry News"). AI will suggest one if omitted. */
+  category?: string;
+}
+
+export interface ExpandedArticle {
+  /** Suggested article headline */
+  title: string;
+  /** Full article body in Markdown */
+  body: string;
+  /** Suggested category */
+  category: string;
+}
+
 /**
  * Arbitrary metadata about where the draft came from (repo, run id, model, etc.)
  */
