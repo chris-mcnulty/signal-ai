@@ -4,6 +4,7 @@ const MODEL = "gpt-5.4-mini";
 
 export interface GeneratedArticle {
   title: string;
+  dek: string;
   body: string;
   category?: string;
   model: string;
@@ -21,6 +22,7 @@ export const AI_DRAFTING_SYSTEM_PROMPT = [
   "Write a complete, well-structured article draft in Markdown.",
   "Respond ONLY with a JSON object with these keys:",
   '- "title": a compelling headline (string)',
+  '- "dek": a 1-2 sentence deck that expands on the headline and entices the reader — no em dashes, no AI filler words (string)',
   '- "body": the full article body in Markdown, 500-900 words (string)',
   '- "category": a short one-or-two-word category for the article (string)',
 ].join("\n");
@@ -64,6 +66,7 @@ export async function generateArticleDraft(
 
   const obj = parsed as Record<string, unknown>;
   const title = typeof obj.title === "string" ? obj.title.trim() : "";
+  const dek = typeof obj.dek === "string" ? obj.dek.trim() : "";
   const body = typeof obj.body === "string" ? obj.body.trim() : "";
   const aiCategory =
     typeof obj.category === "string" && obj.category.trim()
@@ -74,7 +77,7 @@ export async function generateArticleDraft(
     throw new Error("AI response was missing a title or body");
   }
 
-  return { title, body, category: aiCategory, model: MODEL };
+  return { title, dek, body, category: aiCategory, model: MODEL };
 }
 
 export const EXPAND_BRIEF_SYSTEM_PROMPT = [
@@ -88,6 +91,7 @@ export const EXPAND_BRIEF_SYSTEM_PROMPT = [
   "  - 500–900 words in Markdown",
   "Respond ONLY with a JSON object with these keys:",
   '- "title": a compelling headline (string)',
+  '- "dek": a 1-2 sentence deck that expands on the headline and entices the reader — no em dashes, no AI filler words (string)',
   '- "body": the full article body in Markdown (string)',
   '- "category": a short one-or-two-word category (string)',
 ].join("\n");
@@ -125,6 +129,7 @@ export async function expandFromBrief(
 
   const obj = parsed as Record<string, unknown>;
   const title = typeof obj.title === "string" ? obj.title.trim() : "";
+  const dek = typeof obj.dek === "string" ? obj.dek.trim() : "";
   const body = typeof obj.body === "string" ? obj.body.trim() : "";
   const aiCategory =
     typeof obj.category === "string" && obj.category.trim()
@@ -133,5 +138,5 @@ export async function expandFromBrief(
 
   if (!title || !body) throw new Error("AI response was missing a title or body");
 
-  return { title, body, category: aiCategory, model: MODEL };
+  return { title, dek, body, category: aiCategory, model: MODEL };
 }

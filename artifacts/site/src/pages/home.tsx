@@ -117,13 +117,13 @@ export default function Home() {
                   </h2>
                   
                   <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed mb-6 pr-0 md:pr-8">
-                    {leadStory.dek}
+                    {leadStory.dek || leadStory.excerpt}
                   </p>
 
-                  {leadStory.heroImageUrl && (
+                  {(leadStory.heroImageUrl || leadStory.imageUrl) && (
                     <div className="card-image w-full aspect-video bg-[#e8e4de] mb-6 overflow-hidden">
                       <img 
-                        src={leadStory.heroImageUrl} 
+                        src={leadStory.heroImageUrl || leadStory.imageUrl} 
                         alt={leadStory.title} 
                         className="w-full h-full object-cover"
                       />
@@ -179,14 +179,14 @@ export default function Home() {
                           <span className="card-headline">{story.title}</span>
                         </h4>
                         <p className="text-sm text-news-secondary mb-2 line-clamp-3 leading-relaxed">
-                          {story.dek}
+                          {story.dek || story.excerpt}
                         </p>
                         <div className="font-mono text-xs text-news-secondary uppercase">By {story.author}</div>
                       </div>
-                      {story.heroImageUrl && (
+                      {(story.heroImageUrl || story.imageUrl) && (
                         <div className="card-image w-20 h-20 shrink-0 bg-[#e8e4de] overflow-hidden hidden sm:block">
                           <img
-                            src={story.heroImageUrl}
+                            src={story.heroImageUrl || story.imageUrl}
                             alt={story.title}
                             className="w-full h-full object-cover"
                           />

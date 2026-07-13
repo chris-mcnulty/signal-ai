@@ -113,6 +113,7 @@ router.post("/drafts/generate", apiKeyAuth, generateRateLimit, async (req, res):
     .insert(articlesTable)
     .values({
       title: generated.title,
+      dek: generated.dek,
       body: generated.body,
       category: generated.category ?? category ?? "Uncategorized",
       slug,

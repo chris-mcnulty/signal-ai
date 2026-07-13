@@ -131,7 +131,7 @@ export default function ArticlePage() {
           </h1>
           
           <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed mb-8">
-            {article.dek}
+            {article.dek || article.excerpt}
           </p>
 
           <div className="flex items-center justify-between border-t border-b border-news py-3">
@@ -157,11 +157,11 @@ export default function ArticlePage() {
         </header>
 
         {/* Hero Image */}
-        {article.heroImageUrl && (
+        {(article.heroImageUrl || article.imageUrl) && (
           <figure className="max-w-[900px] mx-auto mb-12 animate-fade-in-up delay-100">
             <div className="aspect-[16/9] w-full bg-[#e8e4de] overflow-hidden">
               <img 
-                src={article.heroImageUrl} 
+                src={article.heroImageUrl || article.imageUrl} 
                 alt={article.title} 
                 className="w-full h-full object-cover"
               />
