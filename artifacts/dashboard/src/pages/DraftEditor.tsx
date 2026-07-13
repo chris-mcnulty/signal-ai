@@ -61,13 +61,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DraftEnginePanel } from "@/components/DraftEnginePanel";
+import { ImagePicker } from "@workspace/image-library";
+
+const API_BASE = "/api";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
   author: z.string().optional().default("SignalAI Staff"),
   excerpt: z.string().optional(),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  imageUrl: z.string().optional().default(""),
   body: z.string().min(1, "Body is required"),
 });
 
@@ -336,9 +339,13 @@ export default function DraftEditor() {
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cover Image URL <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
+                    <FormLabel>Cover Image <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
                     <FormControl>
-                      <Input placeholder="https://..." {...field} />
+                      <ImagePicker
+                        value={field.value || null}
+                        onChange={(path) => field.onChange(path)}
+                        apiBase={API_BASE}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

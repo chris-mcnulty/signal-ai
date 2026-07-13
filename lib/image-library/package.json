@@ -1,0 +1,13 @@
+{
+  "name": "@workspace/image-library",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./core": "./src/core.ts"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

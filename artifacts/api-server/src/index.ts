@@ -4,6 +4,7 @@ import { startSeoNotifier } from "./lib/indexnow";
 import { logSeoBootStatus } from "./lib/seoSubmit";
 import { startCoverageScheduler } from "./lib/seoCoverage";
 import { initEngine } from "./engine";
+import { seedLibraryIfEmpty } from "./lib/seedLibrary";
 
 const rawPort = process.env["PORT"];
 
@@ -30,4 +31,5 @@ app.listen(port, (err) => {
   startSeoNotifier();
   startCoverageScheduler();
   initEngine();
+  seedLibraryIfEmpty().catch((err) => logger.warn({ err }, "Library seed failed"));
 });

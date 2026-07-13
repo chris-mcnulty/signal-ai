@@ -11,6 +11,7 @@ import Seo from "./pages/Seo";
 import Engine from "./pages/Engine";
 import VoiceSettings from "./pages/VoiceSettings";
 import AccessPending from "./pages/AccessPending";
+import ImageLibrary from "./pages/ImageLibrary";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider, useAuth } from "./lib/auth";
 
@@ -52,6 +53,10 @@ function Routes() {
 
       <Route path="/voice">
         <ProtectedRoute component={VoiceSettings} />
+      </Route>
+
+      <Route path="/image-library">
+        <ProtectedRoute component={ImageLibrary} />
       </Route>
 
       <Route>

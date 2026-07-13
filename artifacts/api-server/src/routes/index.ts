@@ -6,6 +6,7 @@ import draftsRouter from "./drafts";
 import seoRouter from "./seo";
 import engineRouter from "./engine";
 import authRouter from "./auth";
+import libraryRouter from "./library";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(articlesRouter);
 router.use(engineRouter);
 router.use(draftsRouter);
 router.use(seoRouter);
+router.use(libraryRouter);
 
 export default router;

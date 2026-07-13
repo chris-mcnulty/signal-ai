@@ -3,9 +3,11 @@ import {
   contentBriefsTable,
   researchBriefingsTable,
   articlesTable,
+  libraryImagesTable,
   type Article,
 } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { getImageForCategory } from "@workspace/image-library/core";
 import { completeJsonForFeature } from "./ai-provider";
 import { resolvePromptContext } from "./context";
 import { uniqueSlug } from "../lib/articles";
@@ -101,6 +103,18 @@ Respond with a JSON object:
     throw new Error("Copywriter response was missing a title or body");
   }
 
+  const category = (data.category ?? "").trim() || brief.category || "Uncategorized";
+
+  const libraryImages = await db.select().from(libraryImagesTable);
+  const pickedImage = getImageForCategory(category, libraryImages.map((img) => ({
+    id: img.id,
+    filename: img.filename,
+    path: img.path,
+    category: img.category,
+    label: img.label,
+    uploadedAt: img.uploadedAt.toISOString(),
+  })));
+
   const slug = await uniqueSlug(title);
   const [article] = await db
     .insert(articlesTable)
@@ -108,10 +122,11 @@ Respond with a JSON object:
       title,
       body,
       excerpt: (data.excerpt ?? "").trim() || null,
-      category: (data.category ?? "").trim() || brief.category || "Uncategorized",
+      category,
       slug,
       status: "pending",
       source: "ai",
+      imageUrl: pickedImage?.path ?? null,
       sourceMetadata: {
         engine: "copywriter",
         briefId: brief.id,

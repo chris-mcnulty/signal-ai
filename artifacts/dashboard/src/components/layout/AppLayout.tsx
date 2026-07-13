@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays, Images } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/seo", label: "SEO", icon: Globe, matchPaths: ["/seo"] },
   { href: "/engine", label: "Engine", icon: Sparkles, matchPaths: ["/engine"] },
   { href: "/voice", label: "Voice", icon: Mic2, matchPaths: ["/voice"] },
+  { href: "/image-library", label: "Images", icon: Images, matchPaths: ["/image-library"] },
 ];
 
 export function AppLayout({ children }: { children: ReactNode }) {
