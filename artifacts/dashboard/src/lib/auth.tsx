@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode, useCallback } from "react";
 import { setAuthTokenGetter } from "@workspace/api-client-react";
 
 const SESSION_KEY = "dashboard_api_key";
@@ -28,6 +28,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null>(() => sessionStorage.getItem(EMAIL_KEY));
   const [editorStatus, setEditorStatus] = useState<EditorStatus>(readStatus);
 
+  // Keep a ref in sync with key on every render so the getter closure always
+  // reads the latest value without needing to re-register a new getter function.
+  // This avoids the null-window that occurred when the old useEffect([key])
+  // ran its cleanup (setAuthTokenGetter(null)) before the setup re-ran.
+  const keyRef = useRef<string | null>(key);
+  keyRef.current = key;
+
   const login = useCallback((newKey: string, newEmail: string, status: EditorStatus) => {
     sessionStorage.setItem(SESSION_KEY, newKey);
     sessionStorage.setItem(EMAIL_KEY, newEmail);
@@ -46,10 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setEditorStatus("unknown");
   }, []);
 
+  // Register the getter once on mount. The getter reads from keyRef.current so
+  // it always returns the latest key with no teardown/setup gap on re-renders.
+  // The cleanup only fires on true unmount (provider leaving the tree).
   useEffect(() => {
-    setAuthTokenGetter(() => key);
+    setAuthTokenGetter(() => keyRef.current);
     return () => setAuthTokenGetter(null);
-  }, [key]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AuthContext.Provider value={{ isLoggedIn: !!key, editorEmail: email, editorStatus, login, logout }}>

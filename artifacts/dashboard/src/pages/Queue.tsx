@@ -68,7 +68,7 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
   });
 
   const statusFilter = activeTab === "all" || activeTab === "scheduled" ? undefined : activeTab;
-  const { data: drafts, isLoading } = useListDrafts(
+  const { data: drafts, isLoading, isError } = useListDrafts(
     statusFilter ? { status: statusFilter } : undefined,
     {
       query: {
@@ -212,6 +212,20 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           {[1, 2, 3].map((i) => (
             <Card key={i} className="p-5 h-24 animate-pulse bg-muted/50 border-0" />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="text-center py-20 border-2 border-dashed border-destructive/30 rounded-xl">
+          <div className="w-12 h-12 bg-destructive/10 rounded-full flex items-center justify-center mx-auto mb-3">
+            <XCircle className="w-5 h-5 text-destructive" />
+          </div>
+          <h3 className="text-base font-semibold mb-1">Couldn't load the queue</h3>
+          <p className="text-sm text-muted-foreground mb-4">There was a problem fetching drafts. Your session may have expired.</p>
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: getListDraftsQueryKey() })}
+            className="text-sm text-primary hover:underline"
+          >
+            Try again
+          </button>
         </div>
       ) : activeTab === "scheduled" ? (
         <ScheduledView
