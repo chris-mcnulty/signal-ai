@@ -34,7 +34,7 @@ export interface CopywriteJobInput {
 
 interface CopywriterResponse {
   title?: string;
-  excerpt?: string;
+  dek?: string;
   body?: string;
   category?: string;
 }
@@ -62,8 +62,15 @@ export async function runCopywrite(input: CopywriteJobInput): Promise<Article> {
       : Promise.resolve(null),
   ]);
 
+  const sourceUrls = briefing?.sources
+    ? [
+        ...briefing.sources.news.map((n) => n.url).filter(Boolean),
+        ...briefing.sources.pages.map((p) => p.url).filter(Boolean),
+      ]
+    : [];
+
   const prompt = [
-    `Write a complete article draft from the concept brief below, in the publication's brand voice. Ground claims in the research briefing where provided — never fabricate statistics, quotes, or named sources.`,
+    `Write a complete article draft from the concept brief below, in the publication's brand voice. Ground every claim in the research briefing where provided — never fabricate statistics, quotes, or named sources.`,
     `## Concept brief
 - Working title: ${brief.title}
 - Summary: ${brief.summary}
@@ -74,11 +81,14 @@ ${brief.keyPoints?.length ? `- Key points to cover:\n${brief.keyPoints.map((p) =
     briefing
       ? `## Research briefing: ${briefing.topic}\n${briefing.briefing.slice(0, 10000)}`
       : "",
+    sourceUrls.length
+      ? `## Source URLs (cite these inline in the body where relevant — use format: [Source Name](url))\n${sourceUrls.join("\n")}`
+      : "",
     `## Output format
 Respond with a JSON object:
 - "title": final headline (string)
-- "excerpt": 1-2 sentence dek/teaser (string)
-- "body": the full article in Markdown, 700-1100 words, with ## subheadings (string)
+- "dek": 1-2 sentence deck/teaser — no em dashes, no AI filler words (string)
+- "body": the full article in Markdown, 700-1100 words, with ## subheadings, inline citations where claims are sourced (string)
 - "category": short category label (string)`,
   ]
     .filter(Boolean)
@@ -98,6 +108,7 @@ Respond with a JSON object:
   );
 
   const title = (data.title ?? "").trim();
+  const dek = (data.dek ?? "").trim() || null;
   const body = (data.body ?? "").trim();
   if (!title || !body) {
     throw new Error("Copywriter response was missing a title or body");
@@ -120,13 +131,14 @@ Respond with a JSON object:
     .insert(articlesTable)
     .values({
       title,
+      dek,
       body,
-      excerpt: (data.excerpt ?? "").trim() || null,
       category,
       slug,
       status: "pending",
       source: "ai",
       imageUrl: pickedImage?.path ?? null,
+      sourceUrls: sourceUrls.length ? sourceUrls : null,
       sourceMetadata: {
         engine: "copywriter",
         briefId: brief.id,
