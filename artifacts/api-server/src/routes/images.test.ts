@@ -124,7 +124,7 @@ describe("POST /api/images/generate", () => {
 
     expect(res.status).toBe(200);
     expect(typeof res.body.path).toBe("string");
-    expect(res.body.path).toMatch(/^\/static\/generated\/.+\.png$/);
+    expect(res.body.path).toMatch(/^\/api\/static\/generated\/.+\.png$/);
 
     // Verify the file was actually written to disk (survives server state).
     const filename = path.basename(res.body.path);
@@ -194,7 +194,7 @@ describe("POST /api/images/generate-and-assign", () => {
 
     expect(res.status).toBe(200);
     expect(typeof res.body.path).toBe("string");
-    expect(res.body.path).toMatch(/^\/static\/generated\/.+\.png$/);
+    expect(res.body.path).toMatch(/^\/api\/static\/generated\/.+\.png$/);
 
     // Confirm the database row was updated.
     const [updated] = await db
