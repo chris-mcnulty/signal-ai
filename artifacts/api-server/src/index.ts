@@ -5,6 +5,7 @@ import { logSeoBootStatus } from "./lib/seoSubmit";
 import { startCoverageScheduler } from "./lib/seoCoverage";
 import { initEngine } from "./engine";
 import { seedLibraryIfEmpty } from "./lib/seedLibrary";
+import { migrateImagePathsIfNeeded } from "./lib/migrateImagePaths";
 
 const rawPort = process.env["PORT"];
 
@@ -31,5 +32,6 @@ app.listen(port, (err) => {
   startSeoNotifier();
   startCoverageScheduler();
   initEngine();
+  migrateImagePathsIfNeeded().catch((err) => logger.warn({ err }, "Image path migration failed"));
   seedLibraryIfEmpty().catch((err) => logger.warn({ err }, "Library seed failed"));
 });

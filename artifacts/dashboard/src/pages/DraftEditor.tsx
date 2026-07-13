@@ -277,7 +277,7 @@ export default function DraftEditor() {
     setGenLoading(true);
     setGenPreview(null);
     try {
-      const apiKey = localStorage.getItem("apiKey") ?? "";
+      const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
       const res = await fetch(`${API_BASE}/images/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-api-key": apiKey },
@@ -297,7 +297,7 @@ export default function DraftEditor() {
     if (!genPreview) return;
     const pathToAssign = genPreview;
     if (draftId) {
-      const apiKey = localStorage.getItem("apiKey") ?? "";
+      const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
       try {
         const res = await fetch(`${API_BASE}/images/assign`, {
           method: "POST",
