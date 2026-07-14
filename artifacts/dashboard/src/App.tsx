@@ -24,7 +24,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   return <Component />;
 }
 
-function Routes() {
+export function Routes() {
   return (
     <Switch>
       <Route path="/" component={Home} />
