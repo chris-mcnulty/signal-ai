@@ -34,10 +34,14 @@ export interface ExpandBriefRequest {
 export interface ExpandedArticle {
   /** Suggested article headline */
   title: string;
+  /** 1-2 sentence deck / sub-headline */
+  dek?: string;
   /** Full article body in Markdown */
   body: string;
   /** Suggested category */
   category: string;
+  /** Source URLs extracted from the brief */
+  sourceUrls?: string[];
 }
 
 /**

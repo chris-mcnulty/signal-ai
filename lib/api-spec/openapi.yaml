@@ -1377,12 +1377,20 @@ components:
         title:
           type: string
           description: Suggested article headline
+        dek:
+          type: string
+          description: 1-2 sentence deck / sub-headline
         body:
           type: string
           description: Full article body in Markdown
         category:
           type: string
           description: Suggested category
+        sourceUrls:
+          type: array
+          items:
+            type: string
+          description: Source URLs extracted from the brief
     SubmitDraftRequest:
       type: object
       properties:

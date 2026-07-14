@@ -247,6 +247,17 @@ export default function DraftEditor() {
           if (!form.getValues("category")) {
             form.setValue("category", result.category, { shouldDirty: true });
           }
+          if (result.dek) {
+            form.setValue("excerpt", result.dek, { shouldDirty: true });
+          }
+          if (result.sourceUrls?.length) {
+            const existing = new Set(form.getValues("sourceUrls") ?? []);
+            const merged = [
+              ...(form.getValues("sourceUrls") ?? []),
+              ...result.sourceUrls.filter((u) => !existing.has(u)),
+            ];
+            form.setValue("sourceUrls", merged, { shouldDirty: true });
+          }
           toast({ title: "Brief expanded — review the article, then save" });
         },
         onError: () => toast({ title: "AI expansion failed. Try again.", variant: "destructive" }),

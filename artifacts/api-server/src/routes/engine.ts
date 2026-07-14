@@ -542,7 +542,14 @@ router.post(
     }
     try {
       const result = await expandFromBrief(parsed.data.brief, parsed.data.category);
-      res.json(ExpandBriefResponse.parse({ title: result.title, body: result.body, category: result.category ?? "Industry News" }));
+      const briefUrls = [...new Set((parsed.data.brief.match(/https?:\/\/[^\s,)>\]"']+/g) ?? []))];
+      res.json(ExpandBriefResponse.parse({
+        title: result.title,
+        dek: result.dek || undefined,
+        body: result.body,
+        category: result.category ?? "Industry News",
+        sourceUrls: briefUrls,
+      }));
     } catch (err) {
       req.log.error({ err }, "Brief expansion failed");
       res.status(502).json({ error: "AI brief expansion failed" });

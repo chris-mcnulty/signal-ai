@@ -11,7 +11,7 @@ import { GENERATED_DIR } from "../paths";
 const router: IRouter = Router();
 
 async function generateAndSave(prompt: string): Promise<string> {
-  const buffer = await generateImageBuffer(prompt, "1792x1024");
+  const buffer = await generateImageBuffer(prompt, "1536x1024");
   await mkdir(GENERATED_DIR, { recursive: true });
   const filename = `${randomUUID()}.png`;
   const filePath = path.join(GENERATED_DIR, filename);

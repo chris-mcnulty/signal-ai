@@ -43,29 +43,36 @@ function sourceDomain(url: string): string {
   }
 }
 
-/** Render a paragraph string, converting [text](url) markdown links to <a> elements. */
+/** Render a paragraph string, converting **bold**, *italic*, and [text](url) markdown. */
 function renderInlineLinks(text: string, paraIndex: number): React.ReactNode[] {
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  // Match **bold**, *italic*, or [text](url) in one pass
+  const tokenRegex = /\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]]+)\]\(([^)]+)\)/g;
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
-  let linkCount = 0;
+  let keyCount = 0;
 
-  while ((match = linkRegex.exec(text)) !== null) {
+  while ((match = tokenRegex.exec(text)) !== null) {
     if (match.index > lastIndex) {
       nodes.push(text.slice(lastIndex, match.index));
     }
-    nodes.push(
-      <a
-        key={`link-${paraIndex}-${linkCount++}`}
-        href={match[2]}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-accent hover:underline"
-      >
-        {match[1]}
-      </a>
-    );
+    if (match[1] !== undefined) {
+      nodes.push(<strong key={`md-${paraIndex}-${keyCount++}`}>{match[1]}</strong>);
+    } else if (match[2] !== undefined) {
+      nodes.push(<em key={`md-${paraIndex}-${keyCount++}`}>{match[2]}</em>);
+    } else {
+      nodes.push(
+        <a
+          key={`md-${paraIndex}-${keyCount++}`}
+          href={match[4]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent hover:underline"
+        >
+          {match[3]}
+        </a>
+      );
+    }
     lastIndex = match.index + match[0].length;
   }
 

@@ -1115,8 +1115,10 @@ export const ExpandBriefBody = zod.object({
 
 export const ExpandBriefResponse = zod.object({
   "title": zod.string().describe('Suggested article headline'),
+  "dek": zod.string().optional().describe('1-2 sentence deck \/ sub-headline'),
   "body": zod.string().describe('Full article body in Markdown'),
-  "category": zod.string().describe('Suggested category')
+  "category": zod.string().describe('Suggested category'),
+  "sourceUrls": zod.array(zod.string()).optional().describe('Source URLs extracted from the brief')
 })
 
 
