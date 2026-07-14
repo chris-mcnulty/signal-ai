@@ -54,41 +54,24 @@ export default function Home() {
     setError("");
     setMsalLoading(true);
     try {
-      const result = await msalInstance.loginPopup(loginRequest);
-      const idToken = result.idToken;
-
-      const res = await fetch("/api/auth/microsoft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (res.ok) {
-        const data = await res.json() as { apiKey: string; email: string; id: number };
-        login(data.apiKey, data.email, "approved" as EditorStatus);
-      } else if (res.status === 403) {
-        setError("Your Microsoft account hasn't been approved yet. Contact an administrator.");
-      } else {
-        setError("Sign-in failed. Try again or use your editor key.");
-      }
+      // Use full-page redirect instead of popup. Popup flows break on iOS
+      // Safari (opens in a new tab with no window.opener, so MSAL cannot
+      // postMessage back to the login page). loginRedirect navigates the
+      // current page to Microsoft; on return, main.tsx exchanges the token
+      // and navigates to /dashboard/ with auth already set in sessionStorage.
+      await msalInstance.loginRedirect(loginRequest);
+      // Page is navigating away — execution does not continue past this point.
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("user_cancelled")) {
-        // user closed the popup — no error needed
-      } else if (msg.includes("popup_window_error")) {
-        // Mobile Safari and some browsers block popups — fall back to a
-        // full-page redirect. main.tsx handles the token exchange on return.
-        msalInstance.loginRedirect(loginRequest).catch(() => {
-          setError("Microsoft sign-in failed. Try again or use your editor key.");
-        });
-      } else if (msg.includes("VITE_ENTRA_CLIENT_ID") || msg.includes("clientId")) {
+      if (msg.includes("VITE_ENTRA_CLIENT_ID") || msg.includes("clientId")) {
         setError("Microsoft sign-in is not configured yet. Use your editor key instead.");
       } else {
         setError("Microsoft sign-in failed. Try again or use your editor key.");
       }
-    } finally {
       setMsalLoading(false);
     }
+    // No finally block — if loginRedirect succeeds the page navigates away
+    // and setMsalLoading(false) would be a no-op on an unmounted component.
   }
 
   return (

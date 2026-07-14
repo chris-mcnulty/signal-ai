@@ -9,10 +9,11 @@ const STATUS_KEY = "dashboard_editor_status";
 
 msalInstance.initialize().then(async () => {
   try {
-    // Handle the result of a loginRedirect flow (e.g. mobile Safari where
-    // popups are blocked and MSAL falls back to a full-page redirect).
-    // This runs before React mounts so sessionStorage is pre-populated and
-    // the AuthProvider reads the correct state on first render.
+    // Handle the result of a loginRedirect flow. This runs before React mounts
+    // so sessionStorage is pre-populated and AuthProvider reads the correct
+    // state on first render. navigateToLoginRequestUrl is false in msal.ts so
+    // we control navigation here rather than letting MSAL race our fetch or
+    // land on the wrong URL.
     const response = await msalInstance.handleRedirectPromise();
     if (response?.idToken) {
       const res = await fetch("/api/auth/microsoft", {
@@ -25,10 +26,15 @@ msalInstance.initialize().then(async () => {
         sessionStorage.setItem(SESSION_KEY, data.apiKey);
         sessionStorage.setItem(EMAIL_KEY, data.email);
         sessionStorage.setItem(STATUS_KEY, "approved");
+        // Navigate to the dashboard — the auth state is now in sessionStorage
+        // so the app will mount logged-in without another redirect.
+        window.location.replace(window.location.origin + "/dashboard/");
+        return; // don't mount React here; the replace triggers a fresh load
       }
+      // Backend rejected the token — fall through and show the login page
     }
   } catch {
-    // Redirect processing failed — render the app anyway (login page will show)
+    // Redirect processing failed — show the login page
   }
 
   createRoot(document.getElementById("root")!).render(<App />);

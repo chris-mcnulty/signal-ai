@@ -15,6 +15,11 @@ const msalConfig: Configuration = {
     clientId: clientId ?? "",
     authority: "https://login.microsoftonline.com/common",
     redirectUri: window.location.origin + "/dashboard/app/callback",
+    // We navigate manually in main.tsx after exchanging the token with the
+    // backend. Disabling auto-navigation prevents MSAL from racing our fetch
+    // or landing on the wrong URL (e.g. origin root) when sessionStorage
+    // state is absent in a popup tab on iOS Safari.
+    navigateToLoginRequestUrl: false,
   },
   cache: {
     cacheLocation: "sessionStorage",
