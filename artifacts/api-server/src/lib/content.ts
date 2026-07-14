@@ -111,6 +111,7 @@ export function toArticleSummary(article: Article) {
     slug: article.slug,
     title: article.title,
     dek: article.dek,
+    excerpt: article.excerpt ?? null,
     category: article.category,
     author: article.author,
     readingMinutes: article.readingMinutes,

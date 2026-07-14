@@ -10,7 +10,8 @@ export interface ArticleSummary {
   id: number;
   slug: string;
   title: string;
-  dek: string;
+  dek?: string | null;
+  excerpt?: string | null;
   category: string;
   author: string;
   readingMinutes: number;

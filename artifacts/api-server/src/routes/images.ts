@@ -3,7 +3,7 @@ import path from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
-import { db, articlesTable } from "@workspace/db";
+import { db, articlesTable, libraryImagesTable } from "@workspace/db";
 import { generateImageBuffer } from "@workspace/integrations-openai-ai-server/image";
 import { requireEditor } from "../middlewares/requireEditor";
 import { GENERATED_DIR } from "../paths";
@@ -16,7 +16,15 @@ async function generateAndSave(prompt: string): Promise<string> {
   const filename = `${randomUUID()}.png`;
   const filePath = path.join(GENERATED_DIR, filename);
   await writeFile(filePath, buffer);
-  return `/api/static/generated/${filename}`;
+  const publicPath = `/api/static/generated/${filename}`;
+  const label = prompt.length > 80 ? prompt.slice(0, 77) + "…" : prompt;
+  await db.insert(libraryImagesTable).values({
+    filename,
+    path: publicPath,
+    category: "Generated",
+    label,
+  });
+  return publicPath;
 }
 
 router.post("/images/generate", requireEditor, async (req, res): Promise<void> => {

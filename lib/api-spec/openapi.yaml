@@ -1439,6 +1439,10 @@ components:
           type: string
         dek:
           type: string
+          nullable: true
+        excerpt:
+          type: string
+          nullable: true
         category:
           type: string
         author:
@@ -1458,7 +1462,6 @@ components:
         - id
         - slug
         - title
-        - dek
         - category
         - author
         - readingMinutes
