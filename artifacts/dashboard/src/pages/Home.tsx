@@ -73,8 +73,14 @@ export default function Home() {
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("user_cancelled") || msg.includes("popup_window_error")) {
+      if (msg.includes("user_cancelled")) {
         // user closed the popup — no error needed
+      } else if (msg.includes("popup_window_error")) {
+        // Mobile Safari and some browsers block popups — fall back to a
+        // full-page redirect. main.tsx handles the token exchange on return.
+        msalInstance.loginRedirect(loginRequest).catch(() => {
+          setError("Microsoft sign-in failed. Try again or use your editor key.");
+        });
       } else if (msg.includes("VITE_ENTRA_CLIENT_ID") || msg.includes("clientId")) {
         setError("Microsoft sign-in is not configured yet. Use your editor key instead.");
       } else {
