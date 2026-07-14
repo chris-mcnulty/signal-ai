@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, Wand2, Loader2, ImagePlus, RefreshCw, Check } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -72,6 +72,7 @@ const formSchema = z.object({
   excerpt: z.string().optional(),
   imageUrl: z.string().optional().default(""),
   body: z.string().min(1, "Body is required"),
+  sourceUrls: z.array(z.string()).optional().default([]),
 });
 
 export default function DraftEditor() {
@@ -106,6 +107,7 @@ export default function DraftEditor() {
       excerpt: "",
       imageUrl: "",
       body: "",
+      sourceUrls: [],
     },
   });
 
@@ -121,12 +123,14 @@ export default function DraftEditor() {
         excerpt: draft.excerpt || "",
         imageUrl: draft.imageUrl || "",
         body: draft.body,
+        sourceUrls: draft.sourceUrls ?? [],
       });
     }
   }, [draft, form]);
 
   const onSave = async (values: z.infer<typeof formSchema>) => {
     try {
+      const cleanUrls = (values.sourceUrls ?? []).map((u) => u.trim()).filter(Boolean);
       const data = {
         title: values.title,
         category: values.category,
@@ -134,6 +138,7 @@ export default function DraftEditor() {
         excerpt: values.excerpt || undefined,
         imageUrl: values.imageUrl || undefined,
         body: values.body,
+        sourceUrls: cleanUrls.length ? cleanUrls : null,
       };
 
       if (isNew) {
@@ -543,6 +548,50 @@ export default function DraftEditor() {
 
               <FormField
                 control={form.control}
+                name="sourceUrls"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>References / Sources</FormLabel>
+                    <div className="space-y-2">
+                      {(field.value ?? []).map((url, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <Input
+                            value={url}
+                            onChange={(e) => {
+                              const next = [...(field.value ?? [])];
+                              next[i] = e.target.value;
+                              field.onChange(next);
+                            }}
+                            placeholder="https://example.com/source"
+                            className="text-sm font-mono"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = (field.value ?? []).filter((_, j) => j !== i);
+                              field.onChange(next);
+                            }}
+                            className="text-muted-foreground hover:text-destructive shrink-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => field.onChange([...(field.value ?? []), ""])}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" /> Add source URL
+                      </button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="body"
                 render={({ field }) => (
                   <FormItem>
@@ -612,27 +661,6 @@ export default function DraftEditor() {
             )}
 
             {/* Sources / citations */}
-            {!isNew && draft && draft.sourceUrls && draft.sourceUrls.length > 0 && (
-              <div className="border border-border rounded-xl overflow-hidden">
-                <div className="px-4 py-3 bg-muted/40 border-b border-border">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Sources</h3>
-                </div>
-                <ol className="divide-y divide-border/60">
-                  {draft.sourceUrls.map((url, i) => {
-                    let hostname = url;
-                    try { hostname = new URL(url).hostname.replace(/^www\./, ""); } catch { /* keep raw */ }
-                    return (
-                      <li key={i} className="px-4 py-2 text-xs flex items-start gap-2">
-                        <span className="text-muted-foreground shrink-0 mt-0.5">[{i + 1}]</span>
-                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate" title={url}>
-                          {hostname}
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-            )}
 
             {/* Primary workflow actions */}
             {!isNew && draft && (
@@ -793,6 +821,9 @@ export default function DraftEditor() {
                       onApplySeo={(proposal) => {
                         if (proposal.seoTitle) {
                           form.setValue("title", proposal.seoTitle, { shouldDirty: true });
+                        }
+                        if (proposal.metaDescription) {
+                          form.setValue("excerpt", proposal.metaDescription, { shouldDirty: true });
                         }
                       }}
                     />

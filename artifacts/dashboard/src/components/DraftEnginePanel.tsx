@@ -285,7 +285,7 @@ function SeoSection({
                   });
                 }}
               >
-                Apply title to editor
+                Apply to editor
               </Button>
             )}
           </DialogFooter>

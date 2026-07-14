@@ -349,7 +349,8 @@ export const UpdateDraftBody = zod.object({
   "category": zod.string().min(1).optional(),
   "author": zod.string().min(1).optional(),
   "excerpt": zod.string().nullish(),
-  "imageUrl": zod.string().nullish()
+  "imageUrl": zod.string().nullish(),
+  "sourceUrls": zod.array(zod.string()).nullish()
 })
 
 export const UpdateDraftResponse = zod.object({

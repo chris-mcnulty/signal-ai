@@ -19,4 +19,6 @@ export interface ArticleUpdate {
   excerpt?: string | null;
   /** @nullable */
   imageUrl?: string | null;
+  /** @nullable */
+  sourceUrls?: string[] | null;
 }

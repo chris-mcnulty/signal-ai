@@ -1712,6 +1712,10 @@ components:
           type: ["string", "null"]
         imageUrl:
           type: ["string", "null"]
+        sourceUrls:
+          type: ["array", "null"]
+          items:
+            type: string
     ApprovalOptions:
       type: object
       properties:
