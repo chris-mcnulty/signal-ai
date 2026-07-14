@@ -275,6 +275,7 @@ export default function DraftEditor() {
   const [genPrompt, setGenPrompt] = useState("");
   const [genLoading, setGenLoading] = useState(false);
   const [genPreview, setGenPreview] = useState<string | null>(null);
+  const [libraryRefreshKey, setLibraryRefreshKey] = useState(0);
 
   const openGenerator = () => {
     const title = form.getValues("title");
@@ -333,6 +334,7 @@ export default function DraftEditor() {
       form.setValue("imageUrl", pathToAssign, { shouldDirty: false });
       setGenOpen(false);
       setGenPreview(null);
+      setLibraryRefreshKey((k) => k + 1);
       invalidateAndRefresh();
       if (draft?.status !== "published") {
         const currentValues = form.getValues();
@@ -459,6 +461,7 @@ export default function DraftEditor() {
                         value={field.value || null}
                         onChange={(path) => field.onChange(path)}
                         apiBase={API_BASE}
+                        refreshKey={libraryRefreshKey}
                       />
                     </FormControl>
 
