@@ -27,11 +27,11 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter(_req, file, cb) {
-    const allowed = ["image/svg+xml", "image/png"];
+    const allowed = ["image/svg+xml", "image/png", "image/jpeg"];
     if (allowed.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Only SVG and PNG files are accepted"));
+      cb(new Error("Only SVG, PNG, and JPEG files are accepted"));
     }
   },
 });
@@ -64,7 +64,7 @@ router.post(
 
     const category = (req.body as { category?: string }).category?.trim() || "General";
     const label = (req.body as { label?: string }).label?.trim() || file.originalname;
-    const ext = file.mimetype === "image/svg+xml" ? ".svg" : ".png";
+    const ext = file.mimetype === "image/svg+xml" ? ".svg" : file.mimetype === "image/jpeg" ? ".jpg" : ".png";
     const slug = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
     const filePath = path.join(LIBRARY_DIR, slug);
     const publicPath = `/api/static/library/${slug}`;

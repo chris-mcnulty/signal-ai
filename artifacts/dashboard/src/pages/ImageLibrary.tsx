@@ -158,11 +158,11 @@ export default function ImageLibrary() {
           <form onSubmit={handleUpload} className="p-5 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium">File <span className="text-muted-foreground font-normal">(SVG or PNG)</span></label>
+                <label className="text-sm font-medium">File <span className="text-muted-foreground font-normal">(SVG, PNG, or JPEG)</span></label>
                 <Input
                   ref={fileRef}
                   type="file"
-                  accept=".svg,.png,image/svg+xml,image/png"
+                  accept=".svg,.png,.jpg,.jpeg,image/svg+xml,image/png,image/jpeg"
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                   className="cursor-pointer"
                 />
