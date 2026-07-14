@@ -14,7 +14,7 @@ const msalConfig: Configuration = {
   auth: {
     clientId: clientId ?? "",
     authority: "https://login.microsoftonline.com/common",
-    redirectUri: window.location.origin,
+    redirectUri: window.location.origin + "/dashboard/app/callback",
   },
   cache: {
     cacheLocation: "sessionStorage",
