@@ -24,6 +24,7 @@ export * from './caseStudyDetail';
 export * from './caseStudyMetric';
 export * from './caseStudyQuote';
 export * from './caseStudySummary';
+export * from './citationsResult';
 export * from './contentBrief';
 export * from './contentBriefInterview';
 export * from './contentBriefStatus';

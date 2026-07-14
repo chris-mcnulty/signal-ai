@@ -37,6 +37,7 @@ import {
   usePublishDraft,
   useUnpublishDraft,
   useExpandBrief,
+  useFindDraftCitations,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListDraftsQueryKey, getGetDraftsSummaryQueryKey } from "@workspace/api-client-react";
@@ -97,6 +98,7 @@ export default function DraftEditor() {
   const publishMutation = usePublishDraft();
   const unpublishMutation = useUnpublishDraft();
   const expandBriefMutation = useExpandBrief();
+  const findCitationsMutation = useFindDraftCitations();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -551,7 +553,38 @@ export default function DraftEditor() {
                 name="sourceUrls"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>References / Sources</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>References / Sources</FormLabel>
+                      <button
+                        type="button"
+                        disabled={!draft?.id || findCitationsMutation.isPending}
+                        onClick={() => {
+                          if (!draft?.id) return;
+                          findCitationsMutation.mutate(
+                            { id: draft.id },
+                            {
+                              onSuccess: (result) => {
+                                const existing = new Set(form.getValues("sourceUrls") ?? []);
+                                const next = [
+                                  ...(form.getValues("sourceUrls") ?? []),
+                                  ...result.citations.filter((u) => !existing.has(u)),
+                                ];
+                                form.setValue("sourceUrls", next, { shouldDirty: true });
+                                toast({ title: `${result.citations.length} citation${result.citations.length === 1 ? "" : "s"} added` });
+                              },
+                              onError: () => toast({ title: "Could not generate citations", variant: "destructive" }),
+                            },
+                          );
+                        }}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                      >
+                        {findCitationsMutation.isPending ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Finding…</>
+                        ) : (
+                          <><Wand2 className="w-3.5 h-3.5" /> Generate</>
+                        )}
+                      </button>
+                    </div>
                     <div className="space-y-2">
                       {(field.value ?? []).map((url, i) => (
                         <div key={i} className="flex items-center gap-2">

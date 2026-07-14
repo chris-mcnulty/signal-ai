@@ -46,6 +46,8 @@ import {
   ExportSocialVariantsCsvParams,
   SeoOptimizeDraftParams,
   SeoOptimizeDraftResponse,
+  FindDraftCitationsParams,
+  FindDraftCitationsResponse,
   ExpandBriefBody,
   ExpandBriefResponse,
 } from "@workspace/api-zod";
@@ -55,6 +57,7 @@ import { rateLimit } from "../middlewares/rateLimit";
 import { enqueueEngineJob } from "../engine/job-queue";
 import { repurposeArticle } from "../engine/repurpose";
 import { optimizeArticleSeo } from "../engine/seo";
+import { findArticleCitations } from "../engine/citations";
 import { expandFromBrief } from "../lib/aiDrafting";
 import { buildVariantsCsv } from "../engine/repurpose-core";
 import { coercePlatform, type RepurposePlatform } from "../engine/repurpose-core";
@@ -492,6 +495,34 @@ router.post(
     } catch (err) {
       req.log.error({ err }, "SEO optimization failed");
       res.status(502).json({ error: "AI SEO optimization failed" });
+    }
+  },
+);
+
+router.post(
+  "/drafts/:id/find-citations",
+  requireEditor,
+  aiRateLimit,
+  async (req, res): Promise<void> => {
+    const params = FindDraftCitationsParams.safeParse(req.params);
+    if (!params.success) {
+      res.status(400).json({ error: params.error.message });
+      return;
+    }
+    const [article] = await db
+      .select()
+      .from(articlesTable)
+      .where(eq(articlesTable.id, params.data.id));
+    if (!article) {
+      res.status(404).json({ error: "Draft not found" });
+      return;
+    }
+    try {
+      const citations = await findArticleCitations(article);
+      res.json(FindDraftCitationsResponse.parse({ citations }));
+    } catch (err) {
+      req.log.error({ err }, "Citation finding failed");
+      res.status(502).json({ error: "AI citation finding failed" });
     }
   },
 );

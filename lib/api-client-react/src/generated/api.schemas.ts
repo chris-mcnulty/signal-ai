@@ -744,6 +744,10 @@ export interface SeoOptimization {
   contentGaps: string[];
 }
 
+export interface CitationsResult {
+  citations: string[];
+}
+
 export type ListArticlesParams = {
 category?: string;
 /**

@@ -1246,6 +1246,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/find-citations:
+    post:
+      operationId: findDraftCitations
+      tags: [engine]
+      summary: Suggest real source URLs for an existing article using AI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suggested citation URLs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CitationsResult"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "502":
+          description: AI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
   /drafts/expand-brief:
     post:
       operationId: expandBrief
@@ -2347,6 +2383,14 @@ components:
           items:
             $ref: "#/components/schemas/InternalLinkSuggestion"
         contentGaps:
+          type: array
+          items:
+            type: string
+    CitationsResult:
+      type: object
+      required: [citations]
+      properties:
+        citations:
           type: array
           items:
             type: string

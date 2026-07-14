@@ -1090,6 +1090,18 @@ export const SeoOptimizeDraftResponse = zod.object({
 
 
 /**
+ * @summary Suggest real source URLs for an existing article using AI
+ */
+export const FindDraftCitationsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const FindDraftCitationsResponse = zod.object({
+  "citations": zod.array(zod.string())
+})
+
+
+/**
  * Accepts raw notes, bullet points, or a partial story brief and returns a fully written article (title, body, category). Does not write to the database — the caller should populate the draft editor fields and save manually.
  * @summary Expand raw notes or a story brief into a full article draft
  */

@@ -32,6 +32,7 @@ import type {
   BriefUpdate,
   CaseStudyDetail,
   CaseStudySummary,
+  CitationsResult,
   ContentBrief,
   DraftsSummary,
   EngineJob,
@@ -3385,6 +3386,77 @@ export const useSeoOptimizeDraft = <TError = ErrorType<ErrorMessage>,
         TContext
       > => {
       return useMutation(getSeoOptimizeDraftMutationOptions(options));
+    }
+
+export const getFindDraftCitationsUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/find-citations`
+}
+
+/**
+ * @summary Suggest real source URLs for an existing article using AI
+ */
+export const findDraftCitations = async (id: number, options?: RequestInit): Promise<CitationsResult> => {
+
+  return customFetch<CitationsResult>(getFindDraftCitationsUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getFindDraftCitationsMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof findDraftCitations>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof findDraftCitations>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['findDraftCitations'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof findDraftCitations>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  findDraftCitations(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FindDraftCitationsMutationResult = NonNullable<Awaited<ReturnType<typeof findDraftCitations>>>
+
+    export type FindDraftCitationsMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Suggest real source URLs for an existing article using AI
+ */
+export const useFindDraftCitations = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof findDraftCitations>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof findDraftCitations>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getFindDraftCitationsMutationOptions(options));
     }
 
 export const getExpandBriefUrl = () => {
