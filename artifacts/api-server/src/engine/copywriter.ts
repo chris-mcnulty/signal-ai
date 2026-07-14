@@ -37,6 +37,7 @@ interface CopywriterResponse {
   dek?: string;
   body?: string;
   category?: string;
+  citations?: string[];
 }
 
 export async function runCopywrite(input: CopywriteJobInput): Promise<Article> {
@@ -89,7 +90,8 @@ Respond with a JSON object:
 - "title": final headline (string)
 - "dek": 1-2 sentence deck/teaser — no em dashes, no AI filler words (string)
 - "body": the full article in Markdown, 700-1100 words, with ## subheadings, inline citations where claims are sourced (string)
-- "category": short category label (string)`,
+- "category": short category label (string)
+- "citations": array of source URLs cited or referenced in the body — use URLs from the research briefing where available, otherwise include real, publicly accessible URLs for the primary claims (array of strings, may be empty)`,
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -116,6 +118,14 @@ Respond with a JSON object:
 
   const category = (data.category ?? "").trim() || brief.category || "Uncategorized";
 
+  const aiCitations = Array.isArray(data.citations)
+    ? (data.citations as unknown[]).filter((u): u is string => typeof u === "string" && u.startsWith("http"))
+    : [];
+  const mergedSourceUrls = [
+    ...sourceUrls,
+    ...aiCitations.filter((u) => !sourceUrls.includes(u)),
+  ];
+
   const libraryImages = await db.select().from(libraryImagesTable);
   const pickedImage = getImageForCategory(category, libraryImages.map((img) => ({
     id: img.id,
@@ -139,7 +149,7 @@ Respond with a JSON object:
       status: "pending",
       source: "ai",
       imageUrl: pickedImage?.path ?? null,
-      sourceUrls: sourceUrls.length ? sourceUrls : null,
+      sourceUrls: mergedSourceUrls.length ? mergedSourceUrls : null,
       sourceMetadata: {
         engine: "copywriter",
         briefId: brief.id,
