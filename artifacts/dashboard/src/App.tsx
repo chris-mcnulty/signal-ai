@@ -59,6 +59,10 @@ function Routes() {
         <ProtectedRoute component={ImageLibrary} />
       </Route>
 
+      <Route path="/app/callback">
+        {null}
+      </Route>
+
       <Route>
         <div className="p-8 min-h-screen flex items-center justify-center flex-col gap-4 text-center">
           <h1 className="text-4xl font-bold">404</h1>
