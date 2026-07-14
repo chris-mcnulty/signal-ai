@@ -1,17 +1,13 @@
 import { Router, type IRouter } from "express";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import multer from "multer";
 import { eq, or } from "drizzle-orm";
 import { db, libraryImagesTable, editorsTable } from "@workspace/db";
 import { articlesTable } from "@workspace/db";
 import { requireEditor } from "../middlewares/requireEditor";
+import { LIBRARY_DIR } from "../paths";
 
 const router: IRouter = Router();
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const LIBRARY_DIR = path.resolve(__dirname, "../../public/static/library");
 
 const ADMIN_EMAILS = ["chris.mcnulty@synozur.com", "admin@synozur.com"];
 

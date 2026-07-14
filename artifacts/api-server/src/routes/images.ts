@@ -1,17 +1,14 @@
 import { Router, type IRouter } from "express";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { mkdir, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db, articlesTable } from "@workspace/db";
 import { generateImageBuffer } from "@workspace/integrations-openai-ai-server/image";
 import { requireEditor } from "../middlewares/requireEditor";
+import { GENERATED_DIR } from "../paths";
 
 const router: IRouter = Router();
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const GENERATED_DIR = path.resolve(__dirname, "../../public/static/generated");
 
 async function generateAndSave(prompt: string): Promise<string> {
   const buffer = await generateImageBuffer(prompt, "1792x1024");
