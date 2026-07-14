@@ -1,6 +1,8 @@
 import { Router, type IRouter } from "express";
-import { getPublishedArticleBySlug } from "../lib/seoPage";
+import { getBaseUrl } from "../lib/site";
+import { getPublishedArticleBySlug, resolveSeoPage } from "../lib/seoPage";
 import { renderArticleOgCard } from "../lib/articleOgCard";
+import { renderAgentHtml } from "../lib/agentRenderer";
 
 const router: IRouter = Router();
 
@@ -56,6 +58,36 @@ router.get("/og/articles/:slug", async (req, res): Promise<void> => {
     req.log?.error({ err }, "failed to render article og card");
     res.status(500).send("Failed to render image");
   }
+});
+
+router.get("/articles/:slug", async (req, res): Promise<void> => {
+  const slug = req.params.slug;
+  if (!slug) {
+    res.status(404).send("Not found");
+    return;
+  }
+
+  const baseUrl = getBaseUrl(req);
+  const page = await resolveSeoPage(baseUrl, `/articles/${slug}`);
+
+  if (page.status === "not_found") {
+    res.status(404).send("Not found");
+    return;
+  }
+
+  const html = await renderAgentHtml(baseUrl, page);
+  if (!html) {
+    res.status(404).send("Not found");
+    return;
+  }
+
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("Cache-Control", "public, max-age=300");
+  } else {
+    res.setHeader("Cache-Control", "no-store");
+  }
+  res.send(html);
 });
 
 export default router;

@@ -47,11 +47,16 @@ ${items}
 
 function articlePageBody(page: ResolvedSeoPage): string {
   const article = page.article!;
+  const heroImage = article.heroImageUrl || article.imageUrl;
+  const heroHtml = heroImage
+    ? `<div class="hero-image"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(article.title)}"></div>`
+    : "";
   return `<main>
 <span class="kicker mono">${escapeHtml(article.category)}</span>
 <h1 class="headline">${escapeHtml(article.title)}</h1>
 <p class="dek">${escapeHtml(article.dek)}</p>
 <div class="byline">By ${escapeHtml(article.author)} — ${formatDate(article.publishedAt ?? article.createdAt)} — ${article.readingMinutes} min read</div>
+${heroHtml}
 <div class="article-body">
 ${renderArticleBody(article.body)}
 </div>

@@ -12,8 +12,12 @@ export function caseStudyOgImageUrl(
 
 export function articleOgImageUrl(
   baseUrl: string,
-  article: Pick<Article, "slug" | "updatedAt">,
+  article: Pick<Article, "slug" | "updatedAt" | "heroImageUrl" | "imageUrl">,
 ): string {
+  const heroImage = article.heroImageUrl || article.imageUrl;
+  if (heroImage) {
+    return heroImage.startsWith("http") ? heroImage : `${baseUrl}${heroImage}`;
+  }
   return `${baseUrl}/og/articles/${article.slug}.png?v=${article.updatedAt.getTime()}`;
 }
 
