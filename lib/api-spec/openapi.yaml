@@ -1444,6 +1444,9 @@ components:
         heroImageUrl:
           type: string
           nullable: true
+        imageUrl:
+          type: string
+          nullable: true
         sourceUrls:
           type: array
           nullable: true

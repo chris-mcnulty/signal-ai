@@ -58,6 +58,7 @@ export const GetArticleResponse = zod.object({
   "publishedAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
   "heroImageUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
   "sourceUrls": zod.array(zod.string()).nullish()
 })
 

@@ -44,6 +44,20 @@ export async function migrateImagePathsIfNeeded(): Promise<void> {
       WHERE hero_image_url LIKE '/static/generated/%'
     `);
 
+    // Fix paths seeded with /case-studies/static/ prefix — those never routed
+    // correctly through the proxy. Rewrite to /api/static/ so Express can serve them.
+    await db.execute(sql`
+      UPDATE articles
+      SET hero_image_url = replace(hero_image_url, '/case-studies/static/news/', '/api/static/news/')
+      WHERE hero_image_url LIKE '/case-studies/static/news/%'
+    `);
+
+    await db.execute(sql`
+      UPDATE articles
+      SET hero_image_url = replace(hero_image_url, '/case-studies/static/case-studies/', '/api/static/case-studies/')
+      WHERE hero_image_url LIKE '/case-studies/static/case-studies/%'
+    `);
+
     logger.info("Image path migration complete");
   } catch (err) {
     logger.warn({ err }, "Image path migration failed (non-fatal)");

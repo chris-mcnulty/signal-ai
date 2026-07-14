@@ -18,5 +18,6 @@ export interface ArticleDetail {
   publishedAt: Date;
   updatedAt: Date;
   heroImageUrl?: string | null;
+  imageUrl?: string | null;
   sourceUrls?: string[] | null;
 }

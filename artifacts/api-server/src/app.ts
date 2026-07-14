@@ -49,6 +49,12 @@ app.use("/api/static/library", express.static(path.join(__dirname, "../public/st
 // AI-generated images
 app.use("/api/static/generated", express.static(path.join(__dirname, "../public/static/generated")));
 
+// News article hero images
+app.use("/api/static/news", express.static(path.join(__dirname, "../public/static/news")));
+
+// Case study hero images
+app.use("/api/static/case-studies", express.static(path.join(__dirname, "../public/static/case-studies")));
+
 // Server-rendered, SEO-optimized public pages (proxied at root paths)
 app.use(caseStudyPagesRouter);
 app.use(articlePagesRouter);

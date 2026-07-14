@@ -132,6 +132,7 @@ export function toArticleDetail(article: Article) {
     publishedAt: article.publishedAt ?? article.createdAt,
     updatedAt: article.updatedAt,
     heroImageUrl: article.heroImageUrl ?? null,
+    imageUrl: article.imageUrl ?? null,
     sourceUrls: article.sourceUrls ?? null,
   };
 }

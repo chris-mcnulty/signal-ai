@@ -99,6 +99,7 @@ export interface ArticleDetail {
   publishedAt: string;
   updatedAt: string;
   heroImageUrl?: string | null;
+  imageUrl?: string | null;
   sourceUrls?: string[] | null;
 }
 

@@ -34,6 +34,48 @@ function ArticleSkeleton() {
   );
 }
 
+/** Extract a readable label from a URL: hostname without www. */
+function sourceDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
+/** Render a paragraph string, converting [text](url) markdown links to <a> elements. */
+function renderInlineLinks(text: string, paraIndex: number): React.ReactNode[] {
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let linkCount = 0;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(text.slice(lastIndex, match.index));
+    }
+    nodes.push(
+      <a
+        key={`link-${paraIndex}-${linkCount++}`}
+        href={match[2]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-accent hover:underline"
+      >
+        {match[1]}
+      </a>
+    );
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+
+  return nodes.length > 0 ? nodes : [text];
+}
+
 export default function ArticlePage() {
   const [, params] = useRoute("/articles/:slug");
   const slug = params?.slug || "";
@@ -83,6 +125,7 @@ export default function ArticlePage() {
     day: 'numeric'
   });
 
+  const heroImage = article.heroImageUrl || article.imageUrl;
   const bodyParagraphs = article.body.split('\n\n').filter(p => p.trim() !== '');
 
   return (
@@ -157,11 +200,11 @@ export default function ArticlePage() {
         </header>
 
         {/* Hero Image */}
-        {(article.heroImageUrl || article.imageUrl) && (
+        {heroImage && (
           <figure className="max-w-[900px] mx-auto mb-12 animate-fade-in-up delay-100">
             <div className="aspect-[16/9] w-full bg-[#e8e4de] overflow-hidden">
               <img 
-                src={article.heroImageUrl || article.imageUrl} 
+                src={heroImage}
                 alt={article.title} 
                 className="w-full h-full object-cover"
               />
@@ -175,36 +218,42 @@ export default function ArticlePage() {
         {/* Article Body — constrained to ~68ch */}
         <div className="article-body font-sans text-news-primary animate-fade-in-up delay-200 mx-auto">
           {bodyParagraphs.map((paragraph, index) => {
-            if (index === 0) {
-              return (
-                <p key={index} className="article-dropcap">
-                  {paragraph}
-                </p>
-              );
-            }
             if (paragraph.startsWith('## ')) {
               return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
             }
             if (paragraph.startsWith('> ')) {
-              return <blockquote key={index}>{paragraph.replace('> ', '')}</blockquote>;
+              return <blockquote key={index}>{renderInlineLinks(paragraph.replace('> ', ''), index)}</blockquote>;
             }
-            return <p key={index}>{paragraph}</p>;
+            if (index === 0) {
+              return (
+                <p key={index} className="article-dropcap">
+                  {renderInlineLinks(paragraph, index)}
+                </p>
+              );
+            }
+            return <p key={index}>{renderInlineLinks(paragraph, index)}</p>;
           })}
         </div>
         
-        {/* Source Links */}
+        {/* Source Links — numbered references with readable domain labels */}
         {article.sourceUrls && article.sourceUrls.length > 0 && (
           <div className="article-body mx-auto mt-12 pt-6 border-t border-news animate-fade-in-up delay-300">
             <h3 className="font-mono text-xs font-bold uppercase tracking-widest mb-4 text-news-secondary">Sources</h3>
-            <ul className="space-y-2">
+            <ol className="space-y-2 list-none">
               {article.sourceUrls.map((url, i) => (
-                <li key={i}>
-                  <a href={url} target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-accent hover:underline break-all">
-                    {url}
+                <li key={i} className="flex items-baseline gap-2">
+                  <span className="font-mono text-xs text-news-secondary shrink-0">[{i + 1}]</span>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-accent hover:underline"
+                  >
+                    {sourceDomain(url)}
                   </a>
                 </li>
               ))}
-            </ul>
+            </ol>
           </div>
         )}
 
