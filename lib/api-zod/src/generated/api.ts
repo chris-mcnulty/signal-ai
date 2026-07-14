@@ -175,6 +175,7 @@ export const SubmitDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -213,6 +214,7 @@ export const GenerateDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -240,6 +242,7 @@ export const ListDraftsResponseItem = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -279,6 +282,7 @@ export const CreateDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -318,6 +322,7 @@ export const GetDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -360,6 +365,7 @@ export const UpdateDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -401,6 +407,7 @@ export const ApproveDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -432,6 +439,7 @@ export const RejectDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -459,6 +467,7 @@ export const PublishDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -486,6 +495,7 @@ export const UnpublishDraftResponse = zod.object({
   "scheduledFor": zod.coerce.date().nullable(),
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })

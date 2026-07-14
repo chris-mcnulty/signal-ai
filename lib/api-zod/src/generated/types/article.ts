@@ -33,6 +33,8 @@ export interface Article {
   publishedAt: Date | null;
   /** @nullable */
   rejectionReason: string | null;
+  /** @nullable */
+  sourceUrls?: string[] | null;
   createdAt: Date;
   updatedAt: Date;
 }

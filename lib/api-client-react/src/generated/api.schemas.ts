@@ -195,6 +195,8 @@ export interface Article {
   publishedAt: string | null;
   /** @nullable */
   rejectionReason: string | null;
+  /** @nullable */
+  sourceUrls?: string[] | null;
   createdAt: string;
   updatedAt: string;
 }

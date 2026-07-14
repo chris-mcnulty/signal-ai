@@ -61,44 +61,60 @@ export function ImagePicker({ value, onChange, apiBase }: ImagePickerProps) {
     );
   }
 
+  const selectedNotInLibrary = value && !images.some((img) => img.path === value);
+
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-64 overflow-y-auto p-1">
-        {images.map((img) => {
+      {selectedNotInLibrary && (
+        <div className="flex items-center justify-between text-xs bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-amber-800">
+          <span className="truncate">Selected image not in library — pick one below or generate a new one.</span>
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="text-amber-700 hover:text-amber-900 ml-2 shrink-0 font-medium"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-80 overflow-y-auto p-1">
+        {(images as LibraryImage[]).map((img) => {
           const isSelected = value === img.path;
           return (
             <button
               key={img.id}
               type="button"
               onClick={() => onChange(img.path)}
-              title={`${img.label} (${img.category})`}
               className={[
-                "relative rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 aspect-video bg-muted",
+                "relative rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 bg-muted text-left",
                 isSelected
                   ? "border-primary ring-2 ring-primary ring-offset-1"
                   : "border-transparent hover:border-border",
               ].join(" ")}
             >
-              <img
-                src={img.path}
-                alt={img.label}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              <div className="aspect-video w-full overflow-hidden">
+                <img
+                  src={img.path}
+                  alt={img.label}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="px-1.5 py-1 bg-background/90 text-[10px] leading-tight text-muted-foreground truncate">
+                {img.label}
+              </div>
               {isSelected && (
-                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                  <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
+                <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow">
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
               )}
             </button>
           );
         })}
       </div>
-      {value && (
+      {value && !selectedNotInLibrary && (
         <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
           <span className="truncate">{value}</span>
           <button
