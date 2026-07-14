@@ -34,7 +34,8 @@ export const ListArticlesResponseItem = zod.object({
   "author": zod.string(),
   "readingMinutes": zod.number(),
   "publishedAt": zod.coerce.date(),
-  "heroImageUrl": zod.string().nullish()
+  "heroImageUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish()
 })
 export const ListArticlesResponse = zod.array(ListArticlesResponseItem)
 
@@ -137,7 +138,8 @@ export const GetCaseStudyResponse = zod.object({
   "author": zod.string(),
   "readingMinutes": zod.number(),
   "publishedAt": zod.coerce.date(),
-  "heroImageUrl": zod.string().nullish()
+  "heroImageUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish()
 }))
 })
 

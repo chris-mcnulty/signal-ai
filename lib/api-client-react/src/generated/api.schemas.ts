@@ -85,6 +85,7 @@ export interface ArticleSummary {
   readingMinutes: number;
   publishedAt: string;
   heroImageUrl?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface ArticleDetail {

@@ -116,6 +116,7 @@ export function toArticleSummary(article: Article) {
     readingMinutes: article.readingMinutes,
     publishedAt: article.publishedAt ?? article.createdAt,
     heroImageUrl: article.heroImageUrl ?? null,
+    imageUrl: article.imageUrl ?? null,
   };
 }
 
