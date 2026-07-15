@@ -19,7 +19,7 @@ was spoofable by anyone with the master key. The key itself must be the identity
 - **`GET /api/auth/me`**: Protected by `requireEditor`, returns `{email, id}` — used by
   the dashboard login flow to get the editor's email from the server (not a form field).
 - **Editors table**: `editors` in Postgres. Columns: id, email, api_key (unique 64-char hex),
-  is_active, invited_at, activated_at. Pre-seeded: chris.mcnulty@synozur.com, admin@synozur.com.
+  is_active, invited_at, activated_at. Pre-seeded with the two permanent admin accounts (see the `editors` table for the actual rows).
 - **Dashboard login**: User enters their personal editor key → `/api/auth/me` → on 200,
   stores key+email from response; on 403, shows AccessPending screen.
 - **No admin UI yet**: Adding/revoking editors requires raw SQL for now. See follow-up tasks.

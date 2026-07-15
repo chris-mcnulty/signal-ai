@@ -1,13 +1,17 @@
 ---
 name: SignalAI Admin Accounts
-description: Permanent full-admin email addresses for the editorial dashboard
+description: Policy — permanent full-admin accounts exist for the editorial dashboard; where to find them.
 ---
 
 ## Permanent Admins
 
-- chris.mcnulty@synozur.com
-- admin@synozur.com
+Two permanent admin accounts exist (user-stated requirement). Their email
+addresses are NOT stored here — look them up in the `editors` table in the
+database (rows with admin/active status) when needed.
 
-**Why:** User-stated requirement — these accounts should always have full admin access to the editorial dashboard, regardless of auth system changes.
+**Why:** These accounts must always retain full admin access to the editorial
+dashboard, regardless of auth system changes.
 
-**How to apply:** When implementing or updating dashboard authentication, these email addresses must always be granted unrestricted access. Do not gate, disable, or remove access for these addresses during any auth refactor.
+**How to apply:** When implementing or updating dashboard authentication,
+never gate, disable, or remove access for the existing active admin rows in
+the `editors` table during any auth refactor.
