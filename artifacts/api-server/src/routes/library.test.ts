@@ -216,6 +216,51 @@ describe("DELETE /api/library/images/:id — conflict", () => {
     expect(Array.isArray(res.body.articles)).toBe(true);
     expect(res.body.articles).toContain("Library hero conflict test");
   });
+
+  it("returns 409 and reports both articles when one uses imageUrl and another uses heroImageUrl", async () => {
+    const image = await insertTestImage();
+
+    const [articleA] = await db
+      .insert(articlesTable)
+      .values({
+        slug: `lib-multi-imageurl-${RUN_SUFFIX}`,
+        title: "Multi-field conflict via imageUrl",
+        body: "Body.",
+        category: "Testing",
+        dek: "",
+        status: "pending",
+        source: "manual",
+        imageUrl: image.path,
+      })
+      .returning();
+    createdArticleIds.push(articleA.id);
+
+    const [articleB] = await db
+      .insert(articlesTable)
+      .values({
+        slug: `lib-multi-heroimageurl-${RUN_SUFFIX}`,
+        title: "Multi-field conflict via heroImageUrl",
+        body: "Body.",
+        category: "Testing",
+        dek: "",
+        status: "pending",
+        source: "manual",
+        heroImageUrl: image.path,
+      })
+      .returning();
+    createdArticleIds.push(articleB.id);
+
+    const res = await request(app)
+      .delete(`/api/library/images/${image.id}`)
+      .set("x-api-key", ADMIN_KEY);
+
+    expect(res.status).toBe(409);
+    expect(res.body.error).toMatch(/referenced/i);
+    expect(Array.isArray(res.body.articles)).toBe(true);
+    expect(res.body.articles.length).toBe(2);
+    expect(res.body.articles).toContain("Multi-field conflict via imageUrl");
+    expect(res.body.articles).toContain("Multi-field conflict via heroImageUrl");
+  });
 });
 
 // ---------------------------------------------------------------------------
