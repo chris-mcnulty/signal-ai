@@ -2,20 +2,16 @@
  * Image generation persistence tests
  *
  * Coverage:
- *   1. POST /api/images/generate        — file written to disk and served at its URL
+ *   1. POST /api/images/generate        — uploads to GCS and returns its public path
  *   2. POST /api/images/generate-and-assign — imageUrl updated in the database
  *
- * The OpenAI image generation call is mocked so tests run offline and without
- * incurring any API cost. The editor DB fixture is created per run so
- * concurrent validation runs don't collide on the shared database.
+ * Both the OpenAI image generation call and the GCS client are mocked so tests
+ * run offline without API cost or cloud credentials.
  */
 
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import request from "supertest";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { access } from "node:fs/promises";
-import * as fs from "node:fs/promises";
+import { Readable } from "node:stream";
 import { eq, inArray } from "drizzle-orm";
 import { db, editorsTable, articlesTable } from "@workspace/db";
 
@@ -33,31 +29,57 @@ const { RUN_SUFFIX, TEST_EDITOR_EMAIL, TEST_EDITOR_KEY } = vi.hoisted(() => {
 });
 
 // ---------------------------------------------------------------------------
-// Mock the OpenAI image generation so tests never hit the network.
-// Returns a minimal 1-byte buffer that is still a valid write target.
+// Mock OpenAI — never hits the network.
 // ---------------------------------------------------------------------------
 
 vi.mock("@workspace/integrations-openai-ai-server/image", () => ({
   generateImageBuffer: vi.fn().mockResolvedValue(Buffer.from("fake-png-data")),
 }));
 
+// ---------------------------------------------------------------------------
+// Mock GCS objectStorageClient — replaces disk I/O with in-memory stubs.
+// The saved buffer is captured so the serve route can stream it back.
+// ---------------------------------------------------------------------------
+
+const gcsStore = new Map<string, Buffer>();
+
+vi.mock("../lib/objectStorage", () => {
+  function makeFile(objectName: string) {
+    return {
+      save: vi.fn(async (buf: Buffer) => { gcsStore.set(objectName, buf); }),
+      exists: vi.fn(async () => [gcsStore.has(objectName)]),
+      getMetadata: vi.fn(async () => [{ contentType: "image/png" }]),
+      createReadStream: vi.fn(() => {
+        const data = gcsStore.get(objectName) ?? Buffer.alloc(0);
+        return Readable.from(data);
+      }),
+    };
+  }
+
+  const mockBucket = {
+    file: vi.fn((name: string) => makeFile(name)),
+  };
+
+  return {
+    objectStorageClient: {
+      bucket: vi.fn(() => mockBucket),
+    },
+  };
+});
+
+// Set the bucket env var that the routes read
+process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID = "test-bucket";
+
 import app from "../app";
 
 // ---------------------------------------------------------------------------
-// Test state — track IDs so afterAll can clean up.
+// Test state
 // ---------------------------------------------------------------------------
 
 const createdArticleIds: number[] = [];
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const GENERATED_DIR = path.resolve(__dirname, "../../public/static/generated");
-
-// ---------------------------------------------------------------------------
-// Database fixtures
-// ---------------------------------------------------------------------------
 
 beforeAll(async () => {
   await db.delete(editorsTable).where(eq(editorsTable.email, TEST_EDITOR_EMAIL));
-
   await db.insert(editorsTable).values({
     email: TEST_EDITOR_EMAIL,
     apiKey: TEST_EDITOR_KEY,
@@ -72,27 +94,11 @@ afterAll(async () => {
       .delete(articlesTable)
       .where(inArray(articlesTable.id, createdArticleIds));
   }
-
-  // Remove fake PNG files written to disk by the mocked image generator so
-  // test residue never accumulates (or gets committed) in the generated dir.
-  try {
-    const entries = await fs.readdir(GENERATED_DIR);
-    await Promise.all(
-      entries.map(async (name) => {
-        const filePath = path.join(GENERATED_DIR, name);
-        const content = await fs.readFile(filePath, "utf8").catch(() => "");
-        if (content === "fake-png-data") {
-          await fs.unlink(filePath).catch(() => {});
-        }
-      }),
-    );
-  } catch {
-    // Directory may not exist if no generation test ran.
-  }
+  gcsStore.clear();
 });
 
 // ---------------------------------------------------------------------------
-// Auth guard — image routes require a valid editor key
+// Auth guard
 // ---------------------------------------------------------------------------
 
 describe("Image route auth", () => {
@@ -112,7 +118,7 @@ describe("Image route auth", () => {
 });
 
 // ---------------------------------------------------------------------------
-// POST /api/images/generate — file persistence and static serving
+// POST /api/images/generate
 // ---------------------------------------------------------------------------
 
 describe("POST /api/images/generate", () => {
@@ -134,7 +140,7 @@ describe("POST /api/images/generate", () => {
     expect(res.body.error).toMatch(/prompt/i);
   });
 
-  it("writes the file to disk and returns its public path", async () => {
+  it("uploads to GCS and returns the public path", async () => {
     const res = await request(app)
       .post("/api/images/generate")
       .set("x-api-key", TEST_EDITOR_KEY)
@@ -144,10 +150,9 @@ describe("POST /api/images/generate", () => {
     expect(typeof res.body.path).toBe("string");
     expect(res.body.path).toMatch(/^\/api\/static\/generated\/.+\.png$/);
 
-    // Verify the file was actually written to disk (survives server state).
-    const filename = path.basename(res.body.path);
-    const filePath = path.join(GENERATED_DIR, filename);
-    await expect(access(filePath)).resolves.toBeUndefined();
+    // Verify the image was saved to the GCS mock store (not local disk).
+    const filename = res.body.path.split("/").pop()!;
+    expect(gcsStore.has(`generated/${filename}`)).toBe(true);
   });
 
   it("serves the generated file at its public URL", async () => {
@@ -159,7 +164,6 @@ describe("POST /api/images/generate", () => {
     expect(generateRes.status).toBe(200);
     const publicPath = generateRes.body.path as string;
 
-    // The static middleware should serve the file at its /api/static/generated URL.
     const serveRes = await request(app).get(publicPath);
     expect(serveRes.status).toBe(200);
     expect(serveRes.headers["content-type"]).toMatch(/image\/png|application\/octet-stream/);
@@ -167,7 +171,7 @@ describe("POST /api/images/generate", () => {
 });
 
 // ---------------------------------------------------------------------------
-// POST /api/images/generate-and-assign — database update
+// POST /api/images/generate-and-assign
 // ---------------------------------------------------------------------------
 
 describe("POST /api/images/generate-and-assign", () => {
@@ -190,7 +194,6 @@ describe("POST /api/images/generate-and-assign", () => {
   });
 
   it("updates the article imageUrl in the database", async () => {
-    // Create a minimal article to assign the image to.
     const [article] = await db
       .insert(articlesTable)
       .values({
@@ -214,7 +217,6 @@ describe("POST /api/images/generate-and-assign", () => {
     expect(typeof res.body.path).toBe("string");
     expect(res.body.path).toMatch(/^\/api\/static\/generated\/.+\.png$/);
 
-    // Confirm the database row was updated.
     const [updated] = await db
       .select({ imageUrl: articlesTable.imageUrl })
       .from(articlesTable)

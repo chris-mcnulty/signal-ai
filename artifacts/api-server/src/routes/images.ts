@@ -1,21 +1,31 @@
 import { Router, type IRouter } from "express";
-import path from "node:path";
-import { mkdir, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db, articlesTable, libraryImagesTable } from "@workspace/db";
 import { generateImageBuffer } from "@workspace/integrations-openai-ai-server/image";
 import { requireEditor } from "../middlewares/requireEditor";
-import { GENERATED_DIR } from "../paths";
+import { objectStorageClient } from "../lib/objectStorage";
 
 const router: IRouter = Router();
 
+// Bucket ID set by Replit Object Storage provisioning
+function getBucket() {
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  if (!bucketId) throw new Error("DEFAULT_OBJECT_STORAGE_BUCKET_ID is not set");
+  return objectStorageClient.bucket(bucketId);
+}
+
 async function generateAndSave(prompt: string): Promise<string> {
   const buffer = await generateImageBuffer(prompt, "1536x1024");
-  await mkdir(GENERATED_DIR, { recursive: true });
   const filename = `${randomUUID()}.png`;
-  const filePath = path.join(GENERATED_DIR, filename);
-  await writeFile(filePath, buffer);
+
+  // Upload to GCS — persistent across server restarts and redeploys.
+  // Previously wrote to local disk (GENERATED_DIR) which was wiped on restart.
+  const bucket = getBucket();
+  const file = bucket.file(`generated/${filename}`);
+  await file.save(buffer, { contentType: "image/png", resumable: false });
+
+  // Keep the same public URL shape so existing DB entries stay valid
   const publicPath = `/api/static/generated/${filename}`;
   const label = prompt.length > 80 ? prompt.slice(0, 77) + "…" : prompt;
   await db.insert(libraryImagesTable).values({

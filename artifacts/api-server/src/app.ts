@@ -8,6 +8,7 @@ import caseStudyPagesRouter from "./pages/caseStudyPages";
 import articlePagesRouter from "./pages/articlePages";
 import sitemapRouter from "./pages/sitemap";
 import { logger } from "./lib/logger";
+import { objectStorageClient } from "./lib/objectStorage";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -46,8 +47,24 @@ app.use("/api", router);
 // forwards these requests to the API server (the proxy only routes /api/* here).
 app.use("/api/static/library", express.static(path.join(__dirname, "../public/static/library")));
 
-// AI-generated images
-app.use("/api/static/generated", express.static(path.join(__dirname, "../public/static/generated")));
+// AI-generated images — streamed from GCS (persistent across restarts).
+// URL shape /api/static/generated/:filename is preserved for backward compat.
+app.get("/api/static/generated/:filename", async (req, res): Promise<void> => {
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  if (!bucketId) { res.status(503).send("Object storage not configured"); return; }
+  try {
+    const file = objectStorageClient.bucket(bucketId).file(`generated/${req.params.filename}`);
+    const [exists] = await file.exists();
+    if (!exists) { res.status(404).send("Not found"); return; }
+    const [metadata] = await file.getMetadata();
+    res.setHeader("Content-Type", (metadata.contentType as string) || "image/png");
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    file.createReadStream().pipe(res);
+  } catch (err) {
+    logger.error({ err }, "Failed to serve generated image from GCS");
+    res.status(500).send("Internal server error");
+  }
+});
 
 // News article hero images
 app.use("/api/static/news", express.static(path.join(__dirname, "../public/static/news")));
