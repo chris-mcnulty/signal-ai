@@ -12,7 +12,10 @@ msalInstance.initialize().then(async () => {
   // on the /app/callback route so we skip it there.
   if (!window.location.pathname.endsWith("/app/callback")) {
     await msalInstance
-      .handleRedirectPromise()
+      // navigateToLoginRequestUrl: false — in MSAL v5 this is an option here,
+      // NOT in the auth config. Without it MSAL may start a full-page
+      // navigation and return a never-resolving promise, freezing startup.
+      .handleRedirectPromise({ navigateToLoginRequestUrl: false })
       .then((response) => {
         if (response) {
           // An auth response landed on a NON-callback page — this means the

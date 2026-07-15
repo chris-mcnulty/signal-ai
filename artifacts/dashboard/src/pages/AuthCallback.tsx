@@ -40,7 +40,14 @@ export default function AuthCallback() {
     async function handleRedirect() {
       beacon("callback-mounted");
       try {
-        const response = await msalInstance.handleRedirectPromise();
+        // MSAL v5 moved navigateToLoginRequestUrl from the auth config to
+        // handleRedirectPromise options — the config value is IGNORED. Without
+        // this option, MSAL full-page navigates back to the login page and
+        // returns a promise that never resolves, so the callback silently
+        // bounced users back to the sign-in screen.
+        const response = await msalInstance.handleRedirectPromise({
+          navigateToLoginRequestUrl: false,
+        });
         beacon("redirect-promise-resolved", {
           gotResponse: !!response,
           gotIdToken: !!response?.idToken,
