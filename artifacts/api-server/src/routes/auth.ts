@@ -59,10 +59,25 @@ async function verifyEntraToken(idToken: string): Promise<{ email: string; tid: 
   return { email: email.toLowerCase(), tid: decoded["tid"] as string };
 }
 
+// Simple in-memory rate limit for the diagnostic beacon: max 60 logged
+// entries per rolling minute across all clients. Beyond that, requests are
+// still acknowledged (204) but silently dropped so the endpoint cannot be
+// used to flood production logs.
+let debugLogWindowStart = 0;
+let debugLogCount = 0;
+
 router.post("/auth/debug-log", (req, res) => {
-  const body = req.body as Record<string, unknown> | undefined;
-  const safe = JSON.stringify(body ?? {}).slice(0, 2000);
-  req.log.warn({ clientDebug: safe }, "SSO client debug beacon");
+  const now = Date.now();
+  if (now - debugLogWindowStart > 60_000) {
+    debugLogWindowStart = now;
+    debugLogCount = 0;
+  }
+  if (debugLogCount < 60) {
+    debugLogCount += 1;
+    const body = req.body as Record<string, unknown> | undefined;
+    const safe = JSON.stringify(body ?? {}).slice(0, 2000);
+    req.log.warn({ clientDebug: safe }, "SSO client debug beacon");
+  }
   res.status(204).end();
 });
 

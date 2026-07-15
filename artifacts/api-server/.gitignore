@@ -1,0 +1,4 @@
+
+# Test residue — images.test.ts writes fake PNGs to disk
+public/static/generated/
+src/public/static/generated/

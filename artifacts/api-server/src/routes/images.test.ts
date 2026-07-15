@@ -15,6 +15,7 @@ import request from "supertest";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { access } from "node:fs/promises";
+import * as fs from "node:fs/promises";
 import { eq, inArray } from "drizzle-orm";
 import { db, editorsTable, articlesTable } from "@workspace/db";
 
@@ -70,6 +71,23 @@ afterAll(async () => {
     await db
       .delete(articlesTable)
       .where(inArray(articlesTable.id, createdArticleIds));
+  }
+
+  // Remove fake PNG files written to disk by the mocked image generator so
+  // test residue never accumulates (or gets committed) in the generated dir.
+  try {
+    const entries = await fs.readdir(GENERATED_DIR);
+    await Promise.all(
+      entries.map(async (name) => {
+        const filePath = path.join(GENERATED_DIR, name);
+        const content = await fs.readFile(filePath, "utf8").catch(() => "");
+        if (content === "fake-png-data") {
+          await fs.unlink(filePath).catch(() => {});
+        }
+      }),
+    );
+  } catch {
+    // Directory may not exist if no generation test ran.
   }
 });
 
