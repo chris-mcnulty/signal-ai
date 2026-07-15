@@ -153,7 +153,7 @@ export function RichTextEditor({ value, onChange }: Props) {
     <div className="border border-border rounded-md bg-card overflow-hidden">
       <ImageFloatingToolbar editor={editor} />
       <Toolbar editor={editor} />
-      <div className="border-t border-border max-h-[640px] overflow-y-auto">
+      <div className="border-t border-border" style={{ maxHeight: "640px", overflowY: "auto" }}>
         <EditorContent editor={editor} />
       </div>
     </div>
