@@ -12,6 +12,7 @@ import Engine from "./pages/Engine";
 import VoiceSettings from "./pages/VoiceSettings";
 import AccessPending from "./pages/AccessPending";
 import ImageLibrary from "./pages/ImageLibrary";
+import AuthCallback from "./pages/AuthCallback";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider, useAuth } from "./lib/auth";
 
@@ -59,9 +60,7 @@ export function Routes() {
         <ProtectedRoute component={ImageLibrary} />
       </Route>
 
-      <Route path="/app/callback">
-        {null}
-      </Route>
+      <Route path="/app/callback" component={AuthCallback} />
 
       <Route>
         <div className="p-8 min-h-screen flex items-center justify-center flex-col gap-4 text-center">
