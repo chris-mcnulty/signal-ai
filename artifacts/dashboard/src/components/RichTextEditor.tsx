@@ -126,7 +126,7 @@ export function RichTextEditor({ value, onChange }: Props) {
     editorProps: {
       attributes: {
         class:
-          "prose dark:prose-invert max-w-none min-h-[480px] px-4 py-4 focus:outline-none text-sm leading-relaxed",
+          "prose dark:prose-invert max-w-none min-h-[480px] max-h-[640px] overflow-y-auto px-4 py-4 focus:outline-none text-sm leading-relaxed",
       },
     },
     onUpdate: ({ editor }) => {
