@@ -12,9 +12,39 @@ export default function AuthCallback() {
   useEffect(() => {
     let cancelled = false;
 
+    function beacon(stage: string, extra: Record<string, unknown> = {}) {
+      try {
+        const msalKeys = Object.keys(window.localStorage).filter((k) =>
+          k.toLowerCase().includes("msal"),
+        ).length;
+        void fetch("/api/auth/debug-log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            stage,
+            path: window.location.pathname,
+            hashLen: window.location.hash.length,
+            hashHasCode: window.location.hash.includes("code="),
+            hashHasError: window.location.hash.includes("error="),
+            searchLen: window.location.search.length,
+            msalKeys,
+            ua: navigator.userAgent.slice(0, 120),
+            ...extra,
+          }),
+        }).catch(() => {});
+      } catch {
+        // diagnostics must never break the flow
+      }
+    }
+
     async function handleRedirect() {
+      beacon("callback-mounted");
       try {
         const response = await msalInstance.handleRedirectPromise();
+        beacon("redirect-promise-resolved", {
+          gotResponse: !!response,
+          gotIdToken: !!response?.idToken,
+        });
 
         if (!response?.idToken) {
           // Microsoft sends the auth result in the URL hash. If it's present
@@ -52,8 +82,12 @@ export default function AuthCallback() {
           }
         }
       } catch (err) {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        beacon("redirect-promise-threw", {
+          errName: err instanceof Error ? err.name : "unknown",
+          errMsg: msg.slice(0, 300),
+        });
         if (!cancelled) {
-          const msg = err instanceof Error ? err.message : "Unknown error";
           setError(`Sign-in error: ${msg}`);
         }
       }

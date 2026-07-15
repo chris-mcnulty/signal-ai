@@ -63,6 +63,19 @@ export default function Home() {
       // Page is navigating away — execution does not continue past this point.
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "";
+      try {
+        void fetch("/api/auth/debug-log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            stage: "login-redirect-threw",
+            errMsg: msg.slice(0, 300),
+            ua: navigator.userAgent.slice(0, 120),
+          }),
+        }).catch(() => {});
+      } catch {
+        // diagnostics only
+      }
       if (msg.includes("VITE_ENTRA_CLIENT_ID") || msg.includes("clientId")) {
         setError("Microsoft sign-in is not configured yet. Use your editor key instead.");
       } else {

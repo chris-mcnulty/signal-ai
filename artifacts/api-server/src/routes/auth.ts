@@ -59,6 +59,13 @@ async function verifyEntraToken(idToken: string): Promise<{ email: string; tid: 
   return { email: email.toLowerCase(), tid: decoded["tid"] as string };
 }
 
+router.post("/auth/debug-log", (req, res) => {
+  const body = req.body as Record<string, unknown> | undefined;
+  const safe = JSON.stringify(body ?? {}).slice(0, 2000);
+  req.log.warn({ clientDebug: safe }, "SSO client debug beacon");
+  res.status(204).end();
+});
+
 router.post("/auth/microsoft", async (req, res) => {
   const { idToken } = req.body as { idToken?: string };
 
