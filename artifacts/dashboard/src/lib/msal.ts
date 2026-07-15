@@ -22,7 +22,12 @@ const msalConfig: Configuration = {
     navigateToLoginRequestUrl: false,
   },
   cache: {
-    cacheLocation: "sessionStorage",
+    // localStorage (not sessionStorage): iOS Safari can start the page with
+    // empty sessionStorage after the round-trip to login.microsoftonline.com,
+    // which makes handleRedirectPromise() lose the request state and return
+    // null — silently bouncing the user back to the login screen.
+    // localStorage survives the redirect.
+    cacheLocation: "localStorage",
   },
 };
 

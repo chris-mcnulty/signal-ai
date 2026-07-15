@@ -63,11 +63,11 @@ const { Routes } = await import("../App");
 
 afterEach(cleanup);
 
-describe("real Routes component — /app/callback renders null, not 404", () => {
-  it("renders nothing at /app/callback (MSAL popup callback page is blank)", () => {
+describe("real Routes component — /app/callback renders AuthCallback, not 404", () => {
+  it("renders the AuthCallback spinner at /app/callback (redirect flow processing)", () => {
     const { hook } = memoryLocation({ path: "/app/callback" });
 
-    const { container } = render(
+    render(
       <Router hook={hook}>
         <Routes />
       </Router>
@@ -84,9 +84,9 @@ describe("real Routes component — /app/callback renders null, not 404", () => 
     ).toBeNull();
 
     expect(
-      container.firstChild,
-      "Route /app/callback renders null — container should be empty"
-    ).toBeNull();
+      screen.getByText("Signing you in…"),
+      "Route /app/callback renders the AuthCallback processing state"
+    ).toBeTruthy();
   });
 
   it("wildcard 404 fallback fires for truly unknown routes", () => {

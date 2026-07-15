@@ -17,8 +17,18 @@ export default function AuthCallback() {
         const response = await msalInstance.handleRedirectPromise();
 
         if (!response?.idToken) {
-          // No redirect response — could be a direct navigation or already processed.
-          // Send them to the login page so they can try again.
+          // Microsoft sends the auth result in the URL hash. If it's present
+          // but MSAL returned null, the request state was lost (e.g. storage
+          // cleared during the redirect) — surface that instead of silently
+          // bouncing back to the login screen.
+          const hash = window.location.hash;
+          if (hash.includes("code=") || hash.includes("error=")) {
+            setError(
+              "Sign-in could not be completed because the browser lost the sign-in state. Please try again.",
+            );
+            return;
+          }
+          // No redirect response — direct navigation or already processed.
           navigate("/", { replace: true });
           return;
         }

@@ -34,13 +34,13 @@ describe("MSAL initialization — callback URL configuration", () => {
     ).toMatch(/initialize\(\)\s*\.then\(/);
   });
 
-  it("msal.ts uses sessionStorage cache to survive popup redirects without losing the editor API key", () => {
+  it("msal.ts uses localStorage cache so redirect state survives iOS Safari round-trips", () => {
     const src = readFileSync(resolve(DASHBOARD_ROOT, "src/lib/msal.ts"), "utf8");
 
     expect(
       src,
-      "MSAL cache must use sessionStorage so the editor API key (dashboard_api_key) survives the popup redirect"
-    ).toContain('cacheLocation: "sessionStorage"');
+      "MSAL cache must use localStorage — iOS Safari can drop sessionStorage across the Microsoft redirect, making handleRedirectPromise() return null"
+    ).toContain('cacheLocation: "localStorage"');
   });
 
   it("msal.ts uses the 'common' authority endpoint to support any Microsoft tenant", () => {
