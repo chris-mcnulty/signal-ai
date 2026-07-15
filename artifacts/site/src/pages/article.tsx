@@ -43,6 +43,53 @@ function sourceDomain(url: string): string {
   }
 }
 
+/** Returns true when the body string is HTML (produced by the rich-text editor). */
+function isHtmlBody(body: string): boolean {
+  return /^\s*<[a-zA-Z]/.test(body);
+}
+
+/** Minimal HTML sanitizer for article bodies — strips unknown tags and unsafe URLs. */
+function sanitizeArticleHtml(html: string): string {
+  if (!html || typeof window === 'undefined') return html;
+  const ALLOWED = new Set(['P','BR','STRONG','B','EM','I','U','SPAN','UL','OL','LI','H1','H2','H3','H4','A','IMG','BLOCKQUOTE','HR','TABLE','THEAD','TBODY','TR','TH','TD','PRE','CODE']);
+  const ALLOWED_ATTRS: Record<string, Set<string>> = {
+    A: new Set(['href','title','rel','target']),
+    IMG: new Set(['src','alt','width','height']),
+    TD: new Set(['colspan','rowspan']), TH: new Set(['colspan','rowspan']),
+  };
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  function walk(node: Node, out: Document): ChildNode | null {
+    if (node.nodeType === Node.TEXT_NODE) return out.createTextNode(node.textContent ?? '');
+    if (node.nodeType !== Node.ELEMENT_NODE) return null;
+    const el = node as Element;
+    const tag = el.tagName.toUpperCase();
+    if (!ALLOWED.has(tag)) {
+      const frag = out.createDocumentFragment();
+      el.childNodes.forEach(c => { const n = walk(c, out); if (n) frag.appendChild(n); });
+      return frag as unknown as ChildNode;
+    }
+    const clean = out.createElement(el.tagName.toLowerCase());
+    const allowed = ALLOWED_ATTRS[tag] ?? new Set<string>();
+    for (const attr of Array.from(el.attributes)) {
+      if (!allowed.has(attr.name.toLowerCase())) continue;
+      const v = attr.value;
+      if ((attr.name === 'href' || attr.name === 'src') && /^javascript:/i.test(v.trim())) continue;
+      clean.setAttribute(attr.name, v);
+    }
+    if (tag === 'A') {
+      const href = clean.getAttribute('href') ?? '';
+      if (/^https?:\/\//i.test(href)) { clean.setAttribute('target','_blank'); clean.setAttribute('rel','noopener noreferrer'); }
+    }
+    el.childNodes.forEach(c => { const n = walk(c, out); if (n) clean.appendChild(n); });
+    return clean;
+  }
+  const wrapper = doc.body.firstElementChild;
+  if (!wrapper) return '';
+  const result = doc.createElement('div');
+  wrapper.childNodes.forEach(c => { const n = walk(c, doc); if (n) result.appendChild(n); });
+  return result.innerHTML;
+}
+
 /** Render a paragraph string, converting **bold**, *italic*, and [text](url) markdown. */
 function renderInlineLinks(text: string, paraIndex: number): React.ReactNode[] {
   // Match **bold**, *italic*, or [text](url) in one pass
@@ -133,7 +180,6 @@ export default function ArticlePage() {
   });
 
   const heroImage = article.heroImageUrl || article.imageUrl;
-  const bodyParagraphs = article.body.split('\n\n').filter(p => p.trim() !== '');
 
   return (
     <div className="broadsheet-theme">
@@ -223,24 +269,31 @@ export default function ArticlePage() {
         )}
 
         {/* Article Body — constrained to ~68ch */}
-        <div className="article-body font-sans text-news-primary animate-fade-in-up delay-200 mx-auto">
-          {bodyParagraphs.map((paragraph, index) => {
-            if (paragraph.startsWith('## ')) {
-              return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
-            }
-            if (paragraph.startsWith('> ')) {
-              return <blockquote key={index}>{renderInlineLinks(paragraph.replace('> ', ''), index)}</blockquote>;
-            }
-            if (index === 0) {
-              return (
-                <p key={index} className="article-dropcap">
-                  {renderInlineLinks(paragraph, index)}
-                </p>
-              );
-            }
-            return <p key={index}>{renderInlineLinks(paragraph, index)}</p>;
-          })}
-        </div>
+        {isHtmlBody(article.body) ? (
+          <div
+            className="article-body prose prose-neutral max-w-none font-sans text-news-primary animate-fade-in-up delay-200 mx-auto"
+            dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.body) }}
+          />
+        ) : (
+          <div className="article-body font-sans text-news-primary animate-fade-in-up delay-200 mx-auto">
+            {article.body.split('\n\n').filter(p => p.trim() !== '').map((paragraph, index) => {
+              if (paragraph.startsWith('## ')) {
+                return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
+              }
+              if (paragraph.startsWith('> ')) {
+                return <blockquote key={index}>{renderInlineLinks(paragraph.replace('> ', ''), index)}</blockquote>;
+              }
+              if (index === 0) {
+                return (
+                  <p key={index} className="article-dropcap">
+                    {renderInlineLinks(paragraph, index)}
+                  </p>
+                );
+              }
+              return <p key={index}>{renderInlineLinks(paragraph, index)}</p>;
+            })}
+          </div>
+        )}
         
         {/* Source Links — numbered references with readable domain labels */}
         {article.sourceUrls && article.sourceUrls.length > 0 && (

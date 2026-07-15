@@ -81,6 +81,18 @@
   },
   "dependencies": {
     "@azure/msal-browser": "^5.17.0",
-    "@workspace/image-library": "workspace:*"
+    "@tiptap/core": "^3.27.4",
+    "@tiptap/extension-image": "^3.27.4",
+    "@tiptap/extension-link": "^3.27.4",
+    "@tiptap/extension-table": "^3.27.4",
+    "@tiptap/extension-table-cell": "^3.27.4",
+    "@tiptap/extension-table-header": "^3.27.4",
+    "@tiptap/extension-table-row": "^3.27.4",
+    "@tiptap/extension-typography": "^3.27.4",
+    "@tiptap/react": "^3.27.4",
+    "@tiptap/starter-kit": "^3.27.4",
+    "@types/turndown": "^5.0.6",
+    "@workspace/image-library": "workspace:*",
+    "turndown": "^7.2.4"
   }
 }

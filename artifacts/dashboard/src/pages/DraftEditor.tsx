@@ -62,6 +62,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DraftEnginePanel } from "@/components/DraftEnginePanel";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { ImagePicker } from "@workspace/image-library";
 
 const API_BASE = "/api";
@@ -643,7 +644,7 @@ export default function DraftEditor() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>Content <span className="text-muted-foreground font-normal text-xs ml-1">Markdown</span></FormLabel>
+                      <FormLabel>Content</FormLabel>
                       <button
                         type="button"
                         onClick={handleExpandBrief}
@@ -658,10 +659,9 @@ export default function DraftEditor() {
                       </button>
                     </div>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Paste your story notes, bullet points, or brief here — then click 'Expand from brief' above to turn them into a full article." 
-                        className="min-h-[480px] font-mono text-sm leading-relaxed p-4 resize-y" 
-                        {...field} 
+                      <RichTextEditor
+                        value={field.value}
+                        onChange={({ html }) => field.onChange(html)}
                       />
                     </FormControl>
                     <FormMessage />
