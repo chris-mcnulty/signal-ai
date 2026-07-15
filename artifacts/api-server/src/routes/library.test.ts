@@ -188,6 +188,34 @@ describe("DELETE /api/library/images/:id — conflict", () => {
     expect(Array.isArray(res.body.articles)).toBe(true);
     expect(res.body.articles.length).toBeGreaterThan(0);
   });
+
+  it("returns 409 and names the article when heroImageUrl references the image", async () => {
+    const image = await insertTestImage();
+
+    const [article] = await db
+      .insert(articlesTable)
+      .values({
+        slug: `lib-hero-conflict-${RUN_SUFFIX}`,
+        title: "Library hero conflict test",
+        body: "Body.",
+        category: "Testing",
+        dek: "",
+        status: "pending",
+        source: "manual",
+        heroImageUrl: image.path,
+      })
+      .returning();
+    createdArticleIds.push(article.id);
+
+    const res = await request(app)
+      .delete(`/api/library/images/${image.id}`)
+      .set("x-api-key", ADMIN_KEY);
+
+    expect(res.status).toBe(409);
+    expect(res.body.error).toMatch(/referenced/i);
+    expect(Array.isArray(res.body.articles)).toBe(true);
+    expect(res.body.articles).toContain("Library hero conflict test");
+  });
 });
 
 // ---------------------------------------------------------------------------
