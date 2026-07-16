@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, editorsTable } from "@workspace/db";
 import { requireEditor } from "../middlewares/requireEditor";
+import type { Editor } from "@workspace/db";
 import jwksClient from "jwks-rsa";
 import jwt from "jsonwebtoken";
 
@@ -99,7 +100,13 @@ router.post("/auth/microsoft", async (req, res) => {
   }
 
   const [editor] = await db
-    .select({ id: editorsTable.id, email: editorsTable.email, apiKey: editorsTable.apiKey, isActive: editorsTable.isActive })
+    .select({
+      id: editorsTable.id,
+      email: editorsTable.email,
+      apiKey: editorsTable.apiKey,
+      isActive: editorsTable.isActive,
+      isAdmin: editorsTable.isAdmin,
+    })
     .from(editorsTable)
     .where(eq(editorsTable.email, email))
     .limit(1);
@@ -114,10 +121,17 @@ router.post("/auth/microsoft", async (req, res) => {
     return;
   }
 
-  res.json({ apiKey: editor.apiKey, email: editor.email, id: editor.id });
+  res.json({ apiKey: editor.apiKey, email: editor.email, id: editor.id, isAdmin: editor.isAdmin });
 });
 
 router.get("/auth/me", requireEditor, async (req, res) => {
+  const editor = (req as typeof req & { editor?: Editor }).editor;
+
+  if (editor) {
+    res.json({ email: editor.email, id: editor.id, isAdmin: editor.isAdmin });
+    return;
+  }
+
   const key =
     req.header("x-api-key") ??
     req.header("authorization")?.replace(/^Bearer\s+/, "");
@@ -127,18 +141,18 @@ router.get("/auth/me", requireEditor, async (req, res) => {
     return;
   }
 
-  const [editor] = await db
-    .select({ id: editorsTable.id, email: editorsTable.email })
+  const [found] = await db
+    .select({ id: editorsTable.id, email: editorsTable.email, isAdmin: editorsTable.isAdmin })
     .from(editorsTable)
     .where(eq(editorsTable.apiKey, key))
     .limit(1);
 
-  if (!editor) {
+  if (!found) {
     res.status(403).json({ error: "Access not yet approved", code: "EDITOR_NOT_APPROVED" });
     return;
   }
 
-  res.json({ email: editor.email, id: editor.id });
+  res.json({ email: found.email, id: found.id, isAdmin: found.isAdmin });
 });
 
 export default router;

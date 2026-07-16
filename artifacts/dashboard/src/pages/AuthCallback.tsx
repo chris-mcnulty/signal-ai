@@ -78,8 +78,8 @@ export default function AuthCallback() {
 
         if (!cancelled) {
           if (res.ok) {
-            const data = await res.json() as { apiKey: string; email: string; id: number };
-            login(data.apiKey, data.email, "approved" as EditorStatus);
+            const data = await res.json() as { apiKey: string; email: string; id: number; isAdmin: boolean };
+            login(data.apiKey, data.email, "approved" as EditorStatus, data.isAdmin);
             navigate("/queue", { replace: true });
           } else if (res.status === 403) {
             login("", "", "pending" as EditorStatus);

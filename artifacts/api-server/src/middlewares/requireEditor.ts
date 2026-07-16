@@ -35,5 +35,7 @@ export async function requireEditor(
     return;
   }
 
+  (req as Request & { editor: typeof editor }).editor = editor;
+
   next();
 }

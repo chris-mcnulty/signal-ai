@@ -5,6 +5,7 @@ export const editorsTable = pgTable("editors", {
   email: text("email").notNull().unique(),
   apiKey: text("api_key").notNull().unique(),
   isActive: boolean("is_active").notNull().default(false),
+  isAdmin: boolean("is_admin").notNull().default(false),
   invitedAt: timestamp("invited_at", { withTimezone: true }).defaultNow().notNull(),
   activatedAt: timestamp("activated_at", { withTimezone: true }),
 });

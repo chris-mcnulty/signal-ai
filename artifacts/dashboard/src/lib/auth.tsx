@@ -4,6 +4,7 @@ import { setAuthTokenGetter } from "@workspace/api-client-react";
 const SESSION_KEY = "dashboard_api_key";
 const EMAIL_KEY = "dashboard_editor_email";
 const STATUS_KEY = "dashboard_editor_status";
+const IS_ADMIN_KEY = "dashboard_is_admin";
 
 export type EditorStatus = "approved" | "pending" | "unknown";
 
@@ -11,7 +12,8 @@ interface AuthContextValue {
   isLoggedIn: boolean;
   editorEmail: string | null;
   editorStatus: EditorStatus;
-  login: (key: string, email: string, status: EditorStatus) => void;
+  isAdmin: boolean;
+  login: (key: string, email: string, status: EditorStatus, isAdmin?: boolean) => void;
   logout: () => void;
 }
 
@@ -23,10 +25,15 @@ function readStatus(): EditorStatus {
   return "unknown";
 }
 
+function readIsAdmin(): boolean {
+  return sessionStorage.getItem(IS_ADMIN_KEY) === "true";
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [key, setKey] = useState<string | null>(() => sessionStorage.getItem(SESSION_KEY));
   const [email, setEmail] = useState<string | null>(() => sessionStorage.getItem(EMAIL_KEY));
   const [editorStatus, setEditorStatus] = useState<EditorStatus>(readStatus);
+  const [isAdmin, setIsAdmin] = useState<boolean>(readIsAdmin);
 
   // Keep a ref in sync with key on every render so the getter closure always
   // reads the latest value without needing to re-register a new getter function.
@@ -35,22 +42,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const keyRef = useRef<string | null>(key);
   keyRef.current = key;
 
-  const login = useCallback((newKey: string, newEmail: string, status: EditorStatus) => {
+  const login = useCallback((newKey: string, newEmail: string, status: EditorStatus, adminFlag?: boolean) => {
     sessionStorage.setItem(SESSION_KEY, newKey);
     sessionStorage.setItem(EMAIL_KEY, newEmail);
     sessionStorage.setItem(STATUS_KEY, status);
+    sessionStorage.setItem(IS_ADMIN_KEY, String(adminFlag ?? false));
     setKey(newKey);
     setEmail(newEmail);
     setEditorStatus(status);
+    setIsAdmin(adminFlag ?? false);
   }, []);
 
   const logout = useCallback(() => {
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(EMAIL_KEY);
     sessionStorage.removeItem(STATUS_KEY);
+    sessionStorage.removeItem(IS_ADMIN_KEY);
     setKey(null);
     setEmail(null);
     setEditorStatus("unknown");
+    setIsAdmin(false);
   }, []);
 
   // Register the getter once on mount. The getter reads from keyRef.current so
@@ -62,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn: !!key, editorEmail: email, editorStatus, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn: !!key, editorEmail: email, editorStatus, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

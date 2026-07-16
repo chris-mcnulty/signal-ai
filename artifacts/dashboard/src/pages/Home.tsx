@@ -29,8 +29,8 @@ export default function Home() {
       });
 
       if (res.ok) {
-        const data = await res.json() as { email: string; id: number };
-        login(key, data.email, "approved" as EditorStatus);
+        const data = await res.json() as { email: string; id: number; isAdmin: boolean };
+        login(key, data.email, "approved" as EditorStatus, data.isAdmin);
       } else if (res.status === 401) {
         setError("Invalid API key. Check your editor key and try again.");
       } else if (res.status === 403) {

@@ -1,21 +1,22 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays, Images } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays, Images, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
-const NAV_LINKS = [
-  { href: "/queue", label: "Queue", icon: LayoutDashboard, matchPaths: ["/queue", "/"] },
-  { href: "/schedule", label: "Schedule", icon: CalendarDays, matchPaths: ["/schedule"] },
-  { href: "/seo", label: "SEO", icon: Globe, matchPaths: ["/seo"] },
-  { href: "/engine", label: "Engine", icon: Sparkles, matchPaths: ["/engine"] },
-  { href: "/voice", label: "Voice", icon: Mic2, matchPaths: ["/voice"] },
-  { href: "/image-library", label: "Images", icon: Images, matchPaths: ["/image-library"] },
-];
-
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { logout } = useAuth();
+  const { logout, isAdmin } = useAuth();
   const [location] = useLocation();
+
+  const NAV_LINKS = [
+    { href: "/queue", label: "Queue", icon: LayoutDashboard, matchPaths: ["/queue", "/"] },
+    { href: "/schedule", label: "Schedule", icon: CalendarDays, matchPaths: ["/schedule"] },
+    { href: "/seo", label: "SEO", icon: Globe, matchPaths: ["/seo"] },
+    { href: "/engine", label: "Engine", icon: Sparkles, matchPaths: ["/engine"] },
+    { href: "/voice", label: "Voice", icon: Mic2, matchPaths: ["/voice"] },
+    { href: "/image-library", label: "Images", icon: Images, matchPaths: ["/image-library"] },
+    ...(isAdmin ? [{ href: "/team", label: "Team", icon: Users, matchPaths: ["/team"] }] : []),
+  ];
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary selection:text-white">

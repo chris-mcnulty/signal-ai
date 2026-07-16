@@ -22,8 +22,6 @@ const CATEGORIES = [
 
 const API_BASE = "/api";
 
-const ADMIN_EMAILS = ["chris.mcnulty@synozur.com", "admin@synozur.com"];
-
 function useLibraryImages() {
   const [images, setImages] = useState<LibraryImage[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,9 +46,8 @@ function useLibraryImages() {
 
 export default function ImageLibrary() {
   const { toast } = useToast();
-  const { editorEmail } = useAuth();
+  const { isAdmin } = useAuth();
   const sessionKey = sessionStorage.getItem("dashboard_api_key");
-  const isAdmin = !!editorEmail && ADMIN_EMAILS.includes(editorEmail.toLowerCase());
 
   const { images, loading, error, fetchImages } = useLibraryImages();
   const [uploading, setUploading] = useState(false);

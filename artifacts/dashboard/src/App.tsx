@@ -12,6 +12,7 @@ import Engine from "./pages/Engine";
 import VoiceSettings from "./pages/VoiceSettings";
 import AccessPending from "./pages/AccessPending";
 import ImageLibrary from "./pages/ImageLibrary";
+import Team from "./pages/Team";
 import AuthCallback from "./pages/AuthCallback";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider, useAuth } from "./lib/auth";
@@ -58,6 +59,10 @@ export function Routes() {
 
       <Route path="/image-library">
         <ProtectedRoute component={ImageLibrary} />
+      </Route>
+
+      <Route path="/team">
+        <ProtectedRoute component={Team} />
       </Route>
 
       <Route path="/app/callback" component={AuthCallback} />
