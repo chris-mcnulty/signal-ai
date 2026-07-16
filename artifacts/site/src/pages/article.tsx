@@ -232,13 +232,27 @@ export default function ArticlePage() {
 
           <div className="flex items-center justify-between border-t border-b border-news py-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
-                <span className="font-mono text-base font-bold text-white leading-none">
-                  {article.author.charAt(0)}
-                </span>
-              </div>
+              {article.authorProfile?.avatarUrl ? (
+                <img
+                  src={article.authorProfile.avatarUrl}
+                  alt={article.author}
+                  className="w-10 h-10 object-cover border border-news shrink-0"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
+                  <span className="font-mono text-base font-bold text-white leading-none">
+                    {article.author.charAt(0)}
+                  </span>
+                </div>
+              )}
               <div>
-                <div className="font-sans font-semibold text-sm text-news-primary">{article.author}</div>
+                {article.authorProfile ? (
+                  <Link href={`/authors/${article.authorProfile.slug}`} className="font-sans font-semibold text-sm text-news-primary hover:text-accent transition-colors">
+                    {article.author}
+                  </Link>
+                ) : (
+                  <div className="font-sans font-semibold text-sm text-news-primary">{article.author}</div>
+                )}
                 <div className="font-mono text-xs text-news-secondary uppercase tracking-wider">Author</div>
               </div>
             </div>
@@ -314,6 +328,37 @@ export default function ArticlePage() {
                 </li>
               ))}
             </ol>
+          </div>
+        )}
+
+        {/* Author bio card */}
+        {article.authorProfile?.bio && (
+          <div className="article-body mx-auto mt-12 pt-8 border-t border-news animate-fade-in-up delay-300">
+            <div className="flex items-start gap-5 bg-white border border-news p-6">
+              {article.authorProfile.avatarUrl ? (
+                <img
+                  src={article.authorProfile.avatarUrl}
+                  alt={article.author}
+                  className="w-16 h-16 object-cover border border-news shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-[#1a1a1a] flex items-center justify-center shrink-0">
+                  <span className="font-serif text-2xl font-bold text-white leading-none">
+                    {article.author.charAt(0)}
+                  </span>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-1">About the Author</div>
+                <Link
+                  href={`/authors/${article.authorProfile.slug}`}
+                  className="font-serif text-lg font-bold text-news-primary hover:text-accent transition-colors block mb-2"
+                >
+                  {article.author}
+                </Link>
+                <p className="text-sm text-news-secondary font-sans leading-relaxed">{article.authorProfile.bio}</p>
+              </div>
+            </div>
           </div>
         )}
 

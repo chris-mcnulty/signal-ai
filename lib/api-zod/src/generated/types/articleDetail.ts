@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AuthorProfile } from './authorProfile';
 
 export interface ArticleDetail {
   id: number;
@@ -14,6 +15,7 @@ export interface ArticleDetail {
   body: string;
   category: string;
   author: string;
+  authorProfile?: AuthorProfile | null;
   readingMinutes: number;
   publishedAt: Date;
   updatedAt: Date;

@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ArticleSummary } from './articleSummary';
+import type { AuthorProfile } from './authorProfile';
 import type { CaseStudyCompany } from './caseStudyCompany';
 import type { CaseStudyMetric } from './caseStudyMetric';
 import type { CaseStudyQuote } from './caseStudyQuote';
@@ -17,6 +18,7 @@ export interface CaseStudyDetail {
   dek: string;
   body: string;
   author: string;
+  authorProfile?: AuthorProfile | null;
   readingMinutes: number;
   publishedAt: Date;
   updatedAt: Date;

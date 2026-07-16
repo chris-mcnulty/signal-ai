@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import request from "supertest";
-import { inArray } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { db, articlesTable } from "@workspace/db";
 import app from "../app";
 
@@ -36,10 +36,6 @@ const TEST_SLUGS = [
 ];
 
 beforeAll(async () => {
-  await db
-    .delete(articlesTable)
-    .where(inArray(articlesTable.slug, TEST_SLUGS));
-
   const now = new Date();
   const rows = await db
     .insert(articlesTable)
@@ -71,6 +67,10 @@ beforeAll(async () => {
         readingMinutes: 3,
       },
     ])
+    .onConflictDoUpdate({
+      target: articlesTable.slug,
+      set: { updatedAt: sql`now()` },
+    })
     .returning({ id: articlesTable.id });
 
   createdIds.push(...rows.map((r) => r.id));

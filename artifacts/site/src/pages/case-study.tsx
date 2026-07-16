@@ -231,8 +231,43 @@ export default function CaseStudyDetail() {
           <aside className="lg:col-span-4 animate-fade-in-up delay-300 space-y-10">
             <div className="border-t-4 border-news pt-4">
               <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-3">Byline</div>
-              <div className="font-sans font-bold text-base text-news-primary">{study.author}</div>
-              <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Enterprise Analyst</div>
+              {study.authorProfile ? (
+                <div className="flex items-center gap-3">
+                  {study.authorProfile.avatarUrl ? (
+                    <img
+                      src={study.authorProfile.avatarUrl}
+                      alt={study.author}
+                      className="w-10 h-10 object-cover border border-news shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
+                      <span className="font-mono text-sm font-bold text-white leading-none">
+                        {study.author.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    <Link
+                      href={`/authors/${study.authorProfile.slug}`}
+                      className="font-sans font-bold text-base text-news-primary hover:text-accent transition-colors block"
+                    >
+                      {study.author}
+                    </Link>
+                    {study.authorProfile.bio && (
+                      <p className="font-mono text-xs text-news-secondary mt-1 leading-relaxed">
+                        {study.authorProfile.bio.length > 120
+                          ? study.authorProfile.bio.slice(0, 120) + '…'
+                          : study.authorProfile.bio}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="font-sans font-bold text-base text-news-primary">{study.author}</div>
+                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Enterprise Analyst</div>
+                </>
+              )}
             </div>
 
             {study.quotes && study.quotes.length > 0 && (

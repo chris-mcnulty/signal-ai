@@ -11,6 +11,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const NAV_LINKS = [
     { href: "/queue", label: "Queue", icon: LayoutDashboard, matchPaths: ["/queue", "/"] },
     { href: "/schedule", label: "Schedule", icon: CalendarDays, matchPaths: ["/schedule"] },
+    { href: "/authors", label: "Authors", icon: Users, matchPaths: ["/authors"] },
     { href: "/seo", label: "SEO", icon: Globe, matchPaths: ["/seo"] },
     { href: "/engine", label: "Engine", icon: Sparkles, matchPaths: ["/engine"] },
     { href: "/voice", label: "Voice", icon: Mic2, matchPaths: ["/voice"] },

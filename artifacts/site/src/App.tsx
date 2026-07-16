@@ -12,6 +12,7 @@ import News from "@/pages/news";
 import UseCases from "@/pages/use-cases";
 import Opinion from "@/pages/opinion";
 import About from "@/pages/about";
+import AuthorPage from "@/pages/author";
 import { SeoHead } from "@/lib/seo";
 
 const queryClient = new QueryClient({
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/use-cases" component={UseCases} />
       <Route path="/opinion" component={Opinion} />
       <Route path="/about" component={About} />
+      <Route path="/authors/:slug" component={AuthorPage} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,4 +1,4 @@
-import type { Article } from "@workspace/db";
+import type { Article, Author } from "@workspace/db";
 import { SITE } from "./site";
 import {
   articleOgImageUrl,
@@ -8,15 +8,15 @@ import {
   breadcrumbJsonLd,
   caseStudyListJsonLd,
   organizationPageJsonLd,
+  authorJsonLd,
 } from "./seo";
 import {
   listCaseStudiesWithArticles,
   getCaseStudyBySlug,
   listPublishedArticles,
+  getArticleBySlug,
   CASE_STUDY_CATEGORY,
 } from "./content";
-import { db, articlesTable } from "@workspace/db";
-import { and, eq } from "drizzle-orm";
 import { promoteDueArticles } from "./articles";
 import { clampDescription } from "./seoAudit";
 
@@ -59,19 +59,18 @@ function articleTitle(article: Article): string {
 
 export async function getPublishedArticleBySlug(
   slug: string,
-): Promise<Article | null> {
+): Promise<{ article: Article; author: Author | null } | null> {
   await promoteDueArticles();
-  const rows = await db
-    .select()
-    .from(articlesTable)
-    .where(
-      and(eq(articlesTable.slug, slug), eq(articlesTable.status, "published")),
-    )
-    .limit(1);
-  return rows[0] ?? null;
+  const result = await getArticleBySlug(slug);
+  if (!result || result.status !== "published") return null;
+  return { article: result, author: result.authorRecord };
 }
 
-export function genericArticleJsonLd(baseUrl: string, article: Article): JsonLd {
+export function genericArticleJsonLd(
+  baseUrl: string,
+  article: Article,
+  author?: Author | null,
+): JsonLd {
   const pageUrl = `${baseUrl}/articles/${article.slug}`;
   return {
     "@context": "https://schema.org",
@@ -83,10 +82,7 @@ export function genericArticleJsonLd(baseUrl: string, article: Article): JsonLd 
     image: article.heroImageUrl ? [article.heroImageUrl] : undefined,
     datePublished: (article.publishedAt ?? article.createdAt).toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    author:
-      !article.author || article.author === "SignalAI Staff"
-        ? { "@type": "Organization", name: "SignalAI" }
-        : { "@type": "Person", name: article.author },
+    author: authorJsonLd(baseUrl, article, author ?? null),
     publisher: publisherJsonLd(baseUrl),
     mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
   };
@@ -192,7 +188,7 @@ export async function resolveSeoPage(
       publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       jsonLd: [
-        caseStudyArticleJsonLd(baseUrl, article, caseStudy),
+        caseStudyArticleJsonLd(baseUrl, article, caseStudy, article.authorRecord),
         breadcrumbJsonLd(baseUrl, [
           { name: "Home", url: `${baseUrl}/` },
           { name: "Case Studies", url: `${baseUrl}/case-studies` },
@@ -206,10 +202,11 @@ export async function resolveSeoPage(
 
   const articleMatch = /^\/articles\/([^/]+)$/.exec(path);
   if (articleMatch) {
-    const article = await getPublishedArticleBySlug(articleMatch[1]!);
-    if (!article) {
+    const result = await getPublishedArticleBySlug(articleMatch[1]!);
+    if (!result) {
       return notFound(baseUrl, path);
     }
+    const { article, author } = result;
     // Case studies canonicalize to /case-studies/:slug.
     const canonicalUrl =
       article.category === CASE_STUDY_CATEGORY
@@ -227,7 +224,7 @@ export async function resolveSeoPage(
       publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       jsonLd: [
-        genericArticleJsonLd(baseUrl, article),
+        genericArticleJsonLd(baseUrl, article, author),
         breadcrumbJsonLd(baseUrl, [
           { name: "Home", url: `${baseUrl}/` },
           { name: article.title, url: canonicalUrl },

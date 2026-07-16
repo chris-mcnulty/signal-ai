@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { authorsTable } from "./authors";
 
 export const ARTICLE_STATUSES = [
   "pending",
@@ -29,6 +30,9 @@ export const articlesTable = pgTable(
     body: text("body").notNull(),
     category: text("category").notNull(),
     author: text("author").notNull().default("SignalAI Staff"),
+    authorId: integer("author_id").references(() => authorsTable.id, {
+      onDelete: "set null",
+    }),
     heroImageUrl: text("hero_image_url"),
     sourceUrls: text("source_urls").array(),
     readingMinutes: integer("reading_minutes").notNull().default(5),

@@ -15,6 +15,11 @@ export interface ArticleUpdate {
   category?: string;
   /** @minLength 1 */
   author?: string;
+  /**
+     * ID of an author record; null clears the author link
+     * @nullable
+     */
+  authorId?: number | null;
   /** @nullable */
   dek?: string | null;
   /** @nullable */

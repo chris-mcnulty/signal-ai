@@ -14,6 +14,7 @@ import AccessPending from "./pages/AccessPending";
 import ImageLibrary from "./pages/ImageLibrary";
 import Team from "./pages/Team";
 import AuthCallback from "./pages/AuthCallback";
+import Authors from "./pages/Authors";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider, useAuth } from "./lib/auth";
 
@@ -63,6 +64,10 @@ export function Routes() {
 
       <Route path="/team">
         <ProtectedRoute component={Team} />
+      </Route>
+
+      <Route path="/authors">
+        <ProtectedRoute component={Authors} />
       </Route>
 
       <Route path="/app/callback" component={AuthCallback} />

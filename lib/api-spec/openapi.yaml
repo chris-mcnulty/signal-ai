@@ -1463,6 +1463,41 @@ components:
         - author
         - readingMinutes
         - publishedAt
+    AuthorProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        twitterHandle:
+          type: string
+          nullable: true
+        linkedInUrl:
+          type: string
+          nullable: true
+        isStaff:
+          type: boolean
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - slug
+        - isStaff
+        - isActive
+        - createdAt
     ArticleDetail:
       type: object
       properties:
@@ -1480,6 +1515,9 @@ components:
           type: string
         author:
           type: string
+        authorProfile:
+          $ref: "#/components/schemas/AuthorProfile"
+          nullable: true
         readingMinutes:
           type: integer
         publishedAt:
@@ -1607,6 +1645,9 @@ components:
           type: string
         author:
           type: string
+        authorProfile:
+          $ref: "#/components/schemas/AuthorProfile"
+          nullable: true
         readingMinutes:
           type: integer
         publishedAt:
@@ -1687,6 +1728,12 @@ components:
           type: string
         author:
           type: string
+        authorId:
+          type: ["integer", "null"]
+          description: ID of the linked author record
+        authorProfile:
+          $ref: "#/components/schemas/AuthorProfile"
+          nullable: true
         imageUrl:
           type: ["string", "null"]
         status:
@@ -1733,6 +1780,9 @@ components:
         author:
           type: string
           minLength: 1
+        authorId:
+          type: ["integer", "null"]
+          description: ID of an author record; if set, overrides the author text field display
         dek:
           type: string
         imageUrl:
@@ -1752,6 +1802,9 @@ components:
         author:
           type: string
           minLength: 1
+        authorId:
+          type: ["integer", "null"]
+          description: ID of an author record; null clears the author link
         dek:
           type: ["string", "null"]
         imageUrl:

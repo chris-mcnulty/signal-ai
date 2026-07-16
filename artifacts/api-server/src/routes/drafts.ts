@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { desc, eq, sql } from "drizzle-orm";
-import { db, articlesTable } from "@workspace/db";
+import { db, articlesTable, authorsTable } from "@workspace/db";
 import {
   ListDraftsQueryParams,
   ListDraftsResponse,
@@ -144,13 +144,19 @@ router.get("/drafts", async (req, res): Promise<void> => {
     ? await db
         .select()
         .from(articlesTable)
+        .leftJoin(authorsTable, eq(articlesTable.authorId, authorsTable.id))
         .where(eq(articlesTable.status, query.data.status))
         .orderBy(desc(articlesTable.updatedAt))
     : await db
         .select()
         .from(articlesTable)
+        .leftJoin(authorsTable, eq(articlesTable.authorId, authorsTable.id))
         .orderBy(desc(articlesTable.updatedAt));
-  res.json(ListDraftsResponse.parse(rows));
+  const articles = rows.map((row) => ({
+    ...row.articles,
+    authorProfile: row.authors ?? null,
+  }));
+  res.json(ListDraftsResponse.parse(articles));
 });
 
 router.post("/drafts", async (req, res): Promise<void> => {
@@ -167,6 +173,7 @@ router.post("/drafts", async (req, res): Promise<void> => {
       body: parsed.data.body,
       category: parsed.data.category,
       ...(parsed.data.author ? { author: parsed.data.author } : {}),
+      ...(parsed.data.authorId != null ? { authorId: parsed.data.authorId } : {}),
       dek: parsed.data.dek ?? "",
       imageUrl: parsed.data.imageUrl ?? null,
       slug,
@@ -207,15 +214,16 @@ router.get("/drafts/:id", async (req, res): Promise<void> => {
     return;
   }
   await promoteDueArticles();
-  const [article] = await db
+  const [row] = await db
     .select()
     .from(articlesTable)
+    .leftJoin(authorsTable, eq(articlesTable.authorId, authorsTable.id))
     .where(eq(articlesTable.id, params.data.id));
-  if (!article) {
+  if (!row) {
     res.status(404).json({ error: "Draft not found" });
     return;
   }
-  res.json(GetDraftResponse.parse(article));
+  res.json(GetDraftResponse.parse({ ...row.articles, authorProfile: row.authors ?? null }));
 });
 
 router.patch("/drafts/:id", async (req, res): Promise<void> => {

@@ -7,6 +7,7 @@
  */
 import type { ArticleSourceMetadata } from './articleSourceMetadata';
 import type { ArticleStatus } from './articleStatus';
+import type { AuthorProfile } from './authorProfile';
 
 export interface Article {
   id: number;
@@ -17,6 +18,12 @@ export interface Article {
   body: string;
   category: string;
   author: string;
+  /**
+     * ID of the linked author record
+     * @nullable
+     */
+  authorId?: number | null;
+  authorProfile?: AuthorProfile | null;
   /** @nullable */
   imageUrl: string | null;
   status: ArticleStatus;

@@ -15,6 +15,7 @@ export * from './articleSourceMetadata';
 export * from './articleStatus';
 export * from './articleSummary';
 export * from './articleUpdate';
+export * from './authorProfile';
 export * from './brandVoice';
 export * from './brandVoiceInput';
 export * from './briefUpdate';

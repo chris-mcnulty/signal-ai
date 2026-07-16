@@ -16,6 +16,7 @@ function makeArticle(overrides: Partial<Article> = {}): Article {
     body: "Article body content.",
     category: "Technology",
     author: "SignalAI Staff",
+    authorId: null,
     heroImageUrl: null,
     sourceUrls: null,
     readingMinutes: 5,

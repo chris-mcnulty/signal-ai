@@ -15,25 +15,24 @@ router.get("/og/articles/:slug", async (req, res): Promise<void> => {
     res.status(404).send("Not found");
     return;
   }
-  const article = await getPublishedArticleBySlug(slug);
-  if (!article) {
+  const result = await getPublishedArticleBySlug(slug);
+  if (!result) {
     res.status(404).send("Not found");
     return;
   }
+  const { article, author } = result;
   const cacheKey = article.updatedAt.toISOString();
   const etag = `"article-og-${slug}-${article.updatedAt.getTime()}"`;
   if (req.headers["if-none-match"] === etag) {
     res.status(304).end();
     return;
   }
+  const authorDisplayName = author?.name ?? (article.author !== "SignalAI Staff" ? article.author : undefined);
   try {
     const png = await renderArticleOgCard(slug, cacheKey, {
       title: article.title,
       category: article.category,
-      author:
-        article.author && article.author !== "SignalAI Staff"
-          ? article.author
-          : undefined,
+      author: authorDisplayName,
     });
     res.setHeader("Content-Type", "image/png");
     res.setHeader("ETag", etag);

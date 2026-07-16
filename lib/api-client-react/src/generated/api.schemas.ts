@@ -92,6 +92,19 @@ export interface ArticleSummary {
   imageUrl?: string | null;
 }
 
+export interface AuthorProfile {
+  id: number;
+  name: string;
+  slug: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
+  twitterHandle?: string | null;
+  linkedInUrl?: string | null;
+  isStaff: boolean;
+  isActive: boolean;
+  createdAt: string;
+}
+
 export interface ArticleDetail {
   id: number;
   slug: string;
@@ -100,6 +113,7 @@ export interface ArticleDetail {
   body: string;
   category: string;
   author: string;
+  authorProfile?: AuthorProfile | null;
   readingMinutes: number;
   publishedAt: string;
   updatedAt: string;
@@ -148,6 +162,7 @@ export interface CaseStudyDetail {
   dek: string;
   body: string;
   author: string;
+  authorProfile?: AuthorProfile | null;
   readingMinutes: number;
   publishedAt: string;
   updatedAt: string;
@@ -184,6 +199,12 @@ export interface Article {
   body: string;
   category: string;
   author: string;
+  /**
+     * ID of the linked author record
+     * @nullable
+     */
+  authorId?: number | null;
+  authorProfile?: AuthorProfile | null;
   /** @nullable */
   imageUrl: string | null;
   status: ArticleStatus;
@@ -215,6 +236,11 @@ export interface ArticleInput {
   category: string;
   /** @minLength 1 */
   author?: string;
+  /**
+     * ID of an author record; if set, overrides the author text field display
+     * @nullable
+     */
+  authorId?: number | null;
   dek?: string;
   imageUrl?: string;
 }
@@ -228,6 +254,11 @@ export interface ArticleUpdate {
   category?: string;
   /** @minLength 1 */
   author?: string;
+  /**
+     * ID of an author record; null clears the author link
+     * @nullable
+     */
+  authorId?: number | null;
   /** @nullable */
   dek?: string | null;
   /** @nullable */

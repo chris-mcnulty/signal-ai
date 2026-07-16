@@ -17,7 +17,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2 } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -64,6 +73,7 @@ import {
 import { DraftEnginePanel } from "@/components/DraftEnginePanel";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { ImagePicker } from "@workspace/image-library";
+import { useListAuthors } from "@workspace/api-client-react";
 
 const API_BASE = "/api";
 
@@ -72,6 +82,7 @@ const formSchema = z.object({
   category: z.string().min(1, "Category is required"),
   author: z.string().optional().default("SignalAI Staff"),
   dek: z.string().optional(),
+  authorId: z.number().nullable().optional(),
   imageUrl: z.string().optional().default(""),
   body: z.string().min(1, "Body is required"),
   sourceUrls: z.array(z.string()).optional().default([]),
@@ -91,6 +102,8 @@ export default function DraftEditor() {
     { query: { enabled: !!draftId, queryKey: getGetDraftQueryKey(draftId!) } }
   );
 
+  const { data: authors = [] } = useListAuthors();
+
   const createMutation = useCreateDraft();
   const updateMutation = useUpdateDraft();
   const deleteMutation = useDeleteDraft();
@@ -108,6 +121,7 @@ export default function DraftEditor() {
       category: "",
       author: "SignalAI Staff",
       dek: "",
+      authorId: null,
       imageUrl: "",
       body: "",
       sourceUrls: [],
@@ -124,6 +138,7 @@ export default function DraftEditor() {
         category: draft.category,
         author: draft.author || "SignalAI Staff",
         dek: draft.dek || "",
+        authorId: (draft as { authorId?: number | null }).authorId ?? null,
         imageUrl: draft.imageUrl || "",
         body: draft.body,
         sourceUrls: draft.sourceUrls ?? [],
@@ -139,6 +154,7 @@ export default function DraftEditor() {
         category: values.category,
         author: values.author || undefined,
         dek: values.dek || undefined,
+        authorId: values.authorId ?? null,
         imageUrl: values.imageUrl || undefined,
         body: values.body,
         sourceUrls: cleanUrls.length ? cleanUrls : null,
@@ -277,6 +293,8 @@ export default function DraftEditor() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const [authorPickerOpen, setAuthorPickerOpen] = useState(false);
 
   const [scheduleDate, setScheduleDate] = useState<Date>();
   const [rejectionReason, setRejectionReason] = useState("");
@@ -440,16 +458,102 @@ export default function DraftEditor() {
 
                 <FormField
                   control={form.control}
-                  name="author"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Author</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SignalAI Staff" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  name="authorId"
+                  render={({ field }) => {
+                    const selectedAuthor = field.value
+                      ? authors.find((a) => a.id === field.value) ?? null
+                      : null;
+                    return (
+                      <FormItem>
+                        <FormLabel>Author</FormLabel>
+                        <Popover open={authorPickerOpen} onOpenChange={setAuthorPickerOpen}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <button
+                                type="button"
+                                role="combobox"
+                                aria-expanded={authorPickerOpen}
+                                className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                              >
+                                <span className="flex items-center gap-2 min-w-0">
+                                  {selectedAuthor ? (
+                                    <>
+                                      <Avatar className="h-5 w-5 shrink-0">
+                                        <AvatarImage src={selectedAuthor.avatarUrl ?? undefined} />
+                                        <AvatarFallback className="text-[10px]">
+                                          {selectedAuthor.name.slice(0, 2).toUpperCase()}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <span className="truncate">{selectedAuthor.name}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <UserCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                                      <span className="text-muted-foreground">SignalAI Staff</span>
+                                    </>
+                                  )}
+                                </span>
+                                <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground ml-2" />
+                              </button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-64 p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search authors…" />
+                              <CommandList>
+                                <CommandEmpty>No author found.</CommandEmpty>
+                                <CommandGroup>
+                                  <CommandItem
+                                    value="signalai-staff"
+                                    onSelect={() => {
+                                      field.onChange(null);
+                                      form.setValue("author", "SignalAI Staff");
+                                      setAuthorPickerOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        field.value == null ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    <UserCircle2 className="mr-2 h-5 w-5 text-muted-foreground" />
+                                    SignalAI Staff
+                                  </CommandItem>
+                                  {authors.map((a) => (
+                                    <CommandItem
+                                      key={a.id}
+                                      value={`${a.name} ${a.slug}`}
+                                      onSelect={() => {
+                                        field.onChange(a.id);
+                                        form.setValue("author", a.name);
+                                        setAuthorPickerOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === a.id ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      <Avatar className="mr-2 h-5 w-5 shrink-0">
+                                        <AvatarImage src={a.avatarUrl ?? undefined} />
+                                        <AvatarFallback className="text-[10px]">
+                                          {a.name.slice(0, 2).toUpperCase()}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      {a.name}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
               </div>
 

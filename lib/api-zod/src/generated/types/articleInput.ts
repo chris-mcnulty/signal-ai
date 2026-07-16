@@ -15,6 +15,11 @@ export interface ArticleInput {
   category: string;
   /** @minLength 1 */
   author?: string;
+  /**
+     * ID of an author record; if set, overrides the author text field display
+     * @nullable
+     */
+  authorId?: number | null;
   dek?: string;
   imageUrl?: string;
 }

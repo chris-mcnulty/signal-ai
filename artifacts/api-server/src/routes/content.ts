@@ -71,10 +71,7 @@ router.get("/case-studies/:slug", async (req, res): Promise<void> => {
   const { article, caseStudy, relatedArticles } = entry;
   res.json(
     GetCaseStudyResponse.parse({
-      ...toArticleSummary(article),
-      body: article.body,
-      updatedAt: article.updatedAt,
-      sourceUrls: article.sourceUrls ?? null,
+      ...toArticleDetail(article),
       company: toCaseStudyCompany(caseStudy),
       metrics: caseStudy.metrics,
       quotes: caseStudy.quotes,

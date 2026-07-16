@@ -1,4 +1,4 @@
-import type { Article, CaseStudy } from "@workspace/db";
+import type { Article, CaseStudy, Author } from "@workspace/db";
 import { SITE } from "./site";
 
 type JsonLd = Record<string, unknown>;
@@ -37,10 +37,43 @@ export function publisherJsonLd(baseUrl: string): JsonLd {
   };
 }
 
+export function authorJsonLd(
+  baseUrl: string,
+  article: Article,
+  author: Author | null | undefined,
+): JsonLd {
+  const authorName = author?.name || article.author || "";
+  // Staff author or blank name → Organization
+  if (!authorName || authorName === "SignalAI Staff" || author?.isStaff) {
+    return { "@type": "Organization", name: "SignalAI" };
+  }
+  // Named author with full Author record → rich Person
+  if (author) {
+    const sameAs: string[] = [];
+    if (author.twitterHandle) {
+      sameAs.push(`https://twitter.com/${author.twitterHandle.replace(/^@/, "")}`);
+    }
+    if (author.linkedInUrl) {
+      sameAs.push(author.linkedInUrl);
+    }
+    const result: JsonLd = {
+      "@type": "Person",
+      name: author.name,
+      url: `${baseUrl}/authors/${author.slug}`,
+    };
+    if (sameAs.length > 0) result.sameAs = sameAs;
+    if (author.bio) result.description = author.bio;
+    return result;
+  }
+  // Named author without Author record → minimal Person
+  return { "@type": "Person", name: authorName };
+}
+
 export function caseStudyArticleJsonLd(
   baseUrl: string,
   article: Article,
   caseStudy: CaseStudy,
+  author?: Author | null,
 ): JsonLd {
   const pageUrl = `${baseUrl}/case-studies/${article.slug}`;
   return {
@@ -60,10 +93,7 @@ export function caseStudyArticleJsonLd(
     ],
     datePublished: (article.publishedAt ?? article.createdAt).toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    author:
-      !article.author || article.author === "SignalAI Staff"
-        ? { "@type": "Organization", name: "SignalAI" }
-        : { "@type": "Person", name: article.author },
+    author: authorJsonLd(baseUrl, article, author ?? null),
     publisher: publisherJsonLd(baseUrl),
     mainEntityOfPage: {
       "@type": "WebPage",
