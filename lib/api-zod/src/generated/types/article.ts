@@ -13,7 +13,7 @@ export interface Article {
   title: string;
   slug: string;
   /** @nullable */
-  excerpt: string | null;
+  dek: string | null;
   body: string;
   category: string;
   author: string;

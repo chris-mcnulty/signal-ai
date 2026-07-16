@@ -89,7 +89,6 @@ export function buildFinding(article: {
   title: string;
   category: string;
   dek: string;
-  excerpt: string | null;
   body: string;
   seoTitle: string | null;
   seoDescription: string | null;
@@ -109,7 +108,6 @@ export function buildFinding(article: {
   if (!article.seoDescription?.trim()) {
     const suggestion = suggestDescription([
       article.dek,
-      article.excerpt,
       article.body,
     ]);
     if (suggestion) {
@@ -138,7 +136,6 @@ export async function runSeoAudit(): Promise<AuditReport> {
       title: articlesTable.title,
       category: articlesTable.category,
       dek: articlesTable.dek,
-      excerpt: articlesTable.excerpt,
       body: articlesTable.body,
       seoTitle: articlesTable.seoTitle,
       seoDescription: articlesTable.seoDescription,

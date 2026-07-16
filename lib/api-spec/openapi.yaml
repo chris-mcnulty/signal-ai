@@ -313,7 +313,7 @@ paths:
     patch:
       operationId: updateDraft
       tags: [drafts]
-      summary: Edit a draft's title, body, category, excerpt, or image
+      summary: Edit a draft's title, body, category, dek, or image
       parameters:
         - name: id
           in: path
@@ -1440,9 +1440,6 @@ components:
         dek:
           type: string
           nullable: true
-        excerpt:
-          type: string
-          nullable: true
         category:
           type: string
         author:
@@ -1666,7 +1663,7 @@ components:
           author,
           status,
           source,
-          excerpt,
+          dek,
           imageUrl,
           scheduledFor,
           publishedAt,
@@ -1682,7 +1679,7 @@ components:
           type: string
         slug:
           type: string
-        excerpt:
+        dek:
           type: ["string", "null"]
         body:
           type: string
@@ -1736,7 +1733,7 @@ components:
         author:
           type: string
           minLength: 1
-        excerpt:
+        dek:
           type: string
         imageUrl:
           type: string
@@ -1755,7 +1752,7 @@ components:
         author:
           type: string
           minLength: 1
-        excerpt:
+        dek:
           type: ["string", "null"]
         imageUrl:
           type: ["string", "null"]

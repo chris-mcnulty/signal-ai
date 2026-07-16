@@ -84,7 +84,6 @@ export interface ArticleSummary {
   slug: string;
   title: string;
   dek?: string | null;
-  excerpt?: string | null;
   category: string;
   author: string;
   readingMinutes: number;
@@ -181,7 +180,7 @@ export interface Article {
   title: string;
   slug: string;
   /** @nullable */
-  excerpt: string | null;
+  dek: string | null;
   body: string;
   category: string;
   author: string;
@@ -216,7 +215,7 @@ export interface ArticleInput {
   category: string;
   /** @minLength 1 */
   author?: string;
-  excerpt?: string;
+  dek?: string;
   imageUrl?: string;
 }
 
@@ -230,7 +229,7 @@ export interface ArticleUpdate {
   /** @minLength 1 */
   author?: string;
   /** @nullable */
-  excerpt?: string | null;
+  dek?: string | null;
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */

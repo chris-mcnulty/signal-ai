@@ -11,7 +11,6 @@ export interface ArticleSummary {
   slug: string;
   title: string;
   dek?: string | null;
-  excerpt?: string | null;
   category: string;
   author: string;
   readingMinutes: number;

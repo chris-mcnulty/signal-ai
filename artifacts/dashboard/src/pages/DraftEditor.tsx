@@ -71,7 +71,7 @@ const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
   author: z.string().optional().default("SignalAI Staff"),
-  excerpt: z.string().optional(),
+  dek: z.string().optional(),
   imageUrl: z.string().optional().default(""),
   body: z.string().min(1, "Body is required"),
   sourceUrls: z.array(z.string()).optional().default([]),
@@ -107,7 +107,7 @@ export default function DraftEditor() {
       title: "",
       category: "",
       author: "SignalAI Staff",
-      excerpt: "",
+      dek: "",
       imageUrl: "",
       body: "",
       sourceUrls: [],
@@ -123,7 +123,7 @@ export default function DraftEditor() {
         title: draft.title,
         category: draft.category,
         author: draft.author || "SignalAI Staff",
-        excerpt: draft.excerpt || "",
+        dek: draft.dek || "",
         imageUrl: draft.imageUrl || "",
         body: draft.body,
         sourceUrls: draft.sourceUrls ?? [],
@@ -138,7 +138,7 @@ export default function DraftEditor() {
         title: values.title,
         category: values.category,
         author: values.author || undefined,
-        excerpt: values.excerpt || undefined,
+        dek: values.dek || undefined,
         imageUrl: values.imageUrl || undefined,
         body: values.body,
         sourceUrls: cleanUrls.length ? cleanUrls : null,
@@ -249,7 +249,7 @@ export default function DraftEditor() {
             form.setValue("category", result.category, { shouldDirty: true });
           }
           if (result.dek) {
-            form.setValue("excerpt", result.dek, { shouldDirty: true });
+            form.setValue("dek", result.dek, { shouldDirty: true });
           }
           if (result.sourceUrls?.length) {
             const existing = new Set(form.getValues("sourceUrls") ?? []);
@@ -547,10 +547,10 @@ export default function DraftEditor() {
 
               <FormField
                 control={form.control}
-                name="excerpt"
+                name="dek"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Excerpt</FormLabel>
+                    <FormLabel>Subtitle / Dek</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="A short summary of the article..." 
@@ -870,7 +870,7 @@ export default function DraftEditor() {
                           form.setValue("title", proposal.seoTitle, { shouldDirty: true });
                         }
                         if (proposal.metaDescription) {
-                          form.setValue("excerpt", proposal.metaDescription, { shouldDirty: true });
+                          form.setValue("dek", proposal.metaDescription, { shouldDirty: true });
                         }
                       }}
                     />

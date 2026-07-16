@@ -30,7 +30,6 @@ export const ListArticlesResponseItem = zod.object({
   "slug": zod.string(),
   "title": zod.string(),
   "dek": zod.string().nullish(),
-  "excerpt": zod.string().nullish(),
   "category": zod.string(),
   "author": zod.string(),
   "readingMinutes": zod.number(),
@@ -135,7 +134,6 @@ export const GetCaseStudyResponse = zod.object({
   "slug": zod.string(),
   "title": zod.string(),
   "dek": zod.string().nullish(),
-  "excerpt": zod.string().nullish(),
   "category": zod.string(),
   "author": zod.string(),
   "readingMinutes": zod.number(),
@@ -168,7 +166,7 @@ export const SubmitDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -207,7 +205,7 @@ export const GenerateDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -235,7 +233,7 @@ export const ListDraftsResponseItem = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -267,7 +265,7 @@ export const CreateDraftBody = zod.object({
   "body": zod.string().min(1),
   "category": zod.string().min(1),
   "author": zod.string().min(1).optional(),
-  "excerpt": zod.string().optional(),
+  "dek": zod.string().optional(),
   "imageUrl": zod.string().optional()
 })
 
@@ -275,7 +273,7 @@ export const CreateDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -315,7 +313,7 @@ export const GetDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -333,7 +331,7 @@ export const GetDraftResponse = zod.object({
 
 
 /**
- * @summary Edit a draft's title, body, category, excerpt, or image
+ * @summary Edit a draft's title, body, category, dek, or image
  */
 export const UpdateDraftParams = zod.object({
   "id": zod.coerce.number()
@@ -350,7 +348,7 @@ export const UpdateDraftBody = zod.object({
   "body": zod.string().min(1).optional(),
   "category": zod.string().min(1).optional(),
   "author": zod.string().min(1).optional(),
-  "excerpt": zod.string().nullish(),
+  "dek": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
   "sourceUrls": zod.array(zod.string()).nullish()
 })
@@ -359,7 +357,7 @@ export const UpdateDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -401,7 +399,7 @@ export const ApproveDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -433,7 +431,7 @@ export const RejectDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -461,7 +459,7 @@ export const PublishDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),
@@ -489,7 +487,7 @@ export const UnpublishDraftResponse = zod.object({
   "id": zod.number(),
   "title": zod.string(),
   "slug": zod.string(),
-  "excerpt": zod.string().nullable(),
+  "dek": zod.string().nullable(),
   "body": zod.string(),
   "category": zod.string(),
   "author": zod.string(),

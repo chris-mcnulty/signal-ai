@@ -105,22 +105,12 @@ export async function getCaseStudyBySlug(
   };
 }
 
-/** Strip HTML tags and truncate to ~280 chars at a word boundary. */
-function cleanExcerpt(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  const text = raw.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-  if (text.length <= 280) return text;
-  const cut = text.lastIndexOf(" ", 280);
-  return text.slice(0, cut > 0 ? cut : 280) + "…";
-}
-
 export function toArticleSummary(article: Article) {
   return {
     id: article.id,
     slug: article.slug,
     title: article.title,
     dek: article.dek,
-    excerpt: cleanExcerpt(article.excerpt),
     category: article.category,
     author: article.author,
     readingMinutes: article.readingMinutes,

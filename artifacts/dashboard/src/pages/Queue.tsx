@@ -280,8 +280,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
                     <h3 className="text-base font-semibold tracking-tight truncate group-hover:text-primary transition-colors">
                       {draft.title}
                     </h3>
-                    {draft.excerpt && (
-                      <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{draft.excerpt}</p>
+                    {draft.dek && (
+                      <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{draft.dek}</p>
                     )}
                   </div>
 
@@ -448,7 +448,7 @@ type ScheduledDraft = {
   category: string;
   scheduledFor?: string | null;
   imageUrl?: string | null;
-  excerpt?: string | null;
+  dek?: string | null;
 };
 
 function ScheduledView({
@@ -510,8 +510,8 @@ function ScheduledView({
                 <h3 className="text-base font-semibold tracking-tight truncate">
                   {draft.title}
                 </h3>
-                {draft.excerpt && (
-                  <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{draft.excerpt}</p>
+                {draft.dek && (
+                  <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">{draft.dek}</p>
                 )}
                 <div className="flex items-center gap-4 mt-1.5 text-xs">
                   <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium">

@@ -167,7 +167,7 @@ router.post("/drafts", async (req, res): Promise<void> => {
       body: parsed.data.body,
       category: parsed.data.category,
       ...(parsed.data.author ? { author: parsed.data.author } : {}),
-      excerpt: parsed.data.excerpt ?? null,
+      dek: parsed.data.dek ?? "",
       imageUrl: parsed.data.imageUrl ?? null,
       slug,
       status: "pending",

@@ -950,7 +950,7 @@ export const getUpdateDraftUrl = (id: number,) => {
 }
 
 /**
- * @summary Edit a draft's title, body, category, excerpt, or image
+ * @summary Edit a draft's title, body, category, dek, or image
  */
 export const updateDraft = async (id: number,
     articleUpdate: ArticleUpdate, options?: RequestInit): Promise<Article> => {
@@ -1000,7 +1000,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateDraftMutationError = ErrorType<ErrorMessage>
 
     /**
- * @summary Edit a draft's title, body, category, excerpt, or image
+ * @summary Edit a draft's title, body, category, dek, or image
  */
 export const useUpdateDraft = <TError = ErrorType<ErrorMessage>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateDraft>>, TError,{id: number;data: BodyType<ArticleUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}

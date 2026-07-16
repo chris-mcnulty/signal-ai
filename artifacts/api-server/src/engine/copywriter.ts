@@ -142,7 +142,6 @@ Respond with a JSON object:
     .values({
       title,
       dek,
-      excerpt: dek || undefined,
       body,
       category,
       slug,

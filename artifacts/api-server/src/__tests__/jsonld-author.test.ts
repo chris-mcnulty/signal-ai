@@ -13,7 +13,6 @@ function makeArticle(overrides: Partial<Article> = {}): Article {
     slug: "test-article",
     title: "Test Article",
     dek: "A test article dek.",
-    excerpt: null,
     body: "Article body content.",
     category: "Technology",
     author: "SignalAI Staff",

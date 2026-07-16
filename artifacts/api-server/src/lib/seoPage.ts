@@ -49,7 +49,6 @@ function articleDescription(article: Article): string {
   const source =
     article.seoDescription?.trim() ||
     article.dek?.trim() ||
-    article.excerpt?.trim() ||
     article.body;
   return clampDescription(source);
 }

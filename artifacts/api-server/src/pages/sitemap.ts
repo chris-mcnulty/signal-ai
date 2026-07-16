@@ -48,7 +48,7 @@ router.get("/rss.xml", async (req, res): Promise<void> => {
     .select({
       slug: articlesTable.slug,
       title: articlesTable.title,
-      excerpt: articlesTable.excerpt,
+      dek: articlesTable.dek,
       author: articlesTable.author,
       category: articlesTable.category,
       publishedAt: articlesTable.publishedAt,
@@ -65,7 +65,7 @@ router.get("/rss.xml", async (req, res): Promise<void> => {
     const path = pathForArticle(a);
     const link = escapeXml(`${baseUrl}${path}`);
     const title = escapeXml(a.title);
-    const description = escapeXml(a.excerpt ?? "");
+    const description = escapeXml(a.dek ?? "");
     const author = escapeXml(a.author);
     const pubDate = a.publishedAt
       ? a.publishedAt.toUTCString()

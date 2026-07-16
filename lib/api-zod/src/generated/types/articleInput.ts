@@ -15,6 +15,6 @@ export interface ArticleInput {
   category: string;
   /** @minLength 1 */
   author?: string;
-  excerpt?: string;
+  dek?: string;
   imageUrl?: string;
 }

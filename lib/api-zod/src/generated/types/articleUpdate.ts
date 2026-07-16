@@ -16,7 +16,7 @@ export interface ArticleUpdate {
   /** @minLength 1 */
   author?: string;
   /** @nullable */
-  excerpt?: string | null;
+  dek?: string | null;
   /** @nullable */
   imageUrl?: string | null;
   /** @nullable */

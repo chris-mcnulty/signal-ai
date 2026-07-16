@@ -227,7 +227,7 @@ export default function ArticlePage() {
           </h1>
           
           <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed mb-8">
-            {article.dek || article.excerpt}
+            {article.dek}
           </p>
 
           <div className="flex items-center justify-between border-t border-b border-news py-3">

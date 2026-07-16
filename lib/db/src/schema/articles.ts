@@ -26,7 +26,6 @@ export const articlesTable = pgTable(
     slug: text("slug").notNull(),
     title: text("title").notNull(),
     dek: text("dek").notNull().default(""),
-    excerpt: text("excerpt"),
     body: text("body").notNull(),
     category: text("category").notNull(),
     author: text("author").notNull().default("SignalAI Staff"),

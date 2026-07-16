@@ -117,7 +117,7 @@ export default function Home() {
                   </h2>
                   
                   <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed mb-6 pr-0 md:pr-8">
-                    {leadStory.dek || leadStory.excerpt}
+                    {leadStory.dek}
                   </p>
 
                   {(leadStory.heroImageUrl || leadStory.imageUrl) && (
@@ -179,7 +179,7 @@ export default function Home() {
                           <span className="card-headline">{story.title}</span>
                         </h4>
                         <p className="text-sm text-news-secondary mb-2 line-clamp-3 leading-relaxed">
-                          {story.dek || story.excerpt}
+                          {story.dek}
                         </p>
                         <div className="font-mono text-xs text-news-secondary uppercase">By {story.author}</div>
                       </div>
