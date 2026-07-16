@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -265,6 +265,18 @@ export default function DraftEditor() {
       },
     );
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
+
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const [scheduleDate, setScheduleDate] = useState<Date>();
   const [rejectionReason, setRejectionReason] = useState("");
@@ -890,6 +902,16 @@ export default function DraftEditor() {
           </div>
         </div>
       </div>
+
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all"
+          aria-label="Back to top"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </button>
+      )}
     </AppLayout>
   );
 }
