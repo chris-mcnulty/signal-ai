@@ -1,6 +1,6 @@
 import { db, articlesTable, caseStudiesTable, articleRelationsTable, authorsTable } from "@workspace/db";
 import type { Article, CaseStudy, Author } from "@workspace/db";
-import { desc, eq, and, inArray, or, ilike } from "drizzle-orm";
+import { desc, eq, and, inArray, or, ilike, sql } from "drizzle-orm";
 import { promoteDueArticles } from "./articles";
 
 export const CASE_STUDY_CATEGORY = "case-study";
