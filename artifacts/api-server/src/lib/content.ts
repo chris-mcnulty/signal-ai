@@ -126,6 +126,8 @@ export async function listCaseStudiesWithArticles(): Promise<
       and(
         eq(articlesTable.status, "published"),
         eq(articlesTable.category, CASE_STUDY_CATEGORY),
+        // Only list entries where at least a company name has been filled in
+        sql`${caseStudiesTable.companyName} != ''`,
       ),
     )
     .orderBy(desc(articlesTable.publishedAt));

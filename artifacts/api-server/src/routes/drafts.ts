@@ -174,12 +174,13 @@ router.post("/drafts", async (req, res): Promise<void> => {
     return;
   }
   const slug = await uniqueSlug(parsed.data.title);
+  const category = normalizeCategory(parsed.data.category);
   const [article] = await db
     .insert(articlesTable)
     .values({
       title: parsed.data.title,
       body: parsed.data.body,
-      category: normalizeCategory(parsed.data.category),
+      category,
       ...(parsed.data.author ? { author: parsed.data.author } : {}),
       ...(parsed.data.authorId != null ? { authorId: parsed.data.authorId } : {}),
       dek: parsed.data.dek ?? "",
@@ -189,6 +190,12 @@ router.post("/drafts", async (req, res): Promise<void> => {
       source: "manual",
     })
     .returning();
+  if (category === CASE_STUDY_CATEGORY) {
+    await db
+      .insert(caseStudiesTable)
+      .values({ articleId: article.id, companyName: "", companyWebsite: "", industry: "", companySize: "", headquarters: "", companySummary: "" })
+      .onConflictDoNothing();
+  }
   res.status(201).json(CreateDraftResponse.parse(article));
 });
 
@@ -256,6 +263,14 @@ router.patch("/drafts/:id", async (req, res): Promise<void> => {
   if (!article) {
     res.status(404).json({ error: "Draft not found" });
     return;
+  }
+  // Auto-provision an empty case_studies row so the editor can fill it in
+  // immediately after setting the category — no orphaned articles.
+  if (article.category === CASE_STUDY_CATEGORY) {
+    await db
+      .insert(caseStudiesTable)
+      .values({ articleId: article.id, companyName: "", companyWebsite: "", industry: "", companySize: "", headquarters: "", companySummary: "" })
+      .onConflictDoNothing();
   }
   res.json(UpdateDraftResponse.parse(article));
 });

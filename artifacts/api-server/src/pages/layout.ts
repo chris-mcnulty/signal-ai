@@ -135,6 +135,34 @@ ${bodyHtml}
 </html>`;
 }
 
+/**
+ * Convert markdown inline elements (links, bold, italic) in a raw text segment
+ * to HTML, escaping all plain-text portions.  Never double-escapes.
+ */
+function renderInline(raw: string): string {
+  const parts: string[] = [];
+  let lastIndex = 0;
+  // Match links [text](url), **bold**, or *italic* — in that priority order
+  const pattern = /\[([^\]]*)\]\((https?:\/\/[^\s)]*)\)|\*\*([^*]+)\*\*|\*([^*\n]+)\*/g;
+  let m: RegExpExecArray | null;
+  while ((m = pattern.exec(raw)) !== null) {
+    parts.push(escapeHtml(raw.slice(lastIndex, m.index)));
+    if (m[1] !== undefined) {
+      // [text](url)
+      parts.push(`<a href="${escapeHtml(m[2])}" target="_blank" rel="noopener noreferrer">${escapeHtml(m[1])}</a>`);
+    } else if (m[3] !== undefined) {
+      // **bold**
+      parts.push(`<strong>${escapeHtml(m[3])}</strong>`);
+    } else {
+      // *italic*
+      parts.push(`<em>${escapeHtml(m[4])}</em>`);
+    }
+    lastIndex = m.index + m[0].length;
+  }
+  parts.push(escapeHtml(raw.slice(lastIndex)));
+  return parts.join("");
+}
+
 export function renderArticleBody(body: string): string {
   return body
     .split(/\n\s*\n/)
@@ -142,9 +170,13 @@ export function renderArticleBody(body: string): string {
     .filter(Boolean)
     .map((block) => {
       if (block.startsWith("## ")) {
-        return `<h2>${escapeHtml(block.slice(3))}</h2>`;
+        return `<h2>${renderInline(block.slice(3))}</h2>`;
       }
-      return `<p>${escapeHtml(block)}</p>`;
+      if (block.startsWith("# ")) {
+        // Treat top-level heading as h2 to avoid duplicating the article <h1>
+        return `<h2>${renderInline(block.slice(2))}</h2>`;
+      }
+      return `<p>${renderInline(block)}</p>`;
     })
     .join("\n");
 }
