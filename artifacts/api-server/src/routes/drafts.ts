@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { desc, eq, sql } from "drizzle-orm";
-import { db, articlesTable, authorsTable } from "@workspace/db";
+import { db, articlesTable, authorsTable, caseStudiesTable } from "@workspace/db";
 import {
   ListDraftsQueryParams,
   ListDraftsResponse,
@@ -30,6 +30,14 @@ import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { requireEditor } from "../middlewares/requireEditor";
 import { rateLimit } from "../middlewares/rateLimit";
 import { promoteDueArticles, uniqueSlug } from "../lib/articles";
+import { normalizeCategory } from "../lib/content";
+import {
+  GetDraftCaseStudyParams,
+  GetDraftCaseStudyResponse,
+  UpsertDraftCaseStudyParams,
+  UpsertDraftCaseStudyBody,
+  UpsertDraftCaseStudyResponse,
+} from "@workspace/api-zod";
 import { generateArticleDraft } from "../lib/aiDrafting";
 import { submitUrls, type SubmitTrigger } from "../lib/seoSubmit";
 import { pathForArticle } from "../lib/seoContent";
@@ -79,7 +87,7 @@ router.post("/drafts/submit", apiKeyAuth, async (req, res): Promise<void> => {
     .values({
       title,
       body,
-      category: category ?? "Uncategorized",
+      category: normalizeCategory(category ?? "Uncategorized"),
       slug,
       status: "pending",
       source: "api",
@@ -115,7 +123,7 @@ router.post("/drafts/generate", apiKeyAuth, generateRateLimit, async (req, res):
       title: generated.title,
       dek: generated.dek,
       body: generated.body,
-      category: generated.category ?? category ?? "Uncategorized",
+      category: normalizeCategory(generated.category ?? category ?? "Uncategorized"),
       slug,
       status: "pending",
       source: "ai",
@@ -171,7 +179,7 @@ router.post("/drafts", async (req, res): Promise<void> => {
     .values({
       title: parsed.data.title,
       body: parsed.data.body,
-      category: parsed.data.category,
+      category: normalizeCategory(parsed.data.category),
       ...(parsed.data.author ? { author: parsed.data.author } : {}),
       ...(parsed.data.authorId != null ? { authorId: parsed.data.authorId } : {}),
       dek: parsed.data.dek ?? "",
@@ -237,9 +245,12 @@ router.patch("/drafts/:id", async (req, res): Promise<void> => {
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+  const updates = parsed.data.category
+    ? { ...parsed.data, category: normalizeCategory(parsed.data.category) }
+    : parsed.data;
   const [article] = await db
     .update(articlesTable)
-    .set(parsed.data)
+    .set(updates)
     .where(eq(articlesTable.id, params.data.id))
     .returning();
   if (!article) {
@@ -374,6 +385,86 @@ router.post("/drafts/:id/unpublish", async (req, res): Promise<void> => {
   }
   notifySearchEngines(req, article, "delete", "unpublish-hook");
   res.json(UnpublishDraftResponse.parse(article));
+});
+
+// ── Case-study metadata (company, proof points, quotes) ─────────────────────
+
+router.get("/drafts/:id/case-study", async (req, res): Promise<void> => {
+  const params = GetDraftCaseStudyParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const [article] = await db
+    .select({ id: articlesTable.id })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, params.data.id));
+  if (!article) {
+    res.status(404).json({ error: "Draft not found" });
+    return;
+  }
+  const [row] = await db
+    .select()
+    .from(caseStudiesTable)
+    .where(eq(caseStudiesTable.articleId, params.data.id));
+  res.json(
+    GetDraftCaseStudyResponse.parse({
+      articleId: params.data.id,
+      exists: !!row,
+      companyName: row?.companyName ?? "",
+      companyWebsite: row?.companyWebsite ?? "",
+      industry: row?.industry ?? "",
+      companySize: row?.companySize ?? "",
+      headquarters: row?.headquarters ?? "",
+      companySummary: row?.companySummary ?? "",
+      metrics: row?.metrics ?? [],
+      quotes: row?.quotes ?? [],
+    }),
+  );
+});
+
+router.put("/drafts/:id/case-study", async (req, res): Promise<void> => {
+  const params = UpsertDraftCaseStudyParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const parsed = UpsertDraftCaseStudyBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+  const [article] = await db
+    .select({ id: articlesTable.id })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, params.data.id));
+  if (!article) {
+    res.status(404).json({ error: "Draft not found" });
+    return;
+  }
+  const values = { ...parsed.data, articleId: params.data.id };
+  const [row] = await db
+    .insert(caseStudiesTable)
+    .values(values)
+    .onConflictDoUpdate({
+      target: caseStudiesTable.articleId,
+      set: parsed.data,
+    })
+    .returning();
+  res.json(
+    UpsertDraftCaseStudyResponse.parse({
+      articleId: row.articleId,
+      exists: true,
+      companyName: row.companyName,
+      companyWebsite: row.companyWebsite,
+      industry: row.industry,
+      companySize: row.companySize,
+      headquarters: row.headquarters,
+      companySummary: row.companySummary,
+      metrics: row.metrics,
+      quotes: row.quotes,
+    }),
+  );
 });
 
 export default router;

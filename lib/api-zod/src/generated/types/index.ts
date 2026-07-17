@@ -22,6 +22,8 @@ export * from './briefUpdate';
 export * from './briefUpdateStatus';
 export * from './caseStudyCompany';
 export * from './caseStudyDetail';
+export * from './caseStudyEditorData';
+export * from './caseStudyEditorInput';
 export * from './caseStudyMetric';
 export * from './caseStudyQuote';
 export * from './caseStudySummary';

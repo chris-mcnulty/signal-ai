@@ -71,11 +71,26 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DraftEnginePanel } from "@/components/DraftEnginePanel";
+import { CaseStudyPanel } from "@/components/CaseStudyPanel";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { ImagePicker } from "@workspace/image-library";
 import { useListAuthors } from "@workspace/api-client-react";
 
 const API_BASE = "/api";
+
+const CATEGORY_OPTIONS = [
+  { value: "news", label: "News" },
+  { value: "case-study", label: "Case Study" },
+  { value: "opinion", label: "Opinion" },
+  { value: "use-cases", label: "Use Cases" },
+];
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -448,9 +463,23 @@ export default function DraftEditor() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. AI Models" {...field} />
-                      </FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {CATEGORY_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                          {field.value && !CATEGORY_OPTIONS.some((o) => o.value === field.value) && (
+                            <SelectItem value={field.value}>{field.value}</SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -777,7 +806,7 @@ export default function DraftEditor() {
                     <FormControl>
                       <RichTextEditor
                         value={field.value}
-                        onChange={({ html }) => field.onChange(html)}
+                        onChange={({ markdown }) => field.onChange(markdown)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -786,6 +815,12 @@ export default function DraftEditor() {
               />
             </form>
           </Form>
+
+          {!isNew && draftId && form.watch("category") === "case-study" && (
+            <div className="mt-6">
+              <CaseStudyPanel draftId={draftId} />
+            </div>
+          )}
         </div>
 
         {/* Sidebar — clearly secondary */}

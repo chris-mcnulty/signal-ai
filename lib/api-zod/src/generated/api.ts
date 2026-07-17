@@ -661,6 +661,83 @@ export const UnpublishDraftResponse = zod.object({
 
 
 /**
+ * @summary Get case-study metadata (company, metrics, quotes) for an article
+ */
+export const GetDraftCaseStudyParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetDraftCaseStudyResponse = zod.object({
+  "articleId": zod.number(),
+  "exists": zod.boolean().describe('Whether a case-study metadata row exists for this article yet'),
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companySize": zod.string(),
+  "headquarters": zod.string(),
+  "companySummary": zod.string(),
+  "metrics": zod.array(zod.object({
+  "label": zod.string(),
+  "value": zod.string(),
+  "context": zod.string()
+})),
+  "quotes": zod.array(zod.object({
+  "quote": zod.string(),
+  "attribution": zod.string(),
+  "role": zod.string()
+}))
+})
+
+
+/**
+ * @summary Create or update case-study metadata for an article
+ */
+export const UpsertDraftCaseStudyParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpsertDraftCaseStudyBody = zod.object({
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companySize": zod.string(),
+  "headquarters": zod.string(),
+  "companySummary": zod.string(),
+  "metrics": zod.array(zod.object({
+  "label": zod.string(),
+  "value": zod.string(),
+  "context": zod.string()
+})),
+  "quotes": zod.array(zod.object({
+  "quote": zod.string(),
+  "attribution": zod.string(),
+  "role": zod.string()
+}))
+})
+
+export const UpsertDraftCaseStudyResponse = zod.object({
+  "articleId": zod.number(),
+  "exists": zod.boolean().describe('Whether a case-study metadata row exists for this article yet'),
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companySize": zod.string(),
+  "headquarters": zod.string(),
+  "companySummary": zod.string(),
+  "metrics": zod.array(zod.object({
+  "label": zod.string(),
+  "value": zod.string(),
+  "context": zod.string()
+})),
+  "quotes": zod.array(zod.object({
+  "quote": zod.string(),
+  "attribution": zod.string(),
+  "role": zod.string()
+}))
+})
+
+
+/**
  * @summary Audit published content for missing SEO fields
  */
 export const GetSeoAuditResponse = zod.object({

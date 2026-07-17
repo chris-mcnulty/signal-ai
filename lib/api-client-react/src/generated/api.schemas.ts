@@ -174,6 +174,31 @@ export interface CaseStudyDetail {
   relatedArticles: ArticleSummary[];
 }
 
+export interface CaseStudyEditorInput {
+  companyName: string;
+  companyWebsite: string;
+  industry: string;
+  companySize: string;
+  headquarters: string;
+  companySummary: string;
+  metrics: CaseStudyMetric[];
+  quotes: CaseStudyQuote[];
+}
+
+export interface CaseStudyEditorData {
+  articleId: number;
+  /** Whether a case-study metadata row exists for this article yet */
+  exists: boolean;
+  companyName: string;
+  companyWebsite: string;
+  industry: string;
+  companySize: string;
+  headquarters: string;
+  companySummary: string;
+  metrics: CaseStudyMetric[];
+  quotes: CaseStudyQuote[];
+}
+
 export type ArticleStatus = typeof ArticleStatus[keyof typeof ArticleStatus];
 
 

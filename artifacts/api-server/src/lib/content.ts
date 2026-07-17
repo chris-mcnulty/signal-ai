@@ -5,6 +5,18 @@ import { promoteDueArticles } from "./articles";
 
 export const CASE_STUDY_CATEGORY = "case-study";
 
+/**
+ * Normalize a free-text category into its canonical slug form so filtering
+ * works regardless of how editors type it ("Case Study" → "case-study").
+ */
+export function normalizeCategory(category: string): string {
+  return category
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 export type ArticleWithAuthor = Article & { authorRecord: Author | null };
 
 export type CaseStudyWithArticle = {

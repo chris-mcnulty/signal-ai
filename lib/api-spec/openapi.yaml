@@ -502,6 +502,77 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/case-study:
+    get:
+      operationId: getDraftCaseStudy
+      tags: [drafts]
+      summary: Get case-study metadata (company, metrics, quotes) for an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Case-study metadata, or null fields if none exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseStudyEditorData"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    put:
+      operationId: upsertDraftCaseStudy
+      tags: [drafts]
+      summary: Create or update case-study metadata for an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseStudyEditorInput"
+      responses:
+        "200":
+          description: Saved case-study metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseStudyEditorData"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
   /seo/admin/audit:
     get:
       operationId: getSeoAudit
@@ -1692,6 +1763,59 @@ components:
         - metrics
         - quotes
         - relatedArticles
+    CaseStudyEditorInput:
+      type: object
+      required: [companyName, companyWebsite, industry, companySize, headquarters, companySummary, metrics, quotes]
+      properties:
+        companyName:
+          type: string
+        companyWebsite:
+          type: string
+        industry:
+          type: string
+        companySize:
+          type: string
+        headquarters:
+          type: string
+        companySummary:
+          type: string
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyMetric"
+        quotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyQuote"
+    CaseStudyEditorData:
+      type: object
+      required: [articleId, exists, companyName, companyWebsite, industry, companySize, headquarters, companySummary, metrics, quotes]
+      properties:
+        articleId:
+          type: integer
+        exists:
+          type: boolean
+          description: Whether a case-study metadata row exists for this article yet
+        companyName:
+          type: string
+        companyWebsite:
+          type: string
+        industry:
+          type: string
+        companySize:
+          type: string
+        headquarters:
+          type: string
+        companySummary:
+          type: string
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyMetric"
+        quotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseStudyQuote"
     Article:
       type: object
       required:

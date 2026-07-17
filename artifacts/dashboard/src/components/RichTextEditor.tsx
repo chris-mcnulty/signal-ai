@@ -145,8 +145,8 @@ export function RichTextEditor({ value, onChange }: Props) {
     },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      lastValueRef.current = html;
       const markdown = turndown.turndown(html);
+      lastValueRef.current = markdown;
       onChange({ html, markdown });
     },
   });

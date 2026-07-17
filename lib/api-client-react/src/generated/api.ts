@@ -31,6 +31,8 @@ import type {
   BrandVoiceInput,
   BriefUpdate,
   CaseStudyDetail,
+  CaseStudyEditorData,
+  CaseStudyEditorInput,
   CaseStudySummary,
   CitationsResult,
   ContentBrief,
@@ -1368,6 +1370,155 @@ export const useUnpublishDraft = <TError = ErrorType<ErrorMessage>,
         TContext
       > => {
       return useMutation(getUnpublishDraftMutationOptions(options));
+    }
+
+export const getGetDraftCaseStudyUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/case-study`
+}
+
+/**
+ * @summary Get case-study metadata (company, metrics, quotes) for an article
+ */
+export const getDraftCaseStudy = async (id: number, options?: RequestInit): Promise<CaseStudyEditorData> => {
+
+  return customFetch<CaseStudyEditorData>(getGetDraftCaseStudyUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDraftCaseStudyQueryKey = (id: number,) => {
+    return [
+    `/api/drafts/${id}/case-study`
+    ] as const;
+    }
+
+
+export const getGetDraftCaseStudyQueryOptions = <TData = Awaited<ReturnType<typeof getDraftCaseStudy>>, TError = ErrorType<ErrorMessage>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDraftCaseStudy>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDraftCaseStudyQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDraftCaseStudy>>> = ({ signal }) => getDraftCaseStudy(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDraftCaseStudy>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDraftCaseStudyQueryResult = NonNullable<Awaited<ReturnType<typeof getDraftCaseStudy>>>
+export type GetDraftCaseStudyQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Get case-study metadata (company, metrics, quotes) for an article
+ */
+
+export function useGetDraftCaseStudy<TData = Awaited<ReturnType<typeof getDraftCaseStudy>>, TError = ErrorType<ErrorMessage>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDraftCaseStudy>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDraftCaseStudyQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpsertDraftCaseStudyUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/case-study`
+}
+
+/**
+ * @summary Create or update case-study metadata for an article
+ */
+export const upsertDraftCaseStudy = async (id: number,
+    caseStudyEditorInput: CaseStudyEditorInput, options?: RequestInit): Promise<CaseStudyEditorData> => {
+
+  return customFetch<CaseStudyEditorData>(getUpsertDraftCaseStudyUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(caseStudyEditorInput)
+  }
+);}
+
+
+
+
+
+export const getUpsertDraftCaseStudyMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertDraftCaseStudy>>, TError,{id: number;data: BodyType<CaseStudyEditorInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertDraftCaseStudy>>, TError,{id: number;data: BodyType<CaseStudyEditorInput>}, TContext> => {
+
+const mutationKey = ['upsertDraftCaseStudy'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertDraftCaseStudy>>, {id: number;data: BodyType<CaseStudyEditorInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  upsertDraftCaseStudy(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertDraftCaseStudyMutationResult = NonNullable<Awaited<ReturnType<typeof upsertDraftCaseStudy>>>
+    export type UpsertDraftCaseStudyMutationBody = BodyType<CaseStudyEditorInput>
+    export type UpsertDraftCaseStudyMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Create or update case-study metadata for an article
+ */
+export const useUpsertDraftCaseStudy = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertDraftCaseStudy>>, TError,{id: number;data: BodyType<CaseStudyEditorInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof upsertDraftCaseStudy>>,
+        TError,
+        {id: number;data: BodyType<CaseStudyEditorInput>},
+        TContext
+      > => {
+      return useMutation(getUpsertDraftCaseStudyMutationOptions(options));
     }
 
 export const getGetSeoAuditUrl = () => {
