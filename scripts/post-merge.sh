@@ -10,6 +10,20 @@ if command -v psql >/dev/null 2>&1 && [ -n "$DATABASE_URL" ]; then
     ALTER TABLE editors ADD COLUMN IF NOT EXISTS is_admin boolean NOT NULL DEFAULT false;
     ALTER TABLE editors ADD COLUMN IF NOT EXISTS invited_at timestamp;
     ALTER TABLE editors ADD COLUMN IF NOT EXISTS activated_at timestamp;
+    CREATE TABLE IF NOT EXISTS authors (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      slug text NOT NULL,
+      bio text,
+      avatar_url text,
+      twitter_handle text,
+      linked_in_url text,
+      is_staff boolean NOT NULL DEFAULT false,
+      is_active boolean NOT NULL DEFAULT true,
+      created_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS authors_slug_idx ON authors(slug);
+    ALTER TABLE articles ADD COLUMN IF NOT EXISTS author_id integer REFERENCES authors(id) ON DELETE SET NULL;
     UPDATE articles SET status='published' WHERE published_at IS NOT NULL AND status='pending';
   " || true
 fi

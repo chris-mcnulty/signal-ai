@@ -11,6 +11,7 @@ import { TableCell } from "@tiptap/extension-table-cell";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { Typography } from "@tiptap/extension-typography";
 import TurndownService from "turndown";
+import { marked } from "marked";
 import {
   Bold,
   Italic,
@@ -32,6 +33,19 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const turndown = new TurndownService({ headingStyle: "atx", codeBlockStyle: "fenced" });
+
+/** Returns true if the string looks like HTML (rich-text editor output). */
+function isHtml(s: string): boolean {
+  return /^\s*<[a-zA-Z]/.test(s);
+}
+
+/** Ensure content is HTML before handing it to TipTap. Markdown is converted. */
+function toHtml(value: string): string {
+  if (!value) return "";
+  if (isHtml(value)) return value;
+  // marked.parse is synchronous when called with a string (no async option set)
+  return marked.parse(value) as string;
+}
 
 // ---------------------------------------------------------------------------
 // Custom Image extension with size + alignment attributes
@@ -122,7 +136,7 @@ export function RichTextEditor({ value, onChange }: Props) {
       TableCell.configure({ HTMLAttributes: { class: "border border-border px-2 py-1" } }),
       Typography,
     ],
-    content: value || "",
+    content: toHtml(value),
     editorProps: {
       attributes: {
         class:
@@ -141,7 +155,7 @@ export function RichTextEditor({ value, onChange }: Props) {
     if (!editor) return;
     if (value !== lastValueRef.current) {
       lastValueRef.current = value;
-      editor.commands.setContent(value || "", { emitUpdate: false });
+      editor.commands.setContent(toHtml(value), { emitUpdate: false });
     }
   }, [value, editor]);
 
