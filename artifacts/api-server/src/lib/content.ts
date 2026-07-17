@@ -122,7 +122,12 @@ export async function listCaseStudiesWithArticles(): Promise<
     .select()
     .from(caseStudiesTable)
     .innerJoin(articlesTable, eq(caseStudiesTable.articleId, articlesTable.id))
-    .where(eq(articlesTable.status, "published"))
+    .where(
+      and(
+        eq(articlesTable.status, "published"),
+        eq(articlesTable.category, CASE_STUDY_CATEGORY),
+      ),
+    )
     .orderBy(desc(articlesTable.publishedAt));
   const articles = rows.map((r) => r.articles);
   const withAuthors = await attachAuthors(articles);
@@ -145,6 +150,7 @@ export async function getCaseStudyBySlug(
       and(
         eq(articlesTable.slug, slug),
         eq(articlesTable.status, "published"),
+        eq(articlesTable.category, CASE_STUDY_CATEGORY),
       ),
     )
     .limit(1);

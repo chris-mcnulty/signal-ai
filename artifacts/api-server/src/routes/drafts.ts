@@ -30,7 +30,7 @@ import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { requireEditor } from "../middlewares/requireEditor";
 import { rateLimit } from "../middlewares/rateLimit";
 import { promoteDueArticles, uniqueSlug } from "../lib/articles";
-import { normalizeCategory } from "../lib/content";
+import { normalizeCategory, CASE_STUDY_CATEGORY } from "../lib/content";
 import {
   GetDraftCaseStudyParams,
   GetDraftCaseStudyResponse,
@@ -435,11 +435,17 @@ router.put("/drafts/:id/case-study", async (req, res): Promise<void> => {
     return;
   }
   const [article] = await db
-    .select({ id: articlesTable.id })
+    .select({ id: articlesTable.id, category: articlesTable.category })
     .from(articlesTable)
     .where(eq(articlesTable.id, params.data.id));
   if (!article) {
     res.status(404).json({ error: "Draft not found" });
+    return;
+  }
+  if (normalizeCategory(article.category) !== CASE_STUDY_CATEGORY) {
+    res.status(409).json({
+      error: "Article category must be 'case-study' to save case study details",
+    });
     return;
   }
   const values = { ...parsed.data, articleId: params.data.id };

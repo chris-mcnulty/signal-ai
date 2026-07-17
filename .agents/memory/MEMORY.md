@@ -1,4 +1,5 @@
 - [Dual rendering for case studies](case-study-rendering.md) — /case-studies/* is proxied to SSR (api-server), not the React SPA; both layers must be kept in sync.
+- [Case-study category invariant](case-study-category-invariant.md) — categories are normalized slugs; public case-study queries must filter by category, not just join case_studies.
 - [Admin accounts](admin-accounts.md) — policy: two permanent admin accounts must keep dashboard access (see editors table)
 - [Editor allowlist auth](editor-allowlist-auth.md) — dashboard uses per-editor API keys (not shared key); requireEditor middleware; /auth/me for server-derived identity
 - [Source repositories](source-repositories.md) — upstream repos this project derives from

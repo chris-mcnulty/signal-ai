@@ -115,7 +115,8 @@ describe("POST /api/drafts/submit (external submission)", () => {
 
     expect(res.body.title).toBe(payload.title);
     expect(res.body.body).toBe(payload.body);
-    expect(res.body.category).toBe(payload.category);
+    // Categories are normalized to canonical slug form ("Testing" → "testing")
+    expect(res.body.category).toBe("testing");
     expect(res.body.status).toBe("pending");
     expect(res.body.source).toBe("api");
     expect(res.body.sourceMetadata).toEqual(payload.sourceMetadata);
