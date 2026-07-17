@@ -164,10 +164,10 @@ export function RichTextEditor({ value, onChange }: Props) {
   }
 
   return (
-    <div className="border border-border rounded-md bg-card overflow-hidden">
+    <div className="border border-border rounded-md bg-card">
       <ImageFloatingToolbar editor={editor} />
       <Toolbar editor={editor} />
-      <div className="border-t border-border" style={{ maxHeight: "640px", overflowY: "auto" }}>
+      <div className="border-t border-border">
         <EditorContent editor={editor} />
       </div>
     </div>
@@ -282,7 +282,7 @@ function Toolbar({ editor }: { editor: Editor }) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 px-2 py-1.5 bg-card border-b border-border rounded-t-md">
+    <div className="sticky top-12 z-20 flex flex-wrap items-center gap-0.5 px-2 py-1.5 bg-card border-b border-border rounded-t-md">
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
         active={editor.isActive("bold")}
