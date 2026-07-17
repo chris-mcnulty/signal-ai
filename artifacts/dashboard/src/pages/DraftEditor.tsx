@@ -325,14 +325,41 @@ export default function DraftEditor() {
 
   const openGenerator = () => {
     const title = form.getValues("title");
+    const dek = form.getValues("dek");
     const category = form.getValues("category");
-    const parts: string[] = [];
-    if (title) parts.push(`titled '${title}'`);
-    if (category) parts.push(`in the '${category}' category`);
-    const defaultPrompt = parts.length
-      ? `Editorial cover image for an article ${parts.join(" ")}. Professional, high-quality photograph.`
-      : "Editorial cover image. Professional, high-quality photograph.";
-    setGenPrompt(defaultPrompt);
+    const body = form.getValues("body");
+
+    // Pull up to 3 sentences from the body as scene context
+    const bodyExcerpt = body
+      ? body
+          .replace(/#+\s[^\n]*/g, "")   // strip headings
+          .replace(/[*_`[\]()]/g, "")   // strip markdown punctuation
+          .split(/\n+/)
+          .map((s: string) => s.trim())
+          .filter(Boolean)
+          .slice(0, 3)
+          .join(" ")
+          .slice(0, 300)
+      : "";
+
+    const context = dek || bodyExcerpt;
+
+    const categoryMood: Record<string, string> = {
+      "case-study": "cinematic corporate environment, boardroom or industrial setting, dramatic side lighting",
+      "news": "photojournalistic, candid documentary style, natural light, sense of urgency",
+      "opinion": "conceptual fine-art photography, symbolic and atmospheric, muted tones",
+      "use-cases": "modern workplace, collaborative technology in action, clean editorial look",
+    };
+    const mood = categoryMood[category] ?? "editorial photography, professional, high-quality";
+
+    const lines: string[] = [];
+    lines.push(`${mood}.`);
+    if (context) lines.push(`Scene inspired by: ${context}`);
+    lines.push(
+      "No text, no words, no letters, no overlaid copy, no watermarks, no captions anywhere in the image.",
+    );
+
+    setGenPrompt(lines.join(" "));
     setGenPreview(null);
     setGenOpen(true);
   };
