@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 
 const router: IRouter = Router();
 
+const BOOTSTRAP_ADMIN_EMAILS = ["chris.mcnulty@synozur.com"];
+
 // Use the common JWKS endpoint so tokens issued for any tenant (including
 // tenants other than the registering tenant) can have their signatures
 // verified. Microsoft publishes the same signing keys at both the
@@ -121,7 +123,20 @@ router.post("/auth/microsoft", async (req, res) => {
     return;
   }
 
-  res.json({ apiKey: editor.apiKey, email: editor.email, id: editor.id, isAdmin: editor.isAdmin });
+  let isAdmin = editor.isAdmin;
+  if (!isAdmin && BOOTSTRAP_ADMIN_EMAILS.includes(editor.email.toLowerCase())) {
+    try {
+      await db
+        .update(editorsTable)
+        .set({ isAdmin: true })
+        .where(eq(editorsTable.id, editor.id));
+      isAdmin = true;
+    } catch (err) {
+      req.log.error({ err }, "Failed to bootstrap admin flag");
+    }
+  }
+
+  res.json({ apiKey: editor.apiKey, email: editor.email, id: editor.id, isAdmin });
 });
 
 router.get("/auth/me", requireEditor, async (req, res) => {
