@@ -13,9 +13,12 @@ import {
 import {
   listCaseStudiesWithArticles,
   getCaseStudyBySlug,
+  listSpotlightsWithArticles,
+  getSpotlightBySlug,
   listPublishedArticles,
   getArticleBySlug,
   CASE_STUDY_CATEGORY,
+  SPOTLIGHT_CATEGORY,
 } from "./content";
 import { promoteDueArticles } from "./articles";
 import { clampDescription } from "./seoAudit";
@@ -29,7 +32,14 @@ type JsonLd = Record<string, unknown>;
 export interface ResolvedSeoPage {
   status: "ok" | "not_found";
   path: string;
-  kind: "home" | "hub" | "article" | "case-study" | "unknown";
+  kind:
+    | "home"
+    | "hub"
+    | "spotlight-hub"
+    | "article"
+    | "case-study"
+    | "spotlight"
+    | "unknown";
   title: string;
   description: string;
   canonicalUrl: string;
@@ -70,8 +80,9 @@ export function genericArticleJsonLd(
   baseUrl: string,
   article: Article,
   author?: Author | null,
+  pageUrl?: string,
 ): JsonLd {
-  const pageUrl = `${baseUrl}/articles/${article.slug}`;
+  pageUrl ??= `${baseUrl}/articles/${article.slug}`;
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -169,6 +180,74 @@ export async function resolveSeoPage(
     };
   }
 
+  if (path === "/spotlights") {
+    const entries = await listSpotlightsWithArticles();
+    return {
+      status: "ok",
+      path,
+      kind: "spotlight-hub",
+      title: `Company Spotlights — ${SITE.name}`,
+      description: `Company spotlights from ${SITE.name}: the vendors and consultancies shaping commercial AI.`,
+      canonicalUrl: `${baseUrl}/spotlights`,
+      ogImageUrl: defaultOgImage(baseUrl),
+      ogType: "website",
+      jsonLd: [
+        organizationPageJsonLd(baseUrl),
+        {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "@id": `${baseUrl}/spotlights#list`,
+          itemListElement: entries.map(({ article }, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: article.title,
+            url: `${baseUrl}/spotlights/${article.slug}`,
+          })),
+        },
+        breadcrumbJsonLd(baseUrl, [
+          { name: "Home", url: `${baseUrl}/` },
+          { name: "Spotlights", url: `${baseUrl}/spotlights` },
+        ]),
+      ],
+    };
+  }
+
+  const spotlightMatch = /^\/spotlights\/([^/]+)$/.exec(path);
+  if (spotlightMatch) {
+    const entry = await getSpotlightBySlug(spotlightMatch[1]!);
+    if (!entry) {
+      return notFound(baseUrl, path);
+    }
+    const { article } = entry;
+    return {
+      status: "ok",
+      path,
+      kind: "spotlight",
+      title: `${articleTitle(article)} — ${SITE.name}`,
+      description: articleDescription(article),
+      canonicalUrl: `${baseUrl}/spotlights/${article.slug}`,
+      ogImageUrl: articleOgImageUrl(baseUrl, article),
+      ogType: "article",
+      publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
+      modifiedTime: article.updatedAt.toISOString(),
+      jsonLd: [
+        genericArticleJsonLd(
+          baseUrl,
+          article,
+          article.authorRecord,
+          `${baseUrl}/spotlights/${article.slug}`,
+        ),
+        breadcrumbJsonLd(baseUrl, [
+          { name: "Home", url: `${baseUrl}/` },
+          { name: "Spotlights", url: `${baseUrl}/spotlights` },
+          { name: article.title, url: `${baseUrl}/spotlights/${article.slug}` },
+        ]),
+        organizationPageJsonLd(baseUrl),
+      ],
+      article,
+    };
+  }
+
   const caseStudyMatch = /^\/case-studies\/([^/]+)$/.exec(path);
   if (caseStudyMatch) {
     const entry = await getCaseStudyBySlug(caseStudyMatch[1]!);
@@ -207,11 +286,13 @@ export async function resolveSeoPage(
       return notFound(baseUrl, path);
     }
     const { article, author } = result;
-    // Case studies canonicalize to /case-studies/:slug.
+    // Case studies and spotlights canonicalize to their own hubs.
     const canonicalUrl =
       article.category === CASE_STUDY_CATEGORY
         ? `${baseUrl}/case-studies/${article.slug}`
-        : `${baseUrl}/articles/${article.slug}`;
+        : article.category === SPOTLIGHT_CATEGORY
+          ? `${baseUrl}/spotlights/${article.slug}`
+          : `${baseUrl}/articles/${article.slug}`;
     return {
       status: "ok",
       path,
@@ -224,7 +305,7 @@ export async function resolveSeoPage(
       publishedTime: (article.publishedAt ?? article.createdAt).toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       jsonLd: [
-        genericArticleJsonLd(baseUrl, article, author),
+        genericArticleJsonLd(baseUrl, article, author, canonicalUrl),
         breadcrumbJsonLd(baseUrl, [
           { name: "Home", url: `${baseUrl}/` },
           { name: article.title, url: canonicalUrl },

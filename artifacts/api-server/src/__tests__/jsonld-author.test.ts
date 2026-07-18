@@ -103,6 +103,14 @@ describe("genericArticleJsonLd — structure", () => {
     expect(publisher["name"]).toBeTruthy();
   });
 
+  it("uses a provided pageUrl for @id and mainEntityOfPage (spotlight canonical)", () => {
+    const article = makeArticle({ category: "spotlight" });
+    const pageUrl = `${BASE_URL}/spotlights/${article.slug}`;
+    const ld = genericArticleJsonLd(BASE_URL, article, null, pageUrl) as JsonLd;
+    expect(ld["@id"]).toBe(`${pageUrl}#article`);
+    expect((ld["mainEntityOfPage"] as JsonLd)["@id"]).toBe(pageUrl);
+  });
+
   it("uses publishedAt when available, falls back to createdAt", () => {
     const createdAt = new Date("2026-01-01T00:00:00Z");
     const publishedAt = new Date("2026-01-10T00:00:00Z");

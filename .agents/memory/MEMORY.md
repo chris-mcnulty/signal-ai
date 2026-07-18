@@ -4,6 +4,7 @@
 - [Editor allowlist auth](editor-allowlist-auth.md) — dashboard uses per-editor API keys (not shared key); requireEditor middleware; /auth/me for server-derived identity
 - [Source repositories](source-repositories.md) — upstream repos this project derives from
 - [Entra SSO login](entra-sso.md) — dashboard login replaced with Microsoft SSO; API keys still used downstream; token verification via jwks-rsa/jsonwebtoken
+- [SEO route registry](seo-route-registry.md) — every new public SPA route must be added to the api-server SEO resolver/prerenderer or crawlers (and curl) get 404s.
 - [api-zod types collision](api-zod-types-collision.md) — index.ts must only export from ./generated/api; adding types re-export causes TS2308 when endpoints have both path+query params
 - [Prod schema via Publish](prod-schema-publish.md) — prod DB schema only updates on Republish; "session expired" queue error can actually be a missing-column 500.
 - [MSAL v5 redirect handling](msal-v5-redirect.md) — navigateToLoginRequestUrl must be passed to handleRedirectPromise(), not the config; otherwise the promise never resolves on the callback page.

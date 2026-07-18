@@ -8,7 +8,9 @@ import {
 import {
   listPublishedArticles,
   listCaseStudiesWithArticles,
+  listSpotlightsWithArticles,
   CASE_STUDY_CATEGORY,
+  SPOTLIGHT_CATEGORY,
 } from "./content";
 import { formatDate } from "./site";
 import type { ResolvedSeoPage } from "./seoPage";
@@ -26,7 +28,9 @@ async function homeBody(baseUrl: string): Promise<string> {
       const path =
         a.category === CASE_STUDY_CATEGORY
           ? `/case-studies/${a.slug}`
-          : `/articles/${a.slug}`;
+          : a.category === SPOTLIGHT_CATEGORY
+            ? `/spotlights/${a.slug}`
+            : `/articles/${a.slug}`;
       return `<li>
 <span class="kicker mono">${escapeHtml(a.category)}</span>
 <a class="cs-title" href="${escapeHtml(path)}">${escapeHtml(a.title)}</a>
@@ -84,6 +88,27 @@ ${items}
 </main>`;
 }
 
+async function spotlightHubBody(baseUrl: string): Promise<string> {
+  const entries = await listSpotlightsWithArticles();
+  const items = entries
+    .map(
+      ({ article, spotlight }) => `<li>
+<a class="cs-title" href="/spotlights/${escapeHtml(article.slug)}">${escapeHtml(article.title)}</a>
+<p class="cs-dek">${escapeHtml(article.dek)}</p>
+<p class="cs-company">${escapeHtml(spotlight.companyName)} — ${escapeHtml(spotlight.industry)}</p>
+</li>`,
+    )
+    .join("\n");
+  return `<main>
+<h1 class="headline">Company Spotlights</h1>
+<p class="dek">The vendors and consultancies shaping commercial AI.</p>
+<p><a href="${escapeHtml(baseUrl)}/">← ${escapeHtml(SITE.name)} home</a></p>
+<ul class="cs-list">
+${items}
+</ul>
+</main>`;
+}
+
 /**
  * Render a full standalone HTML document for a resolved SEO page. Returns
  * null when the page kind has no prerender body (caller should 404).
@@ -100,6 +125,8 @@ export async function renderAgentHtml(
     body = await homeBody(baseUrl);
   } else if (page.kind === "hub") {
     body = await hubBody(baseUrl);
+  } else if (page.kind === "spotlight-hub") {
+    body = await spotlightHubBody(baseUrl);
   } else if (page.article) {
     body = articlePageBody(page);
   } else {
