@@ -1,8 +1,8 @@
 import React from 'react';
 import { useRoute, Link } from 'wouter';
-import { ArrowLeft, Search, Menu, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-react';
-import { SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { Layout, Header, Footer, NetworkError } from '@/components/layout';
 
 function SpotlightDetailSkeleton() {
   return (
@@ -34,8 +34,6 @@ function SpotlightDetailSkeleton() {
 export default function SpotlightDetail() {
   const [, params] = useRoute("/spotlights/:slug");
   const slug = params?.slug || "";
-  const { searchOpen, openSearch, closeSearch } = useSearch();
-
   const { data: spotlight, isLoading, isError, refetch } = useGetSpotlight(slug, {
     query: {
       enabled: !!slug,
@@ -84,30 +82,8 @@ export default function SpotlightDetail() {
   const bodyParagraphs = spotlight.body.split('\n\n').filter(p => p.trim() !== '');
 
   return (
-    <div className="broadsheet-theme">
-      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
-        <div className="flex items-center gap-3 w-1/3">
-          <Link
-            href="/spotlights"
-            className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider"
-            data-testid="link-back-list"
-          >
-            <ArrowLeft size={14} /> Spotlights
-          </Link>
-        </div>
-        <div className="w-1/3 text-center">
-          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
-              Signal<span className="text-accent">AI</span>
-            </h1>
-          </Link>
-        </div>
-        <div className="w-1/3 flex justify-end gap-1">
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" aria-label="Open menu"><Menu size={18} /></button>
-        </div>
-      </header>
-      <SearchOverlay open={searchOpen} onClose={closeSearch} />
+    <Layout>
+      <Header />
 
       <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
 
@@ -279,14 +255,7 @@ export default function SpotlightDetail() {
         </div>
       </main>
 
-      <footer className="bg-black text-white py-10 px-6 md:px-12 text-center">
-        <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
-          <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">SignalAI</h2>
-        </Link>
-        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-          © {new Date().getFullYear()} SignalAI Media. All rights reserved.
-        </p>
-      </footer>
-    </div>
+      <Footer />
+    </Layout>
   );
 }
