@@ -117,6 +117,15 @@ export default function Home() {
                     <span className="font-mono text-xs text-news-secondary uppercase">
                       {leadStory.readingMinutes} min read
                     </span>
+                    {leadStory.category === 'spotlight' && leadStory.spotlightLogoUrl && (
+                      <div className="ml-auto w-10 h-10 overflow-hidden shrink-0 bg-white border border-news flex items-center justify-center">
+                        <img
+                          src={leadStory.spotlightLogoUrl}
+                          alt=""
+                          className="w-full h-full object-contain p-0.5"
+                        />
+                      </div>
+                    )}
                   </div>
 
                   <hr className="hero-rule" />
@@ -177,10 +186,19 @@ export default function Home() {
                   data-testid={`link-sidebar-${story.slug}`}
                 >
                   <article className={i > 0 ? "pt-6 border-t border-news" : ""}>
-                    <div className="mb-2">
+                    <div className="mb-2 flex items-center gap-2">
                       <span className="card-category font-mono text-xs font-bold text-accent uppercase tracking-wider border border-transparent px-1 py-0.5">
-                        {story.category}
+                        {story.category === 'spotlight' ? 'Spotlight' : story.category}
                       </span>
+                      {story.category === 'spotlight' && story.spotlightLogoUrl && (
+                        <div className="ml-auto w-8 h-8 overflow-hidden shrink-0 bg-white border border-news flex items-center justify-center">
+                          <img
+                            src={story.spotlightLogoUrl}
+                            alt=""
+                            className="w-full h-full object-contain p-0.5"
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className={`flex gap-3 ${story.heroImageUrl ? 'items-start' : ''}`}>
                       <div className="flex-1 min-w-0">
@@ -192,7 +210,7 @@ export default function Home() {
                         </p>
                         <div className="font-mono text-xs text-news-secondary uppercase">By {story.author}</div>
                       </div>
-                      {(story.heroImageUrl || story.imageUrl) && (
+                      {story.category !== 'spotlight' && (story.heroImageUrl || story.imageUrl) && (
                         <div className="card-image w-20 h-20 shrink-0 bg-[#e8e4de] overflow-hidden hidden sm:block">
                           <img
                             src={story.heroImageUrl || story.imageUrl}

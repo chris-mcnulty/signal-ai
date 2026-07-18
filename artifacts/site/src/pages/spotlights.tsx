@@ -8,7 +8,7 @@ function SpotlightSkeleton() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {[1, 2, 3, 4, 5, 6].map(i => (
         <div key={i} className="border border-news p-6 space-y-4">
-          <div className="news-skeleton h-12 w-12 rounded-none" />
+          <div className="news-skeleton h-20 w-20 rounded-none" />
           <div className="news-skeleton h-3 w-20 rounded-none" />
           <div className="news-skeleton h-7 w-3/4 rounded-none" />
           <div className="news-skeleton h-5 w-full rounded-none" />
@@ -63,7 +63,7 @@ export default function SpotlightsPage() {
               >
                 <article className="p-6 h-full flex flex-col">
                   {spotlight.company.logoUrl ? (
-                    <div className="w-12 h-12 mb-4 overflow-hidden">
+                    <div className="w-20 h-20 mb-4 overflow-hidden">
                       <img
                         src={spotlight.company.logoUrl}
                         alt={spotlight.company.name}
@@ -71,8 +71,8 @@ export default function SpotlightsPage() {
                       />
                     </div>
                   ) : (
-                    <div className="w-12 h-12 bg-[#1a1a1a] flex items-center justify-center mb-4 shrink-0">
-                      <span className="font-serif text-lg font-bold text-white leading-none">
+                    <div className="w-20 h-20 bg-[#1a1a1a] flex items-center justify-center mb-4 shrink-0">
+                      <span className="font-serif text-2xl font-bold text-white leading-none">
                         {spotlight.company.name.charAt(0)}
                       </span>
                     </div>

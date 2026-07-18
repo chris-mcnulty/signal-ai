@@ -203,7 +203,7 @@ function toAuthorProfile(author: Author | null) {
   };
 }
 
-export function toArticleSummary(article: ArticleWithAuthor | Article) {
+export function toArticleSummary(article: ArticleWithAuthor | Article, spotlightLogoUrl?: string | null) {
   return {
     id: article.id,
     slug: article.slug,
@@ -215,7 +215,22 @@ export function toArticleSummary(article: ArticleWithAuthor | Article) {
     publishedAt: article.publishedAt ?? article.createdAt,
     heroImageUrl: article.heroImageUrl ?? null,
     imageUrl: article.imageUrl ?? null,
+    spotlightLogoUrl: spotlightLogoUrl ?? null,
   };
+}
+
+export async function attachSpotlightLogos(
+  articles: (ArticleWithAuthor | Article)[],
+): Promise<Map<number, string | null>> {
+  const spotlightArticleIds = articles
+    .filter((a) => a.category === SPOTLIGHT_CATEGORY)
+    .map((a) => a.id);
+  if (spotlightArticleIds.length === 0) return new Map();
+  const rows = await db
+    .select({ articleId: spotlightsTable.articleId, logoUrl: spotlightsTable.companyLogoUrl })
+    .from(spotlightsTable)
+    .where(inArray(spotlightsTable.articleId, spotlightArticleIds));
+  return new Map(rows.map((r) => [r.articleId, r.logoUrl ?? null]));
 }
 
 export function toArticleDetail(article: ArticleWithAuthor | Article) {

@@ -1740,6 +1740,10 @@ components:
         imageUrl:
           type: string
           nullable: true
+        spotlightLogoUrl:
+          type: string
+          nullable: true
+          description: Company logo URL for spotlight articles; null for all other categories
       required:
         - id
         - slug

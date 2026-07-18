@@ -118,16 +118,16 @@ export default function SpotlightDetail() {
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
               <div className="flex items-center gap-4">
                 {spotlight.company.logoUrl ? (
-                  <div className="w-14 h-14 border border-news overflow-hidden shrink-0 bg-white flex items-center justify-center">
+                  <div className="w-24 h-24 border border-news overflow-hidden shrink-0 bg-white flex items-center justify-center">
                     <img
                       src={spotlight.company.logoUrl}
                       alt={spotlight.company.name}
-                      className="w-full h-full object-contain p-1"
+                      className="w-full h-full object-contain p-2"
                     />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 bg-[#1a1a1a] flex items-center justify-center shrink-0">
-                    <span className="font-serif text-2xl font-bold text-white leading-none">
+                  <div className="w-24 h-24 bg-[#1a1a1a] flex items-center justify-center shrink-0">
+                    <span className="font-serif text-4xl font-bold text-white leading-none">
                       {spotlight.company.name.charAt(0)}
                     </span>
                   </div>

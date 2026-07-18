@@ -16,6 +16,7 @@ import {
   toArticleSummary,
   toArticleDetail,
   toCaseStudyCompany,
+  attachSpotlightLogos,
 } from "../lib/content";
 
 const router: IRouter = Router();
@@ -27,7 +28,8 @@ router.get("/articles", async (req, res): Promise<void> => {
     return;
   }
   const articles = await listPublishedArticles(query.data.category, query.data.q);
-  res.json(ListArticlesResponse.parse(articles.map(toArticleSummary)));
+  const logoMap = await attachSpotlightLogos(articles);
+  res.json(ListArticlesResponse.parse(articles.map((a) => toArticleSummary(a, logoMap.get(a.id)))));
 });
 
 router.get("/articles/:slug", async (req, res): Promise<void> => {

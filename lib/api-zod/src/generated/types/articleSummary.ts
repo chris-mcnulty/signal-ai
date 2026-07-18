@@ -17,4 +17,6 @@ export interface ArticleSummary {
   publishedAt: Date;
   heroImageUrl?: string | null;
   imageUrl?: string | null;
+  /** Company logo URL for spotlight articles; null for all other categories */
+  spotlightLogoUrl?: string | null;
 }
