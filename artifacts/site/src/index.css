@@ -289,10 +289,17 @@
 }
 
 .site-header .header-tagline {
+  display: none;
   transition: opacity 0.3s ease, max-height 0.3s ease;
   max-height: 2rem;
   overflow: hidden;
   opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .site-header .header-tagline {
+    display: block;
+  }
 }
 
 .site-header.scrolled .header-tagline {
