@@ -1,5 +1,5 @@
 import type { Article, CaseStudy, Author } from "@workspace/db";
-import { SITE } from "./site";
+import { SITE, STAFF_BYLINE, LEGACY_STAFF_BYLINE } from "./site";
 
 type JsonLd = Record<string, unknown>;
 
@@ -44,8 +44,8 @@ export function authorJsonLd(
 ): JsonLd {
   const authorName = author?.name || article.author || "";
   // Staff author or blank name → Organization
-  if (!authorName || authorName === "SignalAI Staff" || author?.isStaff) {
-    return { "@type": "Organization", name: "SignalAI" };
+  if (!authorName || authorName === LEGACY_STAFF_BYLINE || authorName === STAFF_BYLINE || author?.isStaff) {
+    return { "@type": "Organization", name: SITE.name };
   }
   // Named author with full Author record → rich Person
   if (author) {

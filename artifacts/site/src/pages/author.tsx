@@ -128,7 +128,7 @@ export default function AuthorPage() {
             )}
             <div className="flex-1">
               <div className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-2">
-                {author.isStaff ? 'SignalAI Staff' : 'Contributor'}
+                {author.isStaff ? 'BlueTrail Staff' : 'Contributor'}
               </div>
               <h1 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-4">
                 {author.name}

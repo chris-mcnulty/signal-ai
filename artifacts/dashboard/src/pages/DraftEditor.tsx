@@ -106,7 +106,7 @@ const CATEGORY_OPTIONS = [
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
-  author: z.string().optional().default("SignalAI Staff"),
+  author: z.string().optional().default("BlueTrail Staff"),
   dek: z.string().optional(),
   authorId: z.number().nullable().optional(),
   imageUrl: z.string().optional().default(""),
@@ -149,7 +149,7 @@ export default function DraftEditor() {
     defaultValues: {
       title: "",
       category: "",
-      author: "SignalAI Staff",
+      author: "BlueTrail Staff",
       dek: "",
       authorId: null,
       imageUrl: "",
@@ -166,7 +166,7 @@ export default function DraftEditor() {
       form.reset({
         title: draft.title,
         category: draft.category,
-        author: draft.author || "SignalAI Staff",
+        author: draft.author || "BlueTrail Staff",
         dek: draft.dek || "",
         authorId: (draft as { authorId?: number | null }).authorId ?? null,
         imageUrl: draft.imageUrl || "",
@@ -643,7 +643,7 @@ export default function DraftEditor() {
                                   ) : (
                                     <>
                                       <UserCircle2 className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                      <span className="text-muted-foreground">SignalAI Staff</span>
+                                      <span className="text-muted-foreground">BlueTrail Staff</span>
                                     </>
                                   )}
                                 </span>
@@ -658,10 +658,10 @@ export default function DraftEditor() {
                                 <CommandEmpty>No author found.</CommandEmpty>
                                 <CommandGroup>
                                   <CommandItem
-                                    value="signalai-staff"
+                                    value="bluetrail-staff"
                                     onSelect={() => {
                                       field.onChange(null);
-                                      form.setValue("author", "SignalAI Staff");
+                                      form.setValue("author", "BlueTrail Staff");
                                       setAuthorPickerOpen(false);
                                     }}
                                   >
@@ -672,7 +672,7 @@ export default function DraftEditor() {
                                       )}
                                     />
                                     <UserCircle2 className="mr-2 h-5 w-5 text-muted-foreground" />
-                                    SignalAI Staff
+                                    BlueTrail Staff
                                   </CommandItem>
                                   {authors.map((a) => (
                                     <CommandItem

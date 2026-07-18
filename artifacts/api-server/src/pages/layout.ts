@@ -126,11 +126,11 @@ ${meta.jsonLd.join("\n")}
 </head>
 <body>
 <header class="masthead">
-<a class="brand" href="/">Signal<span>AI</span></a>
+<a class="brand" href="/">BlueTr<span>AI</span>l Intelligence Report</a>
 <div class="tagline mono">${escapeHtml(SITE.tagline)}</div>
 </header>
 ${bodyHtml}
-<footer class="site">© ${new Date().getFullYear()} ${escapeHtml(SITE.name)} — ${escapeHtml(SITE.tagline)}</footer>
+<footer class="site">${escapeHtml(SITE.trademark)}</footer>
 </body>
 </html>`;
 }

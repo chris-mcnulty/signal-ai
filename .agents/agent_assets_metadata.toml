@@ -227,3 +227,15 @@ id = "YFVwJaASJKVAuwHySzDVq"
 uri = "file://artifacts/site/public/logo.svg"
 type = "image"
 title = "SignalAI Logo (SVG)"
+
+[[outputs]]
+id = "uWe7m3vJEngL1PeW2aIRX"
+uri = "file://attached_assets/bluetrail-wordmark.svg"
+type = "image"
+title = "BlueTrail Wordmark (SVG)"
+
+[[outputs]]
+id = "a-Uy7ocMSwYQNdS-c36jJ"
+uri = "file://attached_assets/bluetrail-wordmark.png"
+type = "image"
+title = "BlueTrail Wordmark — LinkedIn Square (PNG, 600×600)"

@@ -94,7 +94,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
     >
       <div className="w-full max-w-2xl px-6">
         <div className="flex items-center justify-between mb-6">
-          <span className="font-mono text-xs uppercase tracking-widest text-news-secondary">Search SignalAI</span>
+          <span className="font-mono text-xs uppercase tracking-widest text-news-secondary">Search BlueTrail Intelligence</span>
           <button
             className="mobile-menu-btn text-news-primary"
             onClick={onClose}
@@ -215,7 +215,7 @@ function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-news">
           <span className="font-serif text-2xl font-black tracking-tight">
-            Signal<span className="text-accent">AI</span>
+            BlueTr<span className="text-accent">AI</span>l
           </span>
           <button
             className="mobile-menu-btn text-news-primary"
@@ -249,7 +249,7 @@ function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
 
         <div className="px-6 py-5 border-t border-news">
           <p className="font-mono text-xs text-news-secondary uppercase tracking-widest leading-relaxed">
-            Separating the signal<br />from the AI noise
+            Blazing the AI trail<br />ahead of the frontier
           </p>
         </div>
       </div>
@@ -304,11 +304,14 @@ export function Header() {
               data-testid="link-home"
             >
               <span className="font-serif text-3xl md:text-4xl font-black tracking-tight">
-                Signal<span className="text-accent">AI</span>
+                BlueTr<span className="text-accent">AI</span>l
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-news-secondary block mt-0.5">
+                Intelligence Report
               </span>
             </Link>
             <p className="header-tagline font-mono text-xs mt-1 text-news-secondary uppercase tracking-widest">
-              Separating the signal from the AI noise
+              Blazing the AI trail ahead of the frontier
             </p>
           </div>
 
@@ -332,10 +335,14 @@ export function Footer() {
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div>
           <h2 className="font-serif text-3xl font-black tracking-tight mb-1">
-            Signal<span className="text-accent">AI</span>
+            BlueTr<span className="text-accent">AI</span>l
           </h2>
           <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-            © {new Date().getFullYear()} SignalAI Media
+            Intelligence Report
+          </p>
+          <p className="font-mono text-xs text-gray-600 mt-2 max-w-xs leading-relaxed">
+            The BlueTrail Report is a trademark of BlueTrail Intelligence Ltd.{" "}
+            © {new Date().getFullYear()} All rights reserved.
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-6 font-mono text-sm uppercase tracking-wider">

@@ -307,7 +307,7 @@ router.post("/drafts/import", async (req, res): Promise<void> => {
 
   // Match author by name; fall back to the plain-text author column
   let resolvedAuthorId: number | null = null;
-  let resolvedAuthorText = data.author ?? "SignalAI Staff";
+  let resolvedAuthorText = data.author ?? "BlueTrail Staff";
   if (data.authorName) {
     const [matchedAuthor] = await db
       .select({ id: authorsTable.id, name: authorsTable.name })

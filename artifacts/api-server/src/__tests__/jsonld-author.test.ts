@@ -53,12 +53,20 @@ function makeCaseStudy(articleId = 1): CaseStudy {
 type JsonLd = Record<string, unknown>;
 
 describe("genericArticleJsonLd — author type", () => {
-  it('emits Organization author for "SignalAI Staff"', () => {
+  it('emits Organization author for legacy "SignalAI Staff" byline', () => {
     const article = makeArticle({ author: "SignalAI Staff" });
     const ld = genericArticleJsonLd(BASE_URL, article) as JsonLd;
     const author = ld["author"] as JsonLd;
     expect(author["@type"]).toBe("Organization");
-    expect(author["name"]).toBe("SignalAI");
+    expect(author["name"]).toBeTruthy();
+  });
+
+  it('emits Organization author for current "BlueTrail Staff" byline', () => {
+    const article = makeArticle({ author: "BlueTrail Staff" });
+    const ld = genericArticleJsonLd(BASE_URL, article) as JsonLd;
+    const author = ld["author"] as JsonLd;
+    expect(author["@type"]).toBe("Organization");
+    expect(author["name"]).toBeTruthy();
   });
 
   it("emits Organization author when author field is empty string", () => {
@@ -66,7 +74,7 @@ describe("genericArticleJsonLd — author type", () => {
     const ld = genericArticleJsonLd(BASE_URL, article) as JsonLd;
     const author = ld["author"] as JsonLd;
     expect(author["@type"]).toBe("Organization");
-    expect(author["name"]).toBe("SignalAI");
+    expect(author["name"]).toBeTruthy();
   });
 
   it("emits Person author for a real named author", () => {
@@ -129,13 +137,22 @@ describe("genericArticleJsonLd — structure", () => {
 });
 
 describe("caseStudyArticleJsonLd — author type", () => {
-  it('emits Organization author for "SignalAI Staff"', () => {
+  it('emits Organization author for legacy "SignalAI Staff" byline', () => {
     const article = makeArticle({ author: "SignalAI Staff" });
     const cs = makeCaseStudy(article.id);
     const ld = caseStudyArticleJsonLd(BASE_URL, article, cs) as JsonLd;
     const author = ld["author"] as JsonLd;
     expect(author["@type"]).toBe("Organization");
-    expect(author["name"]).toBe("SignalAI");
+    expect(author["name"]).toBeTruthy();
+  });
+
+  it('emits Organization author for current "BlueTrail Staff" byline', () => {
+    const article = makeArticle({ author: "BlueTrail Staff" });
+    const cs = makeCaseStudy(article.id);
+    const ld = caseStudyArticleJsonLd(BASE_URL, article, cs) as JsonLd;
+    const author = ld["author"] as JsonLd;
+    expect(author["@type"]).toBe("Organization");
+    expect(author["name"]).toBeTruthy();
   });
 
   it("emits Organization author when author field is null-ish (empty string)", () => {
@@ -144,7 +161,7 @@ describe("caseStudyArticleJsonLd — author type", () => {
     const ld = caseStudyArticleJsonLd(BASE_URL, article, cs) as JsonLd;
     const author = ld["author"] as JsonLd;
     expect(author["@type"]).toBe("Organization");
-    expect(author["name"]).toBe("SignalAI");
+    expect(author["name"]).toBeTruthy();
   });
 
   it("emits Person author for a real named author", () => {

@@ -109,7 +109,7 @@ router.post("/spotlights/import-url", requireEditor, async (req, res): Promise<v
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     const response = await fetch(url, {
-      headers: { "User-Agent": "SignalAI/1.0 (+https://signalai.io)" },
+      headers: { "User-Agent": "BlueTrail/1.0 (+https://www.signalaiglobal.com)" },
       signal: controller.signal,
     });
     clearTimeout(timeout);

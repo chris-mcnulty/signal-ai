@@ -10,10 +10,10 @@ export default function AboutPage() {
       <main className="max-w-[900px] mx-auto p-6 md:p-12 min-h-[60vh]">
         <div className="mb-12 border-b-4 border-news pb-8 animate-fade-in-up">
           <div className="font-mono text-xs font-bold uppercase tracking-widest text-accent mb-4">
-            About SignalAI
+            About BlueTrail Intelligence Report
           </div>
           <h1 className="font-serif text-5xl md:text-7xl font-bold leading-[1.05] mb-6">
-            Separating Signal<br className="hidden md:block" /> from Noise
+            Blazing the AI<br className="hidden md:block" /> Trail Ahead
           </h1>
           <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed max-w-3xl">
             Forward-looking, free coverage of commercial AI — for the people building, deploying, and living with it.
@@ -32,9 +32,9 @@ export default function AboutPage() {
                 truth before most readers have a chance to catch up.
               </p>
               <p>
-                SignalAI exists to change that. We publish forward-looking, independently produced coverage of
-                commercial AI — the deployments that are working, the ones that aren't, and the forces shaping
-                what comes next.
+                The BlueTrail Intelligence Report exists to change that. We publish forward-looking, independently
+                produced coverage of commercial AI — the deployments that are working, the ones that aren't, and
+                the forces shaping what comes next.
               </p>
               <p>
                 We believe the most important AI stories aren't on the research preprint servers. They're in
@@ -74,9 +74,9 @@ export default function AboutPage() {
                 curious citizens — can't always pay for it.
               </p>
               <p>
-                SignalAI is and will remain free to read. Our coverage is editorially independent and
-                commercially supported. We do not accept paid placements or sponsored content that is presented
-                as editorial.
+                The BlueTrail Intelligence Report is and will remain free to read. Our coverage is editorially
+                independent and commercially supported. We do not accept paid placements or sponsored content
+                that is presented as editorial.
               </p>
             </div>
           </section>

@@ -215,7 +215,7 @@ function AuthorForm({
             onChange={(e) => form.setValue("isStaff", e.target.checked)}
           />
           <label htmlFor="isStaff" className="text-sm text-muted-foreground cursor-pointer">
-            Mark as SignalAI Staff author
+            Mark as BlueTrail Staff author
           </label>
         </div>
 

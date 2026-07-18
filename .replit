@@ -106,3 +106,12 @@ externalPort = 3000
 [[ports]]
 localPort = 23183
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+SITE_URL = "https://www.signalaiglobal.com"
+SITE_NAME = "BlueTrail Intelligence Report"
+SITE_PUBLISHER = "BlueTrail Intelligence Ltd."
+SITE_TAGLINE = "Blazing the AI trail ahead of the frontier"
+SITE_DESCRIPTION = "The BlueTrail Intelligence Report covers commercial AI: enterprise deployments, industry analysis, use cases, and the forces shaping what comes next."

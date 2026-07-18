@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { getBaseUrl } from "../lib/site";
+import { getBaseUrl, STAFF_BYLINE, LEGACY_STAFF_BYLINE } from "../lib/site";
 import { getPublishedArticleBySlug, resolveSeoPage } from "../lib/seoPage";
 import { renderArticleOgCard } from "../lib/articleOgCard";
 import { renderAgentHtml } from "../lib/agentRenderer";
@@ -28,7 +28,7 @@ router.get("/og/articles/:slug", async (req, res): Promise<void> => {
     res.status(304).end();
     return;
   }
-  const authorDisplayName = author?.name ?? (article.author !== "SignalAI Staff" ? article.author : undefined);
+  const authorDisplayName = author?.name ?? (article.author !== LEGACY_STAFF_BYLINE && article.author !== STAFF_BYLINE ? article.author : undefined);
   try {
     const png = await renderArticleOgCard(slug, cacheKey, {
       title: article.title,

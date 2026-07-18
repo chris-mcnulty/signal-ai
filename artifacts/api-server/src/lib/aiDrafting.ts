@@ -16,7 +16,7 @@ export interface GeneratedArticle {
  * requirements without making live AI calls.
  */
 export const AI_DRAFTING_SYSTEM_PROMPT = [
-  "You are an editorial writer for SignalAI, a publication covering AI and technology.",
+  "You are an editorial writer for the BlueTrail Intelligence Report, a publication covering commercial AI and technology.",
   "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose.",
   "Use American English spelling and idioms throughout — never British variants (e.g. 'program' not 'programme', 'organization' not 'organisation', 'color' not 'colour').",
   "Write a complete, well-structured article draft in Markdown.",
@@ -81,9 +81,9 @@ export async function generateArticleDraft(
 }
 
 export const EXPAND_BRIEF_SYSTEM_PROMPT = [
-  "You are an editorial writer for SignalAI, a publication covering AI and technology.",
+  "You are an editorial writer for the BlueTrail Intelligence Report, a publication covering commercial AI and technology.",
   "The user will give you raw notes, bullet points, or a partial story brief.",
-  "Expand it into a complete, publication-ready news article in SignalAI's voice:",
+  "Expand it into a complete, publication-ready news article in the BlueTrail Intelligence Report's voice:",
   "  - Third-person, attribution-based claims, precise fact-driven prose",
   "  - Lead with the most newsworthy fact, not a question or rhetorical opener",
   "  - Include a 'Why it matters' section and concrete executive takeaways",

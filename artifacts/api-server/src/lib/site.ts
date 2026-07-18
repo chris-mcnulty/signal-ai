@@ -1,11 +1,22 @@
 import type { Request } from "express";
 
 export const SITE = {
-  name: "SignalAI",
-  tagline: "Separating the signal from the AI noise",
+  name: process.env.SITE_NAME ?? "BlueTrail Intelligence Report",
+  publisher: process.env.SITE_PUBLISHER ?? "BlueTrail Intelligence Ltd.",
+  tagline:
+    process.env.SITE_TAGLINE ?? "Blazing the AI trail ahead of the frontier",
   description:
-    "SignalAI is a publication covering commercial AI: use cases, news, opinion, and company case studies.",
+    process.env.SITE_DESCRIPTION ??
+    "The BlueTrail Intelligence Report covers commercial AI: enterprise deployments, industry analysis, use cases, and the forces shaping what comes next.",
+  trademark:
+    "The BlueTrail Report is a trademark of BlueTrail Intelligence Ltd. \u00a9 2026 All rights reserved.",
 };
+
+/** Default byline for house/staff-authored articles. */
+export const STAFF_BYLINE = process.env.SITE_STAFF_BYLINE ?? "BlueTrail Staff";
+
+/** Legacy byline from the prior brand — kept for backward compat with existing DB rows. */
+export const LEGACY_STAFF_BYLINE = "SignalAI Staff";
 
 export function getPublicBaseUrl(): string | null {
   // Explicit canonical origin wins (e.g. a custom domain). Set SITE_URL when
