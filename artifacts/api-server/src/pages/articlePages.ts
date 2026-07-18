@@ -3,6 +3,7 @@ import { getBaseUrl } from "../lib/site";
 import { getPublishedArticleBySlug, resolveSeoPage } from "../lib/seoPage";
 import { renderArticleOgCard } from "../lib/articleOgCard";
 import { renderAgentHtml } from "../lib/agentRenderer";
+import { recordArticleView } from "../lib/articleViews";
 
 const router: IRouter = Router();
 
@@ -67,7 +68,10 @@ router.get("/articles/:slug", async (req, res): Promise<void> => {
   }
 
   const baseUrl = getBaseUrl(req);
-  const page = await resolveSeoPage(baseUrl, `/articles/${slug}`);
+  const [page, articleResult] = await Promise.all([
+    resolveSeoPage(baseUrl, `/articles/${slug}`),
+    getPublishedArticleBySlug(slug),
+  ]);
 
   if (page.status === "not_found") {
     res.status(404).send("Not found");
@@ -78,6 +82,10 @@ router.get("/articles/:slug", async (req, res): Promise<void> => {
   if (!html) {
     res.status(404).send("Not found");
     return;
+  }
+
+  if (articleResult) {
+    recordArticleView(req, articleResult.article.id);
   }
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
