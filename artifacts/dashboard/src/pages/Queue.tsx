@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "wouter";
+import { useState, useRef } from "react";
+import { Link, useLocation } from "wouter";
 import { format, formatDistanceToNow, isFuture } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -42,8 +42,13 @@ import {
   ChevronRight,
   Plus,
   Sparkles,
+  Upload,
+  ImageIcon,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const API_BASE = "/api";
 
 type TabValue = "all" | "scheduled" | ArticleStatus;
 
@@ -54,11 +59,30 @@ const STATUS_BORDER: Record<string, string> = {
   rejected: "bg-red-400",
 };
 
+type ImportPreview = {
+  _version: number;
+  title: string;
+  category: string;
+  slug: string;
+  imageUrl?: string | null;
+  heroImageUrl?: string | null;
+  authorName?: string | null;
+  [key: string]: unknown;
+};
+
 export default function Queue({ initialTab = "all" }: { initialTab?: TabValue }) {
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [rescheduleTarget, setRescheduleTarget] = useState<{ id: number; title: string } | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>();
+
+  const [importOpen, setImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<ImportPreview | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importLoading, setImportLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [, setLocation] = useLocation();
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -83,6 +107,79 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: getListDraftsQueryKey() });
     queryClient.invalidateQueries({ queryKey: getGetDraftsSummaryQueryKey() });
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportError(null);
+    setImportPreview(null);
+    setImportFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target?.result as string) as ImportPreview;
+        if (parsed._version !== 1) {
+          setImportError("Unsupported file format — expected _version: 1.");
+          return;
+        }
+        if (!parsed.title || !parsed.category || !parsed.slug) {
+          setImportError("File is missing required fields (title, category, slug).");
+          return;
+        }
+        setImportPreview(parsed);
+      } catch {
+        setImportError("Could not parse the file. Make sure it is a valid JSON export.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImportConfirm = async () => {
+    if (!importPreview || !importFile) return;
+    setImportLoading(true);
+    const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
+    try {
+      const reader = new FileReader();
+      const raw = await new Promise<string>((resolve, reject) => {
+        reader.onload = (ev) => resolve(ev.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsText(importFile);
+      });
+      const body = JSON.parse(raw);
+      const res = await fetch(`${API_BASE}/drafts/import`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        setImportError(err.error ?? "Import failed. Please try again.");
+        return;
+      }
+      const { id } = (await res.json()) as { id: number };
+      invalidate();
+      setImportOpen(false);
+      setImportFile(null);
+      setImportPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast({ title: "Article imported as a pending draft" });
+      setLocation(`/drafts/${id}`);
+    } catch {
+      setImportError("Import failed. Please check your connection and try again.");
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
+  const handleImportDialogClose = (open: boolean) => {
+    if (!open) {
+      setImportFile(null);
+      setImportPreview(null);
+      setImportError(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+    setImportOpen(open);
   };
 
   const handlePublishNow = (id: number) => {
@@ -149,6 +246,15 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 shrink-0"
+            onClick={() => setImportOpen(true)}
+          >
+            <Upload className="w-4 h-4" />
+            Import
+          </Button>
         </div>
       </div>
 
@@ -358,6 +464,96 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
               onClick={handleReschedule}
             >
               Confirm Reschedule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Article Dialog */}
+      <Dialog open={importOpen} onOpenChange={handleImportDialogClose}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Import article from JSON</DialogTitle>
+            <DialogDescription>
+              Select a <code className="text-xs bg-muted px-1 rounded">.json</code> file exported from this or another environment. The article will be created as a <strong>pending draft</strong> — it will never be published automatically.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-2 flex flex-col gap-4">
+            {/* File picker */}
+            <div
+              className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="w-6 h-6 text-muted-foreground" />
+              <p className="text-sm font-medium">
+                {importFile ? importFile.name : "Click to choose a JSON file"}
+              </p>
+              {!importFile && (
+                <p className="text-xs text-muted-foreground">Only files exported from this system are supported</p>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                className="hidden"
+                onChange={handleFileSelect}
+              />
+            </div>
+
+            {/* Parse error */}
+            {importError && (
+              <div className="flex items-start gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2.5 text-sm text-destructive">
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{importError}</span>
+              </div>
+            )}
+
+            {/* Preview */}
+            {importPreview && !importError && (
+              <div className="rounded-xl border border-border bg-muted/30 p-4 flex flex-col gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Preview</p>
+                <p className="font-semibold text-base leading-snug">{importPreview.title}</p>
+                <p className="text-xs text-muted-foreground">
+                  Category: <span className="font-mono bg-muted px-1 rounded">{importPreview.category}</span>
+                  {importPreview.authorName && (
+                    <> · Author: <span className="font-medium">{importPreview.authorName}</span></>
+                  )}
+                </p>
+
+                {/* Image advisory note */}
+                {(importPreview.imageUrl || importPreview.heroImageUrl) && (
+                  <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-800 dark:text-amber-300 mt-1">
+                    <ImageIcon className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <span>
+                      This article has images. They point to the source environment and will need to be replaced after importing.
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => handleImportDialogClose(false)} disabled={importLoading}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!importPreview || !!importError || importLoading}
+              onClick={handleImportConfirm}
+              className="gap-2"
+            >
+              {importLoading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Importing…
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Import as draft
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2 } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -263,6 +263,30 @@ export default function DraftEditor() {
     });
   };
 
+  const handleExport = async () => {
+    if (!draftId) return;
+    const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
+    try {
+      const res = await fetch(`${API_BASE}/drafts/${draftId}/export`, {
+        headers: { "x-api-key": apiKey },
+      });
+      if (!res.ok) throw new Error("Export failed");
+      const blob = await res.blob();
+      const slug = draft?.slug ?? `draft-${draftId}`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${slug}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast({ title: "Draft exported as JSON" });
+    } catch {
+      toast({ title: "Export failed. Try again.", variant: "destructive" });
+    }
+  };
+
   const handleExpandBrief = () => {
     const brief = form.getValues("body");
     const category = form.getValues("category") || undefined;
@@ -451,6 +475,18 @@ export default function DraftEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {!isNew && draftId && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              className="gap-2 text-muted-foreground"
+              title="Download this article as a JSON file"
+            >
+              <Download className="w-4 h-4" />
+              Export JSON
+            </Button>
+          )}
           <Button 
             onClick={form.handleSubmit(onSave)}
             disabled={createMutation.isPending || updateMutation.isPending}

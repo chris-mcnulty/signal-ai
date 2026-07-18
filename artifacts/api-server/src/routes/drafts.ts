@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql, ilike } from "drizzle-orm";
+import { z } from "zod/v4";
 import { db, articlesTable, authorsTable, caseStudiesTable, libraryImagesTable } from "@workspace/db";
 import {
   ListDraftsQueryParams,
@@ -228,6 +229,125 @@ router.post("/drafts", async (req, res): Promise<void> => {
   res.status(201).json(CreateDraftResponse.parse(article));
 });
 
+// ── Import / Export ──────────────────────────────────────────────────────────
+
+const ImportArticleBody = z.object({
+  _version: z.literal(1),
+  slug: z.string().min(1),
+  title: z.string().min(1),
+  dek: z.string().nullish(),
+  body: z.string().min(1),
+  category: z.string().min(1),
+  author: z.string().nullish(),
+  imageUrl: z.string().nullish(),
+  heroImageUrl: z.string().nullish(),
+  readingMinutes: z.number().int().optional(),
+  seoTitle: z.string().nullish(),
+  seoDescription: z.string().nullish(),
+  sourceUrls: z.array(z.string()).nullish(),
+  authorName: z.string().nullish(),
+  caseStudy: z
+    .object({
+      companyName: z.string(),
+      companyWebsite: z.string(),
+      industry: z.string(),
+      companySize: z.string(),
+      headquarters: z.string(),
+      companySummary: z.string(),
+      metrics: z
+        .array(z.object({ label: z.string(), value: z.string(), context: z.string() }))
+        .optional()
+        .default([]),
+      quotes: z
+        .array(z.object({ quote: z.string(), attribution: z.string(), role: z.string() }))
+        .optional()
+        .default([]),
+    })
+    .nullish(),
+});
+
+router.post("/drafts/import", async (req, res): Promise<void> => {
+  const parsed = ImportArticleBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: `Invalid import payload: ${parsed.error.message}` });
+    return;
+  }
+  const data = parsed.data;
+
+  // Resolve a unique slug from the exported slug
+  const baseSlug = data.slug;
+  let candidate = baseSlug;
+  let i = 2;
+  for (;;) {
+    const [existing] = await db
+      .select({ id: articlesTable.id })
+      .from(articlesTable)
+      .where(eq(articlesTable.slug, candidate));
+    if (!existing) break;
+    candidate = `${baseSlug}-${i}`;
+    i += 1;
+  }
+
+  // Match author by name; fall back to the plain-text author column
+  let resolvedAuthorId: number | null = null;
+  let resolvedAuthorText = data.author ?? "SignalAI Staff";
+  if (data.authorName) {
+    const [matchedAuthor] = await db
+      .select({ id: authorsTable.id, name: authorsTable.name })
+      .from(authorsTable)
+      .where(ilike(authorsTable.name, data.authorName))
+      .limit(1);
+    if (matchedAuthor) {
+      resolvedAuthorId = matchedAuthor.id;
+      resolvedAuthorText = matchedAuthor.name;
+    }
+  }
+
+  const category = normalizeCategory(data.category);
+
+  const [article] = await db
+    .insert(articlesTable)
+    .values({
+      slug: candidate,
+      title: data.title,
+      dek: data.dek ?? "",
+      body: data.body,
+      category,
+      author: resolvedAuthorText,
+      authorId: resolvedAuthorId,
+      imageUrl: data.imageUrl ?? null,
+      heroImageUrl: data.heroImageUrl ?? null,
+      readingMinutes: data.readingMinutes ?? 5,
+      seoTitle: data.seoTitle ?? null,
+      seoDescription: data.seoDescription ?? null,
+      sourceUrls: data.sourceUrls ?? null,
+      status: "pending",
+      source: "manual",
+    })
+    .returning();
+
+  if (data.caseStudy && category === CASE_STUDY_CATEGORY) {
+    await db.insert(caseStudiesTable).values({
+      articleId: article.id,
+      companyName: data.caseStudy.companyName,
+      companyWebsite: data.caseStudy.companyWebsite,
+      industry: data.caseStudy.industry,
+      companySize: data.caseStudy.companySize,
+      headquarters: data.caseStudy.headquarters,
+      companySummary: data.caseStudy.companySummary,
+      metrics: data.caseStudy.metrics,
+      quotes: data.caseStudy.quotes,
+    });
+  } else if (category === CASE_STUDY_CATEGORY) {
+    await db
+      .insert(caseStudiesTable)
+      .values({ articleId: article.id, companyName: "", companyWebsite: "", industry: "", companySize: "", headquarters: "", companySummary: "" })
+      .onConflictDoNothing();
+  }
+
+  res.status(201).json({ id: article.id, slug: article.slug });
+});
+
 router.get("/drafts/summary", async (_req, res): Promise<void> => {
   await promoteDueArticles();
   const rows = await db
@@ -268,6 +388,68 @@ router.get("/drafts/:id", async (req, res): Promise<void> => {
     return;
   }
   res.json(GetDraftResponse.parse({ ...row.articles, authorProfile: row.authors ?? null }));
+});
+
+router.get("/drafts/:id/export", async (req, res): Promise<void> => {
+  const params = GetDraftParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const [row] = await db
+    .select()
+    .from(articlesTable)
+    .leftJoin(authorsTable, eq(articlesTable.authorId, authorsTable.id))
+    .where(eq(articlesTable.id, params.data.id));
+  if (!row) {
+    res.status(404).json({ error: "Draft not found" });
+    return;
+  }
+  const article = row.articles;
+  const authorRecord = row.authors ?? null;
+
+  let caseStudyPayload = null;
+  if (article.category === CASE_STUDY_CATEGORY) {
+    const [cs] = await db
+      .select()
+      .from(caseStudiesTable)
+      .where(eq(caseStudiesTable.articleId, article.id));
+    if (cs) {
+      caseStudyPayload = {
+        companyName: cs.companyName,
+        companyWebsite: cs.companyWebsite,
+        industry: cs.industry,
+        companySize: cs.companySize,
+        headquarters: cs.headquarters,
+        companySummary: cs.companySummary,
+        metrics: cs.metrics,
+        quotes: cs.quotes,
+      };
+    }
+  }
+
+  const payload = {
+    _version: 1,
+    slug: article.slug,
+    title: article.title,
+    dek: article.dek ?? null,
+    body: article.body,
+    category: article.category,
+    author: article.author,
+    imageUrl: article.imageUrl ?? null,
+    heroImageUrl: article.heroImageUrl ?? null,
+    readingMinutes: article.readingMinutes,
+    seoTitle: article.seoTitle ?? null,
+    seoDescription: article.seoDescription ?? null,
+    sourceUrls: article.sourceUrls ?? null,
+    authorName: authorRecord?.name ?? null,
+    caseStudy: caseStudyPayload,
+  };
+
+  const filename = `${article.slug}.json`;
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.setHeader("Content-Type", "application/json");
+  res.json(payload);
 });
 
 router.patch("/drafts/:id", async (req, res): Promise<void> => {
