@@ -71,6 +71,12 @@ import type {
   SeoSubmitBundle,
   SeoSubmitRequest,
   SocialVariant,
+  SpotlightDetail,
+  SpotlightEditorData,
+  SpotlightEditorInput,
+  SpotlightImportRequest,
+  SpotlightImportResult,
+  SpotlightSummary,
   SubmitDraftRequest
 } from './api.schemas';
 
@@ -493,6 +499,380 @@ export function useGetCaseStudy<TData = Awaited<ReturnType<typeof getCaseStudy>>
 
 
 
+
+export const getListSpotlightsUrl = () => {
+
+
+
+
+  return `/api/spotlights`
+}
+
+/**
+ * @summary List all published spotlight articles
+ */
+export const listSpotlights = async ( options?: RequestInit): Promise<SpotlightSummary[]> => {
+
+  return customFetch<SpotlightSummary[]>(getListSpotlightsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSpotlightsQueryKey = () => {
+    return [
+    `/api/spotlights`
+    ] as const;
+    }
+
+
+export const getListSpotlightsQueryOptions = <TData = Awaited<ReturnType<typeof listSpotlights>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSpotlights>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSpotlightsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSpotlights>>> = ({ signal }) => listSpotlights({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSpotlights>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSpotlightsQueryResult = NonNullable<Awaited<ReturnType<typeof listSpotlights>>>
+export type ListSpotlightsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List all published spotlight articles
+ */
+
+export function useListSpotlights<TData = Awaited<ReturnType<typeof listSpotlights>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSpotlights>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSpotlightsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetSpotlightUrl = (slug: string,) => {
+
+
+
+
+  return `/api/spotlights/${slug}`
+}
+
+/**
+ * @summary Get a spotlight by slug
+ */
+export const getSpotlight = async (slug: string, options?: RequestInit): Promise<SpotlightDetail> => {
+
+  return customFetch<SpotlightDetail>(getGetSpotlightUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSpotlightQueryKey = (slug: string,) => {
+    return [
+    `/api/spotlights/${slug}`
+    ] as const;
+    }
+
+
+export const getGetSpotlightQueryOptions = <TData = Awaited<ReturnType<typeof getSpotlight>>, TError = ErrorType<ErrorResponse>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSpotlight>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSpotlightQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSpotlight>>> = ({ signal }) => getSpotlight(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSpotlight>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSpotlightQueryResult = NonNullable<Awaited<ReturnType<typeof getSpotlight>>>
+export type GetSpotlightQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a spotlight by slug
+ */
+
+export function useGetSpotlight<TData = Awaited<ReturnType<typeof getSpotlight>>, TError = ErrorType<ErrorResponse>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSpotlight>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSpotlightQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getImportSpotlightUrlUrl = () => {
+
+
+
+
+  return `/api/spotlights/import-url`
+}
+
+/**
+ * @summary Scrape a company URL and return pre-filled spotlight metadata
+ */
+export const importSpotlightUrl = async (spotlightImportRequest: SpotlightImportRequest, options?: RequestInit): Promise<SpotlightImportResult> => {
+
+  return customFetch<SpotlightImportResult>(getImportSpotlightUrlUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(spotlightImportRequest)
+  }
+);}
+
+
+
+
+
+export const getImportSpotlightUrlMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importSpotlightUrl>>, TError,{data: BodyType<SpotlightImportRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof importSpotlightUrl>>, TError,{data: BodyType<SpotlightImportRequest>}, TContext> => {
+
+const mutationKey = ['importSpotlightUrl'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importSpotlightUrl>>, {data: BodyType<SpotlightImportRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  importSpotlightUrl(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ImportSpotlightUrlMutationResult = NonNullable<Awaited<ReturnType<typeof importSpotlightUrl>>>
+    export type ImportSpotlightUrlMutationBody = BodyType<SpotlightImportRequest>
+    export type ImportSpotlightUrlMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Scrape a company URL and return pre-filled spotlight metadata
+ */
+export const useImportSpotlightUrl = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importSpotlightUrl>>, TError,{data: BodyType<SpotlightImportRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof importSpotlightUrl>>,
+        TError,
+        {data: BodyType<SpotlightImportRequest>},
+        TContext
+      > => {
+      return useMutation(getImportSpotlightUrlMutationOptions(options));
+    }
+
+export const getGetDraftSpotlightUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/spotlight`
+}
+
+/**
+ * @summary Get spotlight metadata for a draft article
+ */
+export const getDraftSpotlight = async (id: number, options?: RequestInit): Promise<SpotlightEditorData> => {
+
+  return customFetch<SpotlightEditorData>(getGetDraftSpotlightUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDraftSpotlightQueryKey = (id: number,) => {
+    return [
+    `/api/drafts/${id}/spotlight`
+    ] as const;
+    }
+
+
+export const getGetDraftSpotlightQueryOptions = <TData = Awaited<ReturnType<typeof getDraftSpotlight>>, TError = ErrorType<ErrorMessage>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDraftSpotlight>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDraftSpotlightQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDraftSpotlight>>> = ({ signal }) => getDraftSpotlight(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDraftSpotlight>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDraftSpotlightQueryResult = NonNullable<Awaited<ReturnType<typeof getDraftSpotlight>>>
+export type GetDraftSpotlightQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Get spotlight metadata for a draft article
+ */
+
+export function useGetDraftSpotlight<TData = Awaited<ReturnType<typeof getDraftSpotlight>>, TError = ErrorType<ErrorMessage>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDraftSpotlight>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDraftSpotlightQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpsertDraftSpotlightUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/spotlight`
+}
+
+/**
+ * @summary Save spotlight metadata for a draft article
+ */
+export const upsertDraftSpotlight = async (id: number,
+    spotlightEditorInput: SpotlightEditorInput, options?: RequestInit): Promise<SpotlightEditorData> => {
+
+  return customFetch<SpotlightEditorData>(getUpsertDraftSpotlightUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(spotlightEditorInput)
+  }
+);}
+
+
+
+
+
+export const getUpsertDraftSpotlightMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertDraftSpotlight>>, TError,{id: number;data: BodyType<SpotlightEditorInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertDraftSpotlight>>, TError,{id: number;data: BodyType<SpotlightEditorInput>}, TContext> => {
+
+const mutationKey = ['upsertDraftSpotlight'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertDraftSpotlight>>, {id: number;data: BodyType<SpotlightEditorInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  upsertDraftSpotlight(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertDraftSpotlightMutationResult = NonNullable<Awaited<ReturnType<typeof upsertDraftSpotlight>>>
+    export type UpsertDraftSpotlightMutationBody = BodyType<SpotlightEditorInput>
+    export type UpsertDraftSpotlightMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Save spotlight metadata for a draft article
+ */
+export const useUpsertDraftSpotlight = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertDraftSpotlight>>, TError,{id: number;data: BodyType<SpotlightEditorInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof upsertDraftSpotlight>>,
+        TError,
+        {id: number;data: BodyType<SpotlightEditorInput>},
+        TContext
+      > => {
+      return useMutation(getUpsertDraftSpotlightMutationOptions(options));
+    }
 
 export const getSubmitDraftUrl = () => {
 

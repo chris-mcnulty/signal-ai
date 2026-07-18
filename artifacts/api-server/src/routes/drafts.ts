@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { desc, eq, sql, ilike } from "drizzle-orm";
 import { z } from "zod/v4";
-import { db, articlesTable, authorsTable, caseStudiesTable, libraryImagesTable } from "@workspace/db";
+import { db, articlesTable, authorsTable, caseStudiesTable, spotlightsTable, libraryImagesTable } from "@workspace/db";
 import {
   ListDraftsQueryParams,
   ListDraftsResponse,
@@ -32,7 +32,7 @@ import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { requireEditor } from "../middlewares/requireEditor";
 import { rateLimit } from "../middlewares/rateLimit";
 import { promoteDueArticles, uniqueSlug } from "../lib/articles";
-import { normalizeCategory, CASE_STUDY_CATEGORY } from "../lib/content";
+import { normalizeCategory, CASE_STUDY_CATEGORY, SPOTLIGHT_CATEGORY } from "../lib/content";
 import {
   GetDraftCaseStudyParams,
   GetDraftCaseStudyResponse,
@@ -224,6 +224,12 @@ router.post("/drafts", async (req, res): Promise<void> => {
     await db
       .insert(caseStudiesTable)
       .values({ articleId: article.id, companyName: "", companyWebsite: "", industry: "", companySize: "", headquarters: "", companySummary: "" })
+      .onConflictDoNothing();
+  }
+  if (category === SPOTLIGHT_CATEGORY) {
+    await db
+      .insert(spotlightsTable)
+      .values({ articleId: article.id })
       .onConflictDoNothing();
   }
   res.status(201).json(CreateDraftResponse.parse(article));
@@ -481,6 +487,12 @@ router.patch("/drafts/:id", async (req, res): Promise<void> => {
     await db
       .insert(caseStudiesTable)
       .values({ articleId: article.id, companyName: "", companyWebsite: "", industry: "", companySize: "", headquarters: "", companySummary: "" })
+      .onConflictDoNothing();
+  }
+  if (article.category === SPOTLIGHT_CATEGORY) {
+    await db
+      .insert(spotlightsTable)
+      .values({ articleId: article.id })
       .onConflictDoNothing();
   }
   res.json(UpdateDraftResponse.parse(article));

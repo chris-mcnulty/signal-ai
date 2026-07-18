@@ -8,6 +8,8 @@ import Home from "@/pages/home";
 import Article from "@/pages/article";
 import CaseStudies from "@/pages/case-studies";
 import CaseStudy from "@/pages/case-study";
+import SpotlightsList from "@/pages/spotlights";
+import SpotlightDetail from "@/pages/spotlight";
 import News from "@/pages/news";
 import UseCases from "@/pages/use-cases";
 import Opinion from "@/pages/opinion";
@@ -30,6 +32,8 @@ function Router() {
       <Route path="/articles/:slug" component={Article} />
       <Route path="/case-studies" component={CaseStudies} />
       <Route path="/case-studies/:slug" component={CaseStudy} />
+      <Route path="/spotlights" component={SpotlightsList} />
+      <Route path="/spotlights/:slug" component={SpotlightDetail} />
       <Route path="/news" component={News} />
       <Route path="/use-cases" component={UseCases} />
       <Route path="/opinion" component={Opinion} />

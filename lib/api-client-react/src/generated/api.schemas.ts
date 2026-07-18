@@ -199,6 +199,74 @@ export interface CaseStudyEditorData {
   quotes: CaseStudyQuote[];
 }
 
+export interface SpotlightCompany {
+  name: string;
+  website: string;
+  industry: string;
+  logoUrl?: string | null;
+  blurb: string;
+}
+
+export interface SpotlightSummary {
+  id: number;
+  slug: string;
+  title: string;
+  dek: string;
+  author: string;
+  readingMinutes: number;
+  publishedAt: string;
+  heroImageUrl?: string | null;
+  imageUrl?: string | null;
+  company: SpotlightCompany;
+}
+
+export interface SpotlightDetail {
+  id: number;
+  slug: string;
+  title: string;
+  dek: string;
+  body: string;
+  author: string;
+  authorProfile?: AuthorProfile | null;
+  readingMinutes: number;
+  publishedAt: string;
+  updatedAt: string;
+  heroImageUrl?: string | null;
+  sourceUrls?: string[] | null;
+  company: SpotlightCompany;
+}
+
+export interface SpotlightEditorInput {
+  companyName: string;
+  companyWebsite: string;
+  industry: string;
+  companyLogoUrl?: string | null;
+  companyBlurb: string;
+}
+
+export interface SpotlightEditorData {
+  articleId: number;
+  exists: boolean;
+  companyName: string;
+  companyWebsite: string;
+  industry: string;
+  companyLogoUrl?: string | null;
+  companyBlurb: string;
+}
+
+export interface SpotlightImportRequest {
+  /** URL of the company or product page to scrape */
+  url: string;
+}
+
+export interface SpotlightImportResult {
+  companyName: string;
+  companyWebsite: string;
+  industry: string;
+  companyLogoUrl: string | null;
+  companyBlurb: string;
+}
+
 export type ArticleStatus = typeof ArticleStatus[keyof typeof ArticleStatus];
 
 

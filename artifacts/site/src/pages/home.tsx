@@ -4,6 +4,12 @@ import { ChevronRight } from 'lucide-react';
 import { useListArticles } from '@workspace/api-client-react';
 import { Layout, Header, Footer } from '@/components/layout';
 
+function articleHref(article: { slug: string; category: string }) {
+  if (article.category === 'spotlight') return `/spotlights/${article.slug}`;
+  if (article.category === 'case-study') return `/case-studies/${article.slug}`;
+  return `/articles/${article.slug}`;
+}
+
 function LeadSkeleton() {
   return (
     <div className="space-y-5">
@@ -70,6 +76,9 @@ export default function Home() {
           <Link href="/case-studies" className="hover-dim cursor-pointer text-accent font-bold transition-colors">
             Case Studies
           </Link>
+          <Link href="/spotlights" className="hover-dim cursor-pointer text-accent font-bold transition-colors">
+            Spotlights
+          </Link>
         </div>
         <div className="shrink-0 flex items-center gap-4">
           <a
@@ -95,7 +104,7 @@ export default function Home() {
               <LeadSkeleton />
             ) : leadStory ? (
               <Link
-                href={`/articles/${leadStory.slug}`}
+                href={articleHref(leadStory)}
                 className="block group article-card"
                 data-testid={`link-article-${leadStory.slug}`}
               >
@@ -103,7 +112,7 @@ export default function Home() {
                   {/* Eyebrow + rule */}
                   <div className="flex items-center gap-3 mb-4">
                     <span className="card-category font-mono text-xs font-bold uppercase tracking-widest text-accent border border-accent px-2 py-1">
-                      {leadStory.category}
+                      {leadStory.category === 'spotlight' ? 'Spotlight' : leadStory.category}
                     </span>
                     <span className="font-mono text-xs text-news-secondary uppercase">
                       {leadStory.readingMinutes} min read
@@ -163,7 +172,7 @@ export default function Home() {
               sidebarStories.map((story, i) => (
                 <Link
                   key={story.id}
-                  href={`/articles/${story.slug}`}
+                  href={articleHref(story)}
                   className="block group article-card sidebar-story"
                   data-testid={`link-sidebar-${story.slug}`}
                 >

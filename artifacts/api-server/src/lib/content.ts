@@ -1,9 +1,10 @@
-import { db, articlesTable, caseStudiesTable, articleRelationsTable, authorsTable } from "@workspace/db";
-import type { Article, CaseStudy, Author } from "@workspace/db";
+import { db, articlesTable, caseStudiesTable, spotlightsTable, articleRelationsTable, authorsTable } from "@workspace/db";
+import type { Article, CaseStudy, Spotlight, Author } from "@workspace/db";
 import { desc, eq, and, inArray, or, ilike, sql } from "drizzle-orm";
 import { promoteDueArticles } from "./articles";
 
 export const CASE_STUDY_CATEGORY = "case-study";
+export const SPOTLIGHT_CATEGORY = "spotlight";
 
 /**
  * Normalize a free-text category into its canonical slug form so filtering
@@ -245,5 +246,70 @@ export function toCaseStudyCompany(caseStudy: CaseStudy) {
     size: caseStudy.companySize,
     headquarters: caseStudy.headquarters,
     summary: caseStudy.companySummary,
+  };
+}
+
+// ── Spotlight helpers ────────────────────────────────────────────────────────
+
+export type SpotlightWithArticle = {
+  article: ArticleWithAuthor;
+  spotlight: Spotlight;
+};
+
+export async function listSpotlightsWithArticles(): Promise<SpotlightWithArticle[]> {
+  await promoteDueArticles();
+  const rows = await db
+    .select()
+    .from(spotlightsTable)
+    .innerJoin(articlesTable, eq(spotlightsTable.articleId, articlesTable.id))
+    .where(
+      and(
+        eq(articlesTable.status, "published"),
+        eq(articlesTable.category, SPOTLIGHT_CATEGORY),
+        sql`${spotlightsTable.companyName} != ''`,
+      ),
+    )
+    .orderBy(desc(articlesTable.publishedAt));
+  const articles = rows.map((r) => r.articles);
+  const withAuthors = await attachAuthors(articles);
+  const authorMap = new Map(withAuthors.map((a) => [a.id, a]));
+  return rows.map((row) => ({
+    article: authorMap.get(row.articles.id)!,
+    spotlight: row.spotlights,
+  }));
+}
+
+export async function getSpotlightBySlug(
+  slug: string,
+): Promise<SpotlightWithArticle | null> {
+  await promoteDueArticles();
+  const rows = await db
+    .select()
+    .from(spotlightsTable)
+    .innerJoin(articlesTable, eq(spotlightsTable.articleId, articlesTable.id))
+    .where(
+      and(
+        eq(articlesTable.slug, slug),
+        eq(articlesTable.status, "published"),
+        eq(articlesTable.category, SPOTLIGHT_CATEGORY),
+      ),
+    )
+    .limit(1);
+  const row = rows[0];
+  if (!row) return null;
+  const articleWithAuthor = await attachAuthor(row.articles);
+  return {
+    article: articleWithAuthor,
+    spotlight: row.spotlights,
+  };
+}
+
+export function toSpotlightCompany(spotlight: Spotlight) {
+  return {
+    name: spotlight.companyName,
+    website: spotlight.companyWebsite,
+    industry: spotlight.industry,
+    logoUrl: spotlight.companyLogoUrl ?? null,
+    blurb: spotlight.companyBlurb,
   };
 }

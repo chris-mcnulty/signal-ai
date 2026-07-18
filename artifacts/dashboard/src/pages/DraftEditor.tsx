@@ -47,6 +47,8 @@ import {
   useUnpublishDraft,
   useExpandBrief,
   useFindDraftCitations,
+  useImportSpotlightUrl,
+  useUpsertDraftSpotlight,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListDraftsQueryKey, getGetDraftsSummaryQueryKey } from "@workspace/api-client-react";
@@ -72,6 +74,7 @@ import {
 } from "@/components/ui/dialog";
 import { DraftEnginePanel } from "@/components/DraftEnginePanel";
 import { CaseStudyPanel } from "@/components/CaseStudyPanel";
+import { SpotlightPanel } from "@/components/SpotlightPanel";
 import {
   Select,
   SelectContent,
@@ -88,6 +91,7 @@ const API_BASE = "/api";
 const CATEGORY_OPTIONS = [
   { value: "news", label: "News" },
   { value: "case-study", label: "Case Study" },
+  { value: "spotlight", label: "Spotlight" },
   { value: "opinion", label: "Opinion" },
   { value: "use-cases", label: "Use Cases" },
 ];
@@ -128,6 +132,10 @@ export default function DraftEditor() {
   const unpublishMutation = useUnpublishDraft();
   const expandBriefMutation = useExpandBrief();
   const findCitationsMutation = useFindDraftCitations();
+  const importSpotlightUrlMutation = useImportSpotlightUrl();
+  const upsertDraftSpotlightMutation = useUpsertDraftSpotlight();
+
+  const [spotlightImportUrl, setSpotlightImportUrl] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -183,7 +191,23 @@ export default function DraftEditor() {
               toast({ title: "Draft created successfully" });
               queryClient.invalidateQueries({ queryKey: getListDraftsQueryKey() });
               queryClient.invalidateQueries({ queryKey: getGetDraftsSummaryQueryKey() });
-              setLocation(`/drafts/${newDraft.id}`);
+              const redirectToNew = () => setLocation(`/drafts/${newDraft.id}`);
+              if (data.category === "spotlight" && spotlightImportUrl.trim()) {
+                importSpotlightUrlMutation.mutate(
+                  { data: { url: spotlightImportUrl.trim() } },
+                  {
+                    onSuccess: (imported) => {
+                      upsertDraftSpotlightMutation.mutate(
+                        { id: newDraft.id, data: { companyName: imported.companyName, companyWebsite: imported.companyWebsite, industry: imported.industry, companyLogoUrl: imported.companyLogoUrl ?? null, companyBlurb: imported.companyBlurb } },
+                        { onSettled: redirectToNew }
+                      );
+                    },
+                    onError: redirectToNew,
+                  }
+                );
+              } else {
+                redirectToNew();
+              }
             },
             onError: () => toast({ title: "Failed to create draft", variant: "destructive" }),
           }
@@ -548,6 +572,23 @@ export default function DraftEditor() {
                   )}
                 />
 
+                {isNew && form.watch("category") === "spotlight" && (
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-medium">Company URL <span className="text-muted-foreground font-normal">(optional — pre-fills spotlight details on save)</span></label>
+                    <div className="flex gap-2 mt-1.5">
+                      <div className="relative flex-1">
+                        <Globe className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                        <Input
+                          value={spotlightImportUrl}
+                          onChange={(e) => setSpotlightImportUrl(e.target.value)}
+                          placeholder="https://company.com"
+                          className="pl-8 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <FormField
                   control={form.control}
                   name="authorId"
@@ -882,6 +923,12 @@ export default function DraftEditor() {
           {!isNew && draftId && form.watch("category") === "case-study" && (
             <div className="mt-6">
               <CaseStudyPanel draftId={draftId} />
+            </div>
+          )}
+
+          {!isNew && draftId && form.watch("category") === "spotlight" && (
+            <div className="mt-6">
+              <SpotlightPanel draftId={draftId} />
             </div>
           )}
         </div>

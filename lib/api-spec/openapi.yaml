@@ -22,6 +22,8 @@ tags:
     description: Research and content generation engine (voice, research, ideation, copywriting, repurposing, SEO)
   - name: analytics
     description: First-party traffic analytics — page views per article, daily series, referrer breakdown
+  - name: spotlights
+    description: Company and product spotlight articles
 paths:
   /healthz:
     get:
@@ -124,6 +126,145 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /spotlights:
+    get:
+      operationId: listSpotlights
+      tags: [spotlights]
+      summary: List all published spotlight articles
+      responses:
+        "200":
+          description: List of spotlights
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpotlightSummary"
+  /spotlights/{slug}:
+    get:
+      operationId: getSpotlight
+      tags: [spotlights]
+      summary: Get a spotlight by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Spotlight detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpotlightDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /spotlights/import-url:
+    post:
+      operationId: importSpotlightUrl
+      tags: [spotlights]
+      summary: Scrape a company URL and return pre-filled spotlight metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpotlightImportRequest"
+      responses:
+        "200":
+          description: Pre-filled spotlight metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpotlightImportResult"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/spotlight:
+    get:
+      operationId: getDraftSpotlight
+      tags: [spotlights]
+      summary: Get spotlight metadata for a draft article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Spotlight editor data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpotlightEditorData"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Draft not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+    put:
+      operationId: upsertDraftSpotlight
+      tags: [spotlights]
+      summary: Save spotlight metadata for a draft article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpotlightEditorInput"
+      responses:
+        "200":
+          description: Saved spotlight metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpotlightEditorData"
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Draft not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
   /drafts/submit:
     post:
       operationId: submitDraft
@@ -1889,6 +2030,141 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CaseStudyQuote"
+    SpotlightCompany:
+      type: object
+      required: [name, website, industry, blurb]
+      properties:
+        name:
+          type: string
+        website:
+          type: string
+        industry:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+        blurb:
+          type: string
+    SpotlightSummary:
+      type: object
+      required: [id, slug, title, dek, author, readingMinutes, publishedAt, company]
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        dek:
+          type: string
+        author:
+          type: string
+        readingMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        heroImageUrl:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        company:
+          $ref: "#/components/schemas/SpotlightCompany"
+    SpotlightDetail:
+      type: object
+      required: [id, slug, title, dek, body, author, readingMinutes, publishedAt, updatedAt, company]
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        dek:
+          type: string
+        body:
+          type: string
+        author:
+          type: string
+        authorProfile:
+          $ref: "#/components/schemas/AuthorProfile"
+          nullable: true
+        readingMinutes:
+          type: integer
+        publishedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        heroImageUrl:
+          type: string
+          nullable: true
+        sourceUrls:
+          type: array
+          nullable: true
+          items:
+            type: string
+        company:
+          $ref: "#/components/schemas/SpotlightCompany"
+    SpotlightEditorInput:
+      type: object
+      required: [companyName, companyWebsite, industry, companyBlurb]
+      properties:
+        companyName:
+          type: string
+        companyWebsite:
+          type: string
+        industry:
+          type: string
+        companyLogoUrl:
+          type: string
+          nullable: true
+        companyBlurb:
+          type: string
+    SpotlightEditorData:
+      type: object
+      required: [articleId, exists, companyName, companyWebsite, industry, companyBlurb]
+      properties:
+        articleId:
+          type: integer
+        exists:
+          type: boolean
+        companyName:
+          type: string
+        companyWebsite:
+          type: string
+        industry:
+          type: string
+        companyLogoUrl:
+          type: string
+          nullable: true
+        companyBlurb:
+          type: string
+    SpotlightImportRequest:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: URL of the company or product page to scrape
+    SpotlightImportResult:
+      type: object
+      required: [companyName, companyWebsite, industry, companyLogoUrl, companyBlurb]
+      properties:
+        companyName:
+          type: string
+        companyWebsite:
+          type: string
+        industry:
+          type: string
+        companyLogoUrl:
+          type: string
+          nullable: true
+        companyBlurb:
+          type: string
     Article:
       type: object
       required:

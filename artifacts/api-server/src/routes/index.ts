@@ -11,6 +11,7 @@ import libraryRouter from "./library";
 import imagesRouter from "./images";
 import adminRouter from "./admin";
 import analyticsRouter from "./analytics";
+import spotlightsRouter from "./spotlights";
 
 const router: IRouter = Router();
 
@@ -19,6 +20,7 @@ router.use(authRouter);
 router.use(adminRouter);
 router.use(analyticsRouter);
 router.use(contentRouter);
+router.use(spotlightsRouter);
 router.use(articlesRouter);
 router.use(authorsRouter);
 router.use(engineRouter);

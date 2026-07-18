@@ -2,7 +2,7 @@ import { db, articlesTable } from "@workspace/db";
 import type { SQL } from "drizzle-orm";
 import { eq, desc } from "drizzle-orm";
 import { promoteDueArticles } from "./articles";
-import { CASE_STUDY_CATEGORY } from "./content";
+import { CASE_STUDY_CATEGORY, SPOTLIGHT_CATEGORY } from "./content";
 
 // #SEO: the ONE shared visibility predicate. Every SEO surface — sitemap,
 // llms.txt, audit, coverage scan, bot prerendering — must derive its notion
@@ -17,7 +17,7 @@ export function publishedArticleFilter(): SQL {
   return eq(articlesTable.status, "published");
 }
 
-export type SeoPageKind = "home" | "hub" | "article" | "case-study";
+export type SeoPageKind = "home" | "hub" | "article" | "case-study" | "spotlight";
 
 export interface SeoPage {
   /** Root-relative path, e.g. "/case-studies/acme". */
@@ -34,9 +34,9 @@ export function pathForArticle(article: {
   slug: string;
   category: string | null;
 }): string {
-  return article.category === CASE_STUDY_CATEGORY
-    ? `/case-studies/${article.slug}`
-    : `/articles/${article.slug}`;
+  if (article.category === CASE_STUDY_CATEGORY) return `/case-studies/${article.slug}`;
+  if (article.category === SPOTLIGHT_CATEGORY) return `/spotlights/${article.slug}`;
+  return `/articles/${article.slug}`;
 }
 
 /**
@@ -74,11 +74,24 @@ export async function listPublicSeoPages(): Promise<SeoPage[]> {
       lastmod: newestUpdate,
       articleId: null,
     },
+    {
+      path: "/spotlights",
+      kind: "hub",
+      title: "Spotlights",
+      lastmod: newestUpdate,
+      articleId: null,
+    },
   ];
   for (const article of articles) {
+    const kind: SeoPageKind =
+      article.category === CASE_STUDY_CATEGORY
+        ? "case-study"
+        : article.category === SPOTLIGHT_CATEGORY
+          ? "spotlight"
+          : "article";
     pages.push({
       path: pathForArticle(article),
-      kind: article.category === CASE_STUDY_CATEGORY ? "case-study" : "article",
+      kind,
       title: article.title,
       lastmod: article.updatedAt,
       articleId: article.id,

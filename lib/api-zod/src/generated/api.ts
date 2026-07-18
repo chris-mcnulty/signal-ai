@@ -169,6 +169,131 @@ export const GetCaseStudyResponse = zod.object({
 
 
 /**
+ * @summary List all published spotlight articles
+ */
+export const ListSpotlightsResponseItem = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "dek": zod.string(),
+  "author": zod.string(),
+  "readingMinutes": zod.number(),
+  "publishedAt": zod.coerce.date(),
+  "heroImageUrl": zod.string().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "company": zod.object({
+  "name": zod.string(),
+  "website": zod.string(),
+  "industry": zod.string(),
+  "logoUrl": zod.string().nullish(),
+  "blurb": zod.string()
+})
+})
+export const ListSpotlightsResponse = zod.array(ListSpotlightsResponseItem)
+
+
+/**
+ * @summary Get a spotlight by slug
+ */
+export const GetSpotlightParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetSpotlightResponse = zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "dek": zod.string(),
+  "body": zod.string(),
+  "author": zod.string(),
+  "authorProfile": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "bio": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "twitterHandle": zod.string().nullish(),
+  "linkedInUrl": zod.string().nullish(),
+  "isStaff": zod.boolean(),
+  "isActive": zod.boolean(),
+  "createdAt": zod.coerce.date()
+}).nullish(),
+  "readingMinutes": zod.number(),
+  "publishedAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "heroImageUrl": zod.string().nullish(),
+  "sourceUrls": zod.array(zod.string()).nullish(),
+  "company": zod.object({
+  "name": zod.string(),
+  "website": zod.string(),
+  "industry": zod.string(),
+  "logoUrl": zod.string().nullish(),
+  "blurb": zod.string()
+})
+})
+
+
+/**
+ * @summary Scrape a company URL and return pre-filled spotlight metadata
+ */
+export const ImportSpotlightUrlBody = zod.object({
+  "url": zod.string().describe('URL of the company or product page to scrape')
+})
+
+export const ImportSpotlightUrlResponse = zod.object({
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companyLogoUrl": zod.string().nullable(),
+  "companyBlurb": zod.string()
+})
+
+
+/**
+ * @summary Get spotlight metadata for a draft article
+ */
+export const GetDraftSpotlightParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetDraftSpotlightResponse = zod.object({
+  "articleId": zod.number(),
+  "exists": zod.boolean(),
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companyLogoUrl": zod.string().nullish(),
+  "companyBlurb": zod.string()
+})
+
+
+/**
+ * @summary Save spotlight metadata for a draft article
+ */
+export const UpsertDraftSpotlightParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpsertDraftSpotlightBody = zod.object({
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companyLogoUrl": zod.string().nullish(),
+  "companyBlurb": zod.string()
+})
+
+export const UpsertDraftSpotlightResponse = zod.object({
+  "articleId": zod.number(),
+  "exists": zod.boolean(),
+  "companyName": zod.string(),
+  "companyWebsite": zod.string(),
+  "industry": zod.string(),
+  "companyLogoUrl": zod.string().nullish(),
+  "companyBlurb": zod.string()
+})
+
+
+/**
  * Accepts an article draft from an external tool (e.g. a CI pipeline or content agent) and stores it as a pending draft. Requires an API key in the X-API-Key header (set DRAFTS_API_KEY secret).
  * @summary Submit an article draft from an external tool
  */
