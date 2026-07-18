@@ -4,6 +4,7 @@ import {
   getGetDraftSpotlightQueryKey,
   useUpsertDraftSpotlight,
   useImportSpotlightUrl,
+  useUpdateDraft,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Globe, Download } from "lucide-react";
+
+function toDatetimeLocalInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 type SpotlightFields = {
   companyName: string;
@@ -28,7 +36,15 @@ const emptySpotlight: SpotlightFields = {
   companyBlurb: "",
 };
 
-export function SpotlightPanel({ draftId }: { draftId: number }) {
+export function SpotlightPanel({
+  draftId,
+  status,
+  publishedAt,
+}: {
+  draftId: number;
+  status?: string;
+  publishedAt?: string | null;
+}) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data, isLoading } = useGetDraftSpotlight(draftId, {
@@ -36,10 +52,18 @@ export function SpotlightPanel({ draftId }: { draftId: number }) {
   });
   const upsertMutation = useUpsertDraftSpotlight();
   const importMutation = useImportSpotlightUrl();
+  const updateDraftMutation = useUpdateDraft();
 
   const [fields, setFields] = useState<SpotlightFields>(emptySpotlight);
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
   const [importUrl, setImportUrl] = useState("");
+  const [publishedAtLocal, setPublishedAtLocal] = useState(() =>
+    publishedAt ? toDatetimeLocalInput(publishedAt) : ""
+  );
+
+  useEffect(() => {
+    setPublishedAtLocal(publishedAt ? toDatetimeLocalInput(publishedAt) : "");
+  }, [publishedAt]);
 
   useEffect(() => {
     if (data && loadedFor !== draftId) {
@@ -78,7 +102,18 @@ export function SpotlightPanel({ draftId }: { draftId: number }) {
     );
   };
 
+  const isPublishedOrApproved = status === "published" || status === "approved";
+
   const handleSave = () => {
+    if (isPublishedOrApproved) {
+      updateDraftMutation.mutate(
+        {
+          id: draftId,
+          data: { publishedAt: publishedAtLocal ? new Date(publishedAtLocal).toISOString() : null },
+        },
+        { onError: () => toast({ title: "Failed to update published date", variant: "destructive" }) },
+      );
+    }
     upsertMutation.mutate(
       {
         id: draftId,
@@ -209,6 +244,24 @@ export function SpotlightPanel({ draftId }: { draftId: number }) {
             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
           />
           <span className="text-xs text-muted-foreground">Logo preview</span>
+        </div>
+      )}
+
+      {/* Published date — only for published/approved articles */}
+      {isPublishedOrApproved && (
+        <div className="space-y-1 border-t border-border pt-4">
+          <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Published date
+          </label>
+          <input
+            type="datetime-local"
+            value={publishedAtLocal}
+            onChange={(e) => setPublishedAtLocal(e.target.value)}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-green-600 dark:text-green-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          />
+          <p className="text-xs text-muted-foreground">
+            Backdate this article to move it to the correct position in the feed. Saved with spotlight details below.
+          </p>
         </div>
       )}
 

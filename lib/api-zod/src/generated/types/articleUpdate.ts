@@ -26,4 +26,9 @@ export interface ArticleUpdate {
   imageUrl?: string | null;
   /** @nullable */
   sourceUrls?: string[] | null;
+  /**
+     * Override the publication timestamp; only applies when status is published or approved
+     * @nullable
+     */
+  publishedAt?: Date | null;
 }

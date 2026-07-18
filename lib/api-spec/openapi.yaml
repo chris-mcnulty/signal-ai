@@ -2290,6 +2290,10 @@ components:
           type: ["array", "null"]
           items:
             type: string
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+          description: Override the publication timestamp; only applies when status is published or approved
     ApprovalOptions:
       type: object
       properties:

@@ -568,7 +568,8 @@ export const UpdateDraftBody = zod.object({
   "authorId": zod.number().nullish().describe('ID of an author record; null clears the author link'),
   "dek": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
-  "sourceUrls": zod.array(zod.string()).nullish()
+  "sourceUrls": zod.array(zod.string()).nullish(),
+  "publishedAt": zod.coerce.date().nullish().describe('Override the publication timestamp; only applies when status is published or approved')
 })
 
 export const UpdateDraftResponse = zod.object({
