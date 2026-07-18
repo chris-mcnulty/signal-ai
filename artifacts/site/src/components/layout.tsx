@@ -175,6 +175,7 @@ const NAV_LINKS = [
   { href: "/use-cases", label: "Use Cases" },
   { href: "/opinion", label: "Opinion" },
   { href: "/case-studies", label: "Case Studies" },
+  { href: "/spotlights", label: "Spotlights" },
   { href: "/about", label: "About" },
 ];
 
