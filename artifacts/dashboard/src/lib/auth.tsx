@@ -42,6 +42,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const keyRef = useRef<string | null>(key);
   keyRef.current = key;
 
+  // Register the getter synchronously during the first render — NOT in an
+  // effect. React runs child effects before parent effects, so a query hook
+  // in a child page (e.g. useGetDraft on a direct load of /drafts/:id) fires
+  // its fetch before this provider's useEffect would run. That sent the first
+  // request without the Authorization header and it failed with a 401 that
+  // react-query never retries — the draft editor stayed empty and
+  // category-conditional panels (Case Study / Spotlight) never appeared.
+  const registeredRef = useRef(false);
+  if (!registeredRef.current) {
+    registeredRef.current = true;
+    setAuthTokenGetter(() => keyRef.current);
+  }
+
   const login = useCallback((newKey: string, newEmail: string, status: EditorStatus, adminFlag?: boolean) => {
     sessionStorage.setItem(SESSION_KEY, newKey);
     sessionStorage.setItem(EMAIL_KEY, newEmail);
@@ -64,12 +77,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
   }, []);
 
-  // Register the getter once on mount. The getter reads from keyRef.current so
-  // it always returns the latest key with no teardown/setup gap on re-renders.
-  // The cleanup only fires on true unmount (provider leaving the tree).
+  // The getter reads from keyRef.current so it always returns the latest key
+  // with no teardown/setup gap on re-renders. The cleanup only fires on true
+  // unmount (provider leaving the tree).
   useEffect(() => {
+    // Re-register on (re)mount so StrictMode's mount→cleanup→remount cycle
+    // (which re-runs effects but not render) doesn't leave the getter null.
+    registeredRef.current = true;
     setAuthTokenGetter(() => keyRef.current);
-    return () => setAuthTokenGetter(null);
+    return () => {
+      setAuthTokenGetter(null);
+      registeredRef.current = false;
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

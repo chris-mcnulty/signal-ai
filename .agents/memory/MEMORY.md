@@ -8,3 +8,5 @@
 - [api-zod types collision](api-zod-types-collision.md) — index.ts must only export from ./generated/api; adding types re-export causes TS2308 when endpoints have both path+query params
 - [Prod schema via Publish](prod-schema-publish.md) — prod DB schema only updates on Republish; "session expired" queue error can actually be a missing-column 500.
 - [MSAL v5 redirect handling](msal-v5-redirect.md) — navigateToLoginRequestUrl must be passed to handleRedirectPromise(), not the config; otherwise the promise never resolves on the callback page.
+- [Radix Select empty reset](radix-select-empty-reset.md) — Radix Select fires onValueChange("") after form.reset; guard with `if (v)` or it wipes the value.
+- [Auth getter at render time](auth-getter-render-time.md) — register API auth token getter during provider render, not useEffect; child queries fire before parent effects.

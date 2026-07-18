@@ -550,7 +550,17 @@ export default function DraftEditor() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={(v) => {
+                          // Radix Select can emit an empty string after a
+                          // form.reset() (its internal form-reset handling),
+                          // which would wipe the freshly-loaded category and
+                          // hide category-dependent panels. An empty string is
+                          // never a legitimate selection, so ignore it.
+                          if (v) field.onChange(v);
+                        }}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a category" />
