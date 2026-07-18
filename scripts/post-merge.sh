@@ -29,4 +29,5 @@ if command -v psql >/dev/null 2>&1 && [ -n "$DATABASE_URL" ]; then
 fi
 # Rebuild the dashboard SPA so production always serves the latest code.
 # The dist is tracked in git (gitignore exception) so it ships with every deploy.
-BASE_PATH=/dashboard/ pnpm --filter @workspace/dashboard run build
+# Run with a generous timeout to avoid post-merge runner cutoff on slow builds.
+BASE_PATH=/dashboard/ timeout 120 pnpm --filter @workspace/dashboard run build
