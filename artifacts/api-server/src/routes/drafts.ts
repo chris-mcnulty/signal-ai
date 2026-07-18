@@ -270,6 +270,17 @@ const ImportArticleBody = z.object({
         .default([]),
     })
     .nullish(),
+  spotlight: z
+    .object({
+      companyName: z.string(),
+      companyWebsite: z.string(),
+      industry: z.string(),
+      companyLogoUrl: z.string().nullish(),
+      companyBlurb: z.string(),
+    })
+    .nullish(),
+  status: z.enum(["pending", "published"]).optional(),
+  publishedAt: z.coerce.date().nullish(),
 });
 
 router.post("/drafts/import", async (req, res): Promise<void> => {
@@ -327,7 +338,9 @@ router.post("/drafts/import", async (req, res): Promise<void> => {
       seoTitle: data.seoTitle ?? null,
       seoDescription: data.seoDescription ?? null,
       sourceUrls: data.sourceUrls ?? null,
-      status: "pending",
+      status: data.status ?? "pending",
+      publishedAt:
+        data.status === "published" ? data.publishedAt ?? new Date() : null,
       source: "manual",
     })
     .returning();
@@ -348,6 +361,20 @@ router.post("/drafts/import", async (req, res): Promise<void> => {
     await db
       .insert(caseStudiesTable)
       .values({ articleId: article.id, companyName: "", companyWebsite: "", industry: "", companySize: "", headquarters: "", companySummary: "" })
+      .onConflictDoNothing();
+  }
+
+  if (category === SPOTLIGHT_CATEGORY) {
+    await db
+      .insert(spotlightsTable)
+      .values({
+        articleId: article.id,
+        companyName: data.spotlight?.companyName ?? "",
+        companyWebsite: data.spotlight?.companyWebsite ?? "",
+        industry: data.spotlight?.industry ?? "",
+        companyLogoUrl: data.spotlight?.companyLogoUrl ?? null,
+        companyBlurb: data.spotlight?.companyBlurb ?? "",
+      })
       .onConflictDoNothing();
   }
 
@@ -414,6 +441,23 @@ router.get("/drafts/:id/export", async (req, res): Promise<void> => {
   const article = row.articles;
   const authorRecord = row.authors ?? null;
 
+  let spotlightPayload = null;
+  if (article.category === SPOTLIGHT_CATEGORY) {
+    const [sp] = await db
+      .select()
+      .from(spotlightsTable)
+      .where(eq(spotlightsTable.articleId, article.id));
+    if (sp) {
+      spotlightPayload = {
+        companyName: sp.companyName,
+        companyWebsite: sp.companyWebsite,
+        industry: sp.industry,
+        companyLogoUrl: sp.companyLogoUrl ?? null,
+        companyBlurb: sp.companyBlurb,
+      };
+    }
+  }
+
   let caseStudyPayload = null;
   if (article.category === CASE_STUDY_CATEGORY) {
     const [cs] = await db
@@ -450,6 +494,9 @@ router.get("/drafts/:id/export", async (req, res): Promise<void> => {
     sourceUrls: article.sourceUrls ?? null,
     authorName: authorRecord?.name ?? null,
     caseStudy: caseStudyPayload,
+    spotlight: spotlightPayload,
+    status: article.status === "published" ? "published" : "pending",
+    publishedAt: article.publishedAt ?? null,
   };
 
   const filename = `${article.slug}.json`;
