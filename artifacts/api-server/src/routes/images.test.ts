@@ -13,7 +13,7 @@ import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import request from "supertest";
 import { Readable } from "node:stream";
 import { eq, inArray } from "drizzle-orm";
-import { db, editorsTable, articlesTable } from "@workspace/db";
+import { db, editorsTable, articlesTable, libraryImagesTable } from "@workspace/db";
 
 // ---------------------------------------------------------------------------
 // Per-run unique values — hoisted so vi.mock() factories can reference them.
@@ -47,6 +47,7 @@ vi.mock("../lib/objectStorage", () => {
   function makeFile(objectName: string) {
     return {
       save: vi.fn(async (buf: Buffer) => { gcsStore.set(objectName, buf); }),
+      delete: vi.fn(async () => { gcsStore.delete(objectName); }),
       exists: vi.fn(async () => [gcsStore.has(objectName)]),
       getMetadata: vi.fn(async () => [{ contentType: "image/png" }]),
       createReadStream: vi.fn(() => {
@@ -222,5 +223,83 @@ describe("POST /api/images/generate-and-assign", () => {
       .from(articlesTable)
       .where(eq(articlesTable.id, article.id));
     expect(updated.imageUrl).toBe(res.body.path);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Article deletion cleans up generated image
+// ---------------------------------------------------------------------------
+
+describe("DELETE /api/drafts/:id — generated image cleanup", () => {
+  it("removes the GCS object and library entry when an article with a generated imageUrl is deleted", async () => {
+    const [article] = await db
+      .insert(articlesTable)
+      .values({
+        slug: `cleanup-test-article-${RUN_SUFFIX}`,
+        title: "Cleanup test article",
+        body: "Body text.",
+        category: "Testing",
+        dek: "",
+        status: "pending",
+        source: "manual",
+      })
+      .returning();
+
+    const assignRes = await request(app)
+      .post("/api/images/generate-and-assign")
+      .set("x-api-key", TEST_EDITOR_KEY)
+      .send({ prompt: "A cleanup test image", articleId: article.id });
+
+    expect(assignRes.status).toBe(200);
+    const generatedPath = assignRes.body.path as string;
+    const filename = generatedPath.split("/").pop()!;
+    const gcsKey = `generated/${filename}`;
+
+    expect(gcsStore.has(gcsKey)).toBe(true);
+
+    const libBefore = await db
+      .select({ id: libraryImagesTable.id })
+      .from(libraryImagesTable)
+      .where(eq(libraryImagesTable.path, generatedPath));
+    expect(libBefore.length).toBeGreaterThan(0);
+
+    const delRes = await request(app)
+      .delete(`/api/drafts/${article.id}`)
+      .set("x-api-key", TEST_EDITOR_KEY);
+
+    expect(delRes.status).toBe(204);
+
+    expect(gcsStore.has(gcsKey)).toBe(false);
+
+    const libAfter = await db
+      .select({ id: libraryImagesTable.id })
+      .from(libraryImagesTable)
+      .where(eq(libraryImagesTable.path, generatedPath));
+    expect(libAfter.length).toBe(0);
+  });
+
+  it("does not attempt GCS cleanup when imageUrl is a library path", async () => {
+    const [article] = await db
+      .insert(articlesTable)
+      .values({
+        slug: `no-cleanup-test-article-${RUN_SUFFIX}`,
+        title: "No-cleanup test article",
+        body: "Body text.",
+        category: "Testing",
+        dek: "",
+        status: "pending",
+        source: "manual",
+        imageUrl: "/api/static/library/some-library-image.png",
+      })
+      .returning();
+
+    const sizeBefore = gcsStore.size;
+
+    const delRes = await request(app)
+      .delete(`/api/drafts/${article.id}`)
+      .set("x-api-key", TEST_EDITOR_KEY);
+
+    expect(delRes.status).toBe(204);
+    expect(gcsStore.size).toBe(sizeBefore);
   });
 });

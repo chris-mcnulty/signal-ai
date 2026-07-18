@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { desc, eq, sql } from "drizzle-orm";
-import { db, articlesTable, authorsTable, caseStudiesTable } from "@workspace/db";
+import { db, articlesTable, authorsTable, caseStudiesTable, libraryImagesTable } from "@workspace/db";
 import {
   ListDraftsQueryParams,
   ListDraftsResponse,
@@ -26,6 +26,7 @@ import {
   UnpublishDraftParams,
   UnpublishDraftResponse,
 } from "@workspace/api-zod";
+import { objectStorageClient } from "../lib/objectStorage";
 import { apiKeyAuth } from "../middlewares/apiKeyAuth";
 import { requireEditor } from "../middlewares/requireEditor";
 import { rateLimit } from "../middlewares/rateLimit";
@@ -45,6 +46,34 @@ import { getBaseUrl } from "../lib/site";
 import type { Request } from "express";
 
 const router: IRouter = Router();
+
+const GENERATED_URL_PREFIX = "/api/static/generated/";
+
+/**
+ * Delete a generated image from object storage and the library table.
+ * Only acts when the URL matches the generated-image prefix; silently
+ * skips library images, external URLs, and nulls. Errors are swallowed
+ * so a storage failure never blocks article deletion.
+ */
+async function cleanupGeneratedImage(imageUrl: string | null | undefined): Promise<void> {
+  if (!imageUrl || !imageUrl.startsWith(GENERATED_URL_PREFIX)) return;
+  const filename = imageUrl.slice(GENERATED_URL_PREFIX.length);
+  if (!filename) return;
+
+  const bucketId = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID;
+  if (bucketId) {
+    await objectStorageClient
+      .bucket(bucketId)
+      .file(`generated/${filename}`)
+      .delete()
+      .catch(() => {});
+  }
+
+  await db
+    .delete(libraryImagesTable)
+    .where(eq(libraryImagesTable.path, imageUrl))
+    .catch(() => {});
+}
 
 /**
  * #SEO: fire-and-forget search-engine notification when an article's public
@@ -292,6 +321,10 @@ router.delete("/drafts/:id", async (req, res): Promise<void> => {
   if (article.status === "published") {
     notifySearchEngines(req, article, "delete", "unpublish-hook");
   }
+  await Promise.all([
+    cleanupGeneratedImage(article.imageUrl),
+    cleanupGeneratedImage(article.heroImageUrl),
+  ]);
   res.sendStatus(204);
 });
 
