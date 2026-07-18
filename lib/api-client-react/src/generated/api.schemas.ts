@@ -808,6 +808,58 @@ export interface CitationsResult {
   citations: string[];
 }
 
+export interface AnalyticsDayStat {
+  /** ISO date string (YYYY-MM-DD) */
+  day: string;
+  views: number;
+}
+
+export interface AnalyticsTopArticle {
+  id: number;
+  slug: string;
+  title: string;
+  views: number;
+  allTimeViews: number;
+}
+
+export type AnalyticsOverviewTotals = {
+  views: number;
+  uniqueArticles: number;
+};
+
+export interface AnalyticsOverview {
+  rangeDays: number;
+  totals: AnalyticsOverviewTotals;
+  series: AnalyticsDayStat[];
+  topArticles: AnalyticsTopArticle[];
+}
+
+export interface AnalyticsReferrerStat {
+  host: string;
+  views: number;
+}
+
+export type AnalyticsArticleDetailArticle = {
+  id: number;
+  slug: string;
+  title: string;
+  /** @nullable */
+  publishedAt?: string | null;
+};
+
+export type AnalyticsArticleDetailTotals = {
+  views: number;
+  viewsAllTime: number;
+};
+
+export interface AnalyticsArticleDetail {
+  article: AnalyticsArticleDetailArticle;
+  rangeDays: number;
+  totals: AnalyticsArticleDetailTotals;
+  series: AnalyticsDayStat[];
+  referrers: AnalyticsReferrerStat[];
+}
+
 export type ListArticlesParams = {
 category?: string;
 /**
@@ -857,4 +909,20 @@ export const ListBriefsStatus = {
   rejected: 'rejected',
   drafted: 'drafted',
 } as const;
+
+export type GetAnalyticsOverviewParams = {
+/**
+ * @minimum 1
+ * @maximum 365
+ */
+days?: number;
+};
+
+export type GetAnalyticsArticleParams = {
+/**
+ * @minimum 1
+ * @maximum 365
+ */
+days?: number;
+};
 

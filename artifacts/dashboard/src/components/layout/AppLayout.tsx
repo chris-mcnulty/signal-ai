@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays, Images, Users } from "lucide-react";
+import { LogOut, LayoutDashboard, Plus, Globe, Sparkles, Mic2, CalendarDays, Images, Users, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
@@ -16,6 +16,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     { href: "/engine", label: "Engine", icon: Sparkles, matchPaths: ["/engine"] },
     { href: "/voice", label: "Voice", icon: Mic2, matchPaths: ["/voice"] },
     { href: "/image-library", label: "Images", icon: Images, matchPaths: ["/image-library"] },
+    { href: "/analytics", label: "Analytics", icon: BarChart3, matchPaths: ["/analytics"] },
     ...(isAdmin ? [{ href: "/team", label: "Team", icon: Users, matchPaths: ["/team"] }] : []),
   ];
 

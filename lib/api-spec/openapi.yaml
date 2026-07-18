@@ -20,6 +20,8 @@ tags:
     description: SEO administration (audit, search-engine submission, index coverage)
   - name: engine
     description: Research and content generation engine (voice, research, ideation, copywriting, repurposing, SEO)
+  - name: analytics
+    description: First-party traffic analytics — page views per article, daily series, referrer breakdown
 paths:
   /healthz:
     get:
@@ -1396,6 +1398,77 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  /analytics/overview:
+    get:
+      operationId: getAnalyticsOverview
+      tags: [analytics]
+      summary: Analytics overview
+      description: Aggregate view counts, daily series, and top articles for the given time window.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+            default: 30
+      responses:
+        "200":
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsOverview"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+  /analytics/articles/{id}:
+    get:
+      operationId: getAnalyticsArticle
+      tags: [analytics]
+      summary: Per-article analytics
+      description: View counts, daily series, and referrer breakdown for a specific article.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: days
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 365
+            default: 30
+      responses:
+        "200":
+          description: Article analytics detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsArticleDetail"
+        "401":
+          description: Missing or invalid API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -2579,3 +2652,90 @@ components:
           type: array
           items:
             type: string
+    AnalyticsDayStat:
+      type: object
+      required: [day, views]
+      properties:
+        day:
+          type: string
+          description: ISO date string (YYYY-MM-DD)
+        views:
+          type: integer
+    AnalyticsTopArticle:
+      type: object
+      required: [id, slug, title, views, allTimeViews]
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        views:
+          type: integer
+        allTimeViews:
+          type: integer
+    AnalyticsOverview:
+      type: object
+      required: [rangeDays, totals, series, topArticles]
+      properties:
+        rangeDays:
+          type: integer
+        totals:
+          type: object
+          required: [views, uniqueArticles]
+          properties:
+            views:
+              type: integer
+            uniqueArticles:
+              type: integer
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsDayStat"
+        topArticles:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsTopArticle"
+    AnalyticsReferrerStat:
+      type: object
+      required: [host, views]
+      properties:
+        host:
+          type: string
+        views:
+          type: integer
+    AnalyticsArticleDetail:
+      type: object
+      required: [article, rangeDays, totals, series, referrers]
+      properties:
+        article:
+          type: object
+          required: [id, slug, title]
+          properties:
+            id:
+              type: integer
+            slug:
+              type: string
+            title:
+              type: string
+            publishedAt:
+              type: ["string", "null"]
+        rangeDays:
+          type: integer
+        totals:
+          type: object
+          required: [views, viewsAllTime]
+          properties:
+            views:
+              type: integer
+            viewsAllTime:
+              type: integer
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsDayStat"
+        referrers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsReferrerStat"

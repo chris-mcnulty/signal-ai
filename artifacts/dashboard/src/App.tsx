@@ -15,6 +15,7 @@ import ImageLibrary from "./pages/ImageLibrary";
 import Team from "./pages/Team";
 import AuthCallback from "./pages/AuthCallback";
 import Authors from "./pages/Authors";
+import Analytics from "./pages/Analytics";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider, useAuth } from "./lib/auth";
 
@@ -68,6 +69,10 @@ export function Routes() {
 
       <Route path="/authors">
         <ProtectedRoute component={Authors} />
+      </Route>
+
+      <Route path="/analytics">
+        <ProtectedRoute component={Analytics} />
       </Route>
 
       <Route path="/app/callback" component={AuthCallback} />

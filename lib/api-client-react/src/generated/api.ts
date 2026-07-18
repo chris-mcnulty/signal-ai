@@ -20,6 +20,8 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AnalyticsArticleDetail,
+  AnalyticsOverview,
   ApiError,
   ApprovalOptions,
   Article,
@@ -43,6 +45,8 @@ import type {
   ExpandBriefRequest,
   ExpandedArticle,
   GenerateDraftRequest,
+  GetAnalyticsArticleParams,
+  GetAnalyticsOverviewParams,
   GroundingDocument,
   GroundingDocumentInput,
   HealthStatus,
@@ -3681,4 +3685,179 @@ export const useExpandBrief = <TError = ErrorType<ErrorMessage>,
       > => {
       return useMutation(getExpandBriefMutationOptions(options));
     }
+
+export const getGetAnalyticsOverviewUrl = (params?: GetAnalyticsOverviewParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/analytics/overview?${stringifiedParams}` : `/api/analytics/overview`
+}
+
+/**
+ * Aggregate view counts, daily series, and top articles for the given time window.
+ * @summary Analytics overview
+ */
+export const getAnalyticsOverview = async (params?: GetAnalyticsOverviewParams, options?: RequestInit): Promise<AnalyticsOverview> => {
+
+  return customFetch<AnalyticsOverview>(getGetAnalyticsOverviewUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAnalyticsOverviewQueryKey = (params?: GetAnalyticsOverviewParams,) => {
+    return [
+    `/api/analytics/overview`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAnalyticsOverviewQueryOptions = <TData = Awaited<ReturnType<typeof getAnalyticsOverview>>, TError = ErrorType<ErrorMessage>>(params?: GetAnalyticsOverviewParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAnalyticsOverviewQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalyticsOverview>>> = ({ signal }) => getAnalyticsOverview(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverview>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAnalyticsOverviewQueryResult = NonNullable<Awaited<ReturnType<typeof getAnalyticsOverview>>>
+export type GetAnalyticsOverviewQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Analytics overview
+ */
+
+export function useGetAnalyticsOverview<TData = Awaited<ReturnType<typeof getAnalyticsOverview>>, TError = ErrorType<ErrorMessage>>(
+ params?: GetAnalyticsOverviewParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAnalyticsOverviewQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAnalyticsArticleUrl = (id: number,
+    params?: GetAnalyticsArticleParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/analytics/articles/${id}?${stringifiedParams}` : `/api/analytics/articles/${id}`
+}
+
+/**
+ * View counts, daily series, and referrer breakdown for a specific article.
+ * @summary Per-article analytics
+ */
+export const getAnalyticsArticle = async (id: number,
+    params?: GetAnalyticsArticleParams, options?: RequestInit): Promise<AnalyticsArticleDetail> => {
+
+  return customFetch<AnalyticsArticleDetail>(getGetAnalyticsArticleUrl(id,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAnalyticsArticleQueryKey = (id: number,
+    params?: GetAnalyticsArticleParams,) => {
+    return [
+    `/api/analytics/articles/${id}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAnalyticsArticleQueryOptions = <TData = Awaited<ReturnType<typeof getAnalyticsArticle>>, TError = ErrorType<ErrorMessage>>(id: number,
+    params?: GetAnalyticsArticleParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAnalyticsArticleQueryKey(id,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAnalyticsArticle>>> = ({ signal }) => getAnalyticsArticle(id,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsArticle>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAnalyticsArticleQueryResult = NonNullable<Awaited<ReturnType<typeof getAnalyticsArticle>>>
+export type GetAnalyticsArticleQueryError = ErrorType<ErrorMessage>
+
+
+/**
+ * @summary Per-article analytics
+ */
+
+export function useGetAnalyticsArticle<TData = Awaited<ReturnType<typeof getAnalyticsArticle>>, TError = ErrorType<ErrorMessage>>(
+ id: number,
+    params?: GetAnalyticsArticleParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAnalyticsArticle>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAnalyticsArticleQueryOptions(id,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 

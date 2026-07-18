@@ -6,6 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './analyticsArticleDetail';
+export * from './analyticsArticleDetailArticle';
+export * from './analyticsArticleDetailTotals';
+export * from './analyticsDayStat';
+export * from './analyticsOverview';
+export * from './analyticsOverviewTotals';
+export * from './analyticsReferrerStat';
+export * from './analyticsTopArticle';
 export * from './apiError';
 export * from './approvalOptions';
 export * from './article';
@@ -46,6 +54,8 @@ export * from './fitAssessmentRecommendation';
 export * from './fitAssessmentTopicFit';
 export * from './fitAssessmentVoiceFit';
 export * from './generateDraftRequest';
+export * from './getAnalyticsArticleParams';
+export * from './getAnalyticsOverviewParams';
 export * from './groundingDocument';
 export * from './groundingDocumentContextTag';
 export * from './groundingDocumentInput';

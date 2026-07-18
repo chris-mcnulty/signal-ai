@@ -1355,3 +1355,76 @@ export const ExpandBriefResponse = zod.object({
 })
 
 
+/**
+ * Aggregate view counts, daily series, and top articles for the given time window.
+ * @summary Analytics overview
+ */
+export const getAnalyticsOverviewQueryDaysDefault = 30;
+export const getAnalyticsOverviewQueryDaysMax = 365;
+
+
+
+export const GetAnalyticsOverviewQueryParams = zod.object({
+  "days": zod.coerce.number().min(1).max(getAnalyticsOverviewQueryDaysMax).default(getAnalyticsOverviewQueryDaysDefault)
+})
+
+export const GetAnalyticsOverviewResponse = zod.object({
+  "rangeDays": zod.number(),
+  "totals": zod.object({
+  "views": zod.number(),
+  "uniqueArticles": zod.number()
+}),
+  "series": zod.array(zod.object({
+  "day": zod.string().describe('ISO date string (YYYY-MM-DD)'),
+  "views": zod.number()
+})),
+  "topArticles": zod.array(zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "views": zod.number(),
+  "allTimeViews": zod.number()
+}))
+})
+
+
+/**
+ * View counts, daily series, and referrer breakdown for a specific article.
+ * @summary Per-article analytics
+ */
+export const GetAnalyticsArticleParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const getAnalyticsArticleQueryDaysDefault = 30;
+export const getAnalyticsArticleQueryDaysMax = 365;
+
+
+
+export const GetAnalyticsArticleQueryParams = zod.object({
+  "days": zod.coerce.number().min(1).max(getAnalyticsArticleQueryDaysMax).default(getAnalyticsArticleQueryDaysDefault)
+})
+
+export const GetAnalyticsArticleResponse = zod.object({
+  "article": zod.object({
+  "id": zod.number(),
+  "slug": zod.string(),
+  "title": zod.string(),
+  "publishedAt": zod.string().nullish()
+}),
+  "rangeDays": zod.number(),
+  "totals": zod.object({
+  "views": zod.number(),
+  "viewsAllTime": zod.number()
+}),
+  "series": zod.array(zod.object({
+  "day": zod.string().describe('ISO date string (YYYY-MM-DD)'),
+  "views": zod.number()
+})),
+  "referrers": zod.array(zod.object({
+  "host": zod.string(),
+  "views": zod.number()
+}))
+})
+
+

@@ -14,3 +14,4 @@ export * from "./socialVariants";
 export * from "./engineJobs";
 export * from "./editors";
 export * from "./libraryImages";
+export * from "./articleViews";

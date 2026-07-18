@@ -16,6 +16,7 @@ import {
 } from "../lib/seo";
 import { renderPage, renderArticleBody } from "./layout";
 import { renderOgCard } from "../lib/ogCard";
+import { recordArticleView } from "../lib/articleViews";
 
 const router: IRouter = Router();
 
@@ -189,6 +190,7 @@ router.get("/case-studies/:slug", async (req, res): Promise<void> => {
 
   const { article, caseStudy, relatedArticles } = entry;
   const pageUrl = `${baseUrl}/case-studies/${article.slug}`;
+  recordArticleView(req, article.id);
 
   const metricsHtml = caseStudy.metrics.length
     ? `<section class="metrics" aria-label="Results">
