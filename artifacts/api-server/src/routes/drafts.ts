@@ -584,12 +584,18 @@ router.post("/drafts/:id/approve", async (req, res): Promise<void> => {
     ? new Date(parsed.data.scheduledFor)
     : null;
   const isFuture = scheduledFor !== null && scheduledFor.getTime() > Date.now();
+  // Preserve a pre-saved backdated publishedAt if one exists on the article.
+  const [existing] = await db
+    .select({ publishedAt: articlesTable.publishedAt })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, params.data.id));
+  const resolvedPublishedAt = existing?.publishedAt ?? new Date();
   const [article] = await db
     .update(articlesTable)
     .set(
       isFuture
         ? { status: "approved", scheduledFor, publishedAt: null, rejectionReason: null }
-        : { status: "published", scheduledFor: null, publishedAt: new Date(), rejectionReason: null },
+        : { status: "published", scheduledFor: null, publishedAt: resolvedPublishedAt, rejectionReason: null },
     )
     .where(eq(articlesTable.id, params.data.id))
     .returning();
@@ -644,9 +650,15 @@ router.post("/drafts/:id/publish", async (req, res): Promise<void> => {
     res.status(400).json({ error: params.error.message });
     return;
   }
+  // Preserve a pre-saved backdated publishedAt if one exists on the article.
+  const [existingPub] = await db
+    .select({ publishedAt: articlesTable.publishedAt })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, params.data.id));
+  const resolvedPublishedAt = existingPub?.publishedAt ?? new Date();
   const [article] = await db
     .update(articlesTable)
-    .set({ status: "published", scheduledFor: null, publishedAt: new Date(), rejectionReason: null })
+    .set({ status: "published", scheduledFor: null, publishedAt: resolvedPublishedAt, rejectionReason: null })
     .where(eq(articlesTable.id, params.data.id))
     .returning();
   if (!article) {

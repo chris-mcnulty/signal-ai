@@ -181,7 +181,6 @@ export default function DraftEditor() {
   const onSave = async (values: z.infer<typeof formSchema>) => {
     try {
       const cleanUrls = (values.sourceUrls ?? []).map((u) => u.trim()).filter(Boolean);
-      const isPublishedOrApproved = draft?.status === "published" || draft?.status === "approved";
       const data = {
         title: values.title,
         category: values.category,
@@ -191,7 +190,7 @@ export default function DraftEditor() {
         imageUrl: values.imageUrl || undefined,
         body: values.body,
         sourceUrls: cleanUrls.length ? cleanUrls : null,
-        ...(isPublishedOrApproved && { publishedAt: publishedAtLocal ? new Date(publishedAtLocal).toISOString() : null }),
+        publishedAt: publishedAtLocal ? new Date(publishedAtLocal).toISOString() : null,
       };
 
       if (isNew) {
@@ -984,18 +983,22 @@ export default function DraftEditor() {
                       <span className="font-medium text-purple-600 dark:text-purple-400">{format(new Date(draft.scheduledFor), "MMM d, h:mm a")}</span>
                     </div>
                   )}
-                  {(draft.status === "published" || draft.status === "approved") && (
-                    <div className="px-4 py-2.5 text-sm space-y-1">
-                      <span className="text-muted-foreground block">Published date</span>
-                      <input
-                        type="datetime-local"
-                        value={publishedAtLocal}
-                        onChange={(e) => setPublishedAtLocal(e.target.value)}
-                        className="w-full rounded-md border border-input bg-background px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                      />
-                      <p className="text-xs text-muted-foreground">Change the date to reorder the article in the feed. Save to apply.</p>
-                    </div>
-                  )}
+                  <div className="px-4 py-2.5 text-sm space-y-1">
+                    <span className="text-muted-foreground block">
+                      {draft.status === "published" ? "Published date" : "Publish date"}
+                    </span>
+                    <input
+                      type="datetime-local"
+                      value={publishedAtLocal}
+                      onChange={(e) => setPublishedAtLocal(e.target.value)}
+                      className="w-full rounded-md border border-input bg-background px-2 py-1 text-xs font-medium text-green-600 dark:text-green-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {draft.status === "published"
+                        ? "Change the date to reorder the article in the feed. Save to apply."
+                        : "Set a past date to backdate this article. Save the draft, then approve/publish."}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
