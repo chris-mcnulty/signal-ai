@@ -24,9 +24,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary selection:text-white">
       <header className="sticky top-0 z-50 px-6 h-14 flex items-center border-b border-border bg-background/90 backdrop-blur-md">
         <div className="flex items-center gap-6">
-          <Link href="/queue" className="flex items-center gap-2 font-bold tracking-tight text-lg hover:text-primary transition-colors shrink-0">
-            <img src="/logo-square-sai.svg" alt="SignalAI" className="w-5 h-5" />
-            SignalAI
+          <Link href="/queue" className="flex items-center gap-2 font-bold tracking-tight text-lg hover:opacity-80 transition-opacity shrink-0">
+            <span className="text-[#0B2E59]">bluestr<span className="text-[#0047AB]">AI</span>l</span>
           </Link>
 
           <nav className="flex items-center gap-0.5">

@@ -55,8 +55,8 @@
   --popover-foreground: 0 0% 9%;
   --popover-border: 0 0% 90%;
   
-  /* Signal Orange */
-  --primary: 15 100% 50%;
+  /* Cobalt */
+  --primary: 215 100% 34%;
   --primary-foreground: 0 0% 100%;
   
   --secondary: 0 0% 96%;
@@ -65,18 +65,18 @@
   --muted: 0 0% 96%;
   --muted-foreground: 0 0% 45%;
   
-  --accent: 15 100% 96%;
-  --accent-foreground: 15 100% 50%;
+  --accent: 215 80% 93%;
+  --accent-foreground: 215 100% 34%;
   
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
   --border: 0 0% 90%;
   --input: 0 0% 90%;
-  --ring: 15 100% 50%;
+  --ring: 215 100% 34%;
 
   --app-font-sans: 'Inter', system-ui, sans-serif;
-  --app-font-mono: 'Space Mono', monospace;
+  --app-font-mono: 'IBM Plex Sans', monospace;
   --radius: 0.25rem;
 }
 
@@ -92,7 +92,7 @@
   --popover-foreground: 0 0% 98%;
   --popover-border: 0 0% 15%;
   
-  --primary: 15 100% 55%;
+  --primary: 215 90% 55%;
   --primary-foreground: 0 0% 100%;
   
   --secondary: 0 0% 15%;
@@ -101,15 +101,15 @@
   --muted: 0 0% 15%;
   --muted-foreground: 0 0% 65%;
   
-  --accent: 15 100% 15%;
-  --accent-foreground: 15 100% 55%;
+  --accent: 215 50% 20%;
+  --accent-foreground: 215 90% 70%;
   
   --destructive: 0 62% 30%;
   --destructive-foreground: 0 0% 98%;
 
   --border: 0 0% 15%;
   --input: 0 0% 15%;
-  --ring: 15 100% 55%;
+  --ring: 215 90% 55%;
 }
 
 @layer base {

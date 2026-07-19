@@ -7,10 +7,7 @@ export default function AccessPending() {
     <div className="min-h-[100dvh] flex flex-col bg-background">
       <header className="px-6 h-16 flex items-center border-b border-border/50">
         <div className="flex items-center gap-2 font-bold tracking-tight text-lg">
-          <div className="w-6 h-6 bg-primary rounded-sm flex items-center justify-center">
-            <div className="w-2 h-2 bg-white rounded-full"></div>
-          </div>
-          SignalAI
+          <span className="text-[#0B2E59]">bluestr<span className="text-[#0047AB]">AI</span>l</span>
         </div>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-2xl mx-auto w-full">
