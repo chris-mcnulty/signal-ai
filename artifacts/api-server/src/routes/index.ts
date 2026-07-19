@@ -12,6 +12,7 @@ import imagesRouter from "./images";
 import adminRouter from "./admin";
 import analyticsRouter from "./analytics";
 import spotlightsRouter from "./spotlights";
+import subscribeRouter from "./subscribe";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(draftsRouter);
 router.use(seoRouter);
 router.use(libraryRouter);
 router.use(imagesRouter);
+router.use(subscribeRouter);
 
 export default router;

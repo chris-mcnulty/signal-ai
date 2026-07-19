@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SubscribeModal } from "./SubscribeModal";
 import { useListArticles } from "@workspace/api-client-react";
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -261,6 +262,7 @@ export function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
   const { searchOpen, openSearch, closeSearch } = useSearch();
 
   useEffect(() => {
@@ -316,7 +318,7 @@ export function Header() {
           </div>
 
           <div className="w-1/3 flex justify-end">
-            <button className="subscribe-cta" data-testid="btn-subscribe">
+            <button className="subscribe-cta" data-testid="btn-subscribe" onClick={() => setSubscribeOpen(true)}>
               Subscribe
             </button>
           </div>
@@ -325,6 +327,7 @@ export function Header() {
 
       <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
     </>
   );
 }

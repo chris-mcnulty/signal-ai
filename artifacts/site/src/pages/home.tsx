@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { ChevronRight } from 'lucide-react';
 import { useListArticles } from '@workspace/api-client-react';
 import { Layout, Footer, NavDrawer, SearchOverlay, useSearch } from '@/components/layout';
+import { SubscribeModal } from '@/components/SubscribeModal';
 import { Search, Menu } from 'lucide-react';
 import { useState } from 'react';
 
@@ -58,6 +59,7 @@ export default function Home() {
   const { data: articles, isLoading: isArticlesLoading } = useListArticles();
   const { data: inBriefArticles, isLoading: isInBriefLoading } = useListArticles({ category: "news" });
   const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
   const { searchOpen, openSearch, closeSearch } = useSearch();
 
   const leadStory = articles?.[0];
@@ -105,7 +107,7 @@ export default function Home() {
               <Search size={22} />
             </button>
           </div>
-          <button className="subscribe-cta" data-testid="btn-subscribe">Subscribe</button>
+          <button className="subscribe-cta" data-testid="btn-subscribe" onClick={() => setSubscribeOpen(true)}>Subscribe</button>
         </div>
 
         {/* Masthead branding — centred in the hero */}
@@ -324,6 +326,7 @@ export default function Home() {
       </main>
       
       <Footer />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
     </Layout>
   );
 }
