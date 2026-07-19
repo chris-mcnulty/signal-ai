@@ -22,7 +22,7 @@ function extractKey(req: Parameters<typeof requireEditor>[0]): string | undefine
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 25 * 1024 * 1024 },
   fileFilter(_req, file, cb) {
     const allowed = ["image/svg+xml", "image/png", "image/jpeg"];
     if (allowed.includes(file.mimetype)) {
@@ -48,10 +48,25 @@ router.get("/library/images", async (_req, res): Promise<void> => {
   })));
 });
 
+const handleUpload = (req: Parameters<typeof requireEditor>[0], res: Parameters<typeof requireEditor>[1], next: Parameters<typeof requireEditor>[2]) => {
+  upload.single("file")(req as any, res as any, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        res.status(413).json({ error: "File too large. Maximum size is 25 MB." });
+        return;
+      }
+      res.status(400).json({ error: err.message });
+      return;
+    }
+    if (err) { next(err); return; }
+    next();
+  });
+};
+
 router.post(
   "/library/images",
   requireEditor,
-  upload.single("file"),
+  handleUpload,
   async (req, res): Promise<void> => {
     const file = req.file;
     if (!file) {
