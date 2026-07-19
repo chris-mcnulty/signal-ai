@@ -9,7 +9,7 @@
  * breaks the contract causes a test failure — bidirectional drift protection.
  *
  * Key elements checked:
- *   - Accent color token (#d94226) consistent between SSR and SPA
+ *   - Accent color token (#0047AB) consistent between SSR and SPA
  *   - .metric value: rust-red in both SSR (.metric .value) and SPA (.metric-value)
  *   - Hero-rule: thick top border ≥ 2px present in both SSR CSS and SPA CSS,
  *     and <hr class="hero-rule"> present in the SSR HTML output
@@ -121,20 +121,20 @@ const dummyMeta = {
 // ---------------------------------------------------------------------------
 
 describe("Parity: accent color token", () => {
-  it("SPA defines --accent:#d94226 in the broadsheet-theme block", () => {
+  it("SPA defines --accent:#0047AB in the broadsheet-theme block", () => {
     const spaCss = loadSpaCss();
     assert.ok(
-      spaCss.includes("--accent: #d94226"),
-      "SPA index.css broadsheet-theme must define --accent: #d94226",
+      spaCss.includes("--accent: #0047AB"),
+      "SPA index.css broadsheet-theme must define --accent: #0047AB",
     );
   });
 
-  it("SSR defines --accent:#d94226 in the :root block", () => {
+  it("SSR defines --accent:#0047AB in the :root block", () => {
     const html = renderPage(dummyMeta, "<main></main>");
     const ssrCss = extractInlineCss(html);
     assert.ok(
-      ssrCss.includes("--accent:#d94226"),
-      "SSR layout must define --accent:#d94226 — got CSS starting with:\n" +
+      ssrCss.includes("--accent:#0047AB"),
+      "SSR layout must define --accent:#0047AB — got CSS starting with:\n" +
         ssrCss.slice(0, 200),
     );
   });
@@ -333,59 +333,59 @@ describe("Parity: typography families", () => {
     );
   });
 
-  it("SSR headings use Playfair Display (matching SPA serif)", () => {
+  it("SSR headings use Cormorant Garamond (matching SPA serif)", () => {
     const html = renderPage(dummyMeta, "<main></main>");
     const ssrCss = extractInlineCss(html);
     assert.ok(
-      ssrCss.includes("'Playfair Display'") ||
-        ssrCss.includes('"Playfair Display"'),
-      "SSR heading font-family must use Playfair Display to match the SPA serif stack",
+      ssrCss.includes("'Cormorant Garamond'") ||
+        ssrCss.includes('"Cormorant Garamond"'),
+      "SSR heading font-family must use Cormorant Garamond to match the SPA serif stack",
     );
   });
 
-  it("SPA imports a named serif web font (Playfair Display)", () => {
+  it("SPA imports a named serif web font (Cormorant Garamond)", () => {
     const spaCss = loadSpaCss();
     assert.ok(
-      spaCss.includes("Playfair Display"),
-      "SPA CSS must load Playfair Display for editorial serif headlines",
+      spaCss.includes("Cormorant Garamond"),
+      "SPA CSS must load Cormorant Garamond for editorial serif headlines",
     );
   });
 
-  it("SSR .mono class uses Space Mono (matching SPA monospace)", () => {
+  it("SSR .mono class uses IBM Plex Sans (matching SPA monospace)", () => {
     const html = renderPage(dummyMeta, "<main></main>");
     const ssrCss = extractInlineCss(html);
     assert.ok(
       ssrCss.includes(".mono") &&
-        (ssrCss.includes("'Space Mono'") || ssrCss.includes('"Space Mono"')),
-      "SSR .mono must use Space Mono to match the SPA monospace font",
+        (ssrCss.includes("'IBM Plex Sans'") || ssrCss.includes('"IBM Plex Sans"')),
+      "SSR .mono must use IBM Plex Sans to match the SPA monospace font",
     );
   });
 
-  it("SPA uses a named monospace font for metadata (Space Mono)", () => {
+  it("SPA uses a named sans-serif font for metadata (IBM Plex Sans)", () => {
     const spaCss = loadSpaCss();
     assert.ok(
-      spaCss.includes("Space Mono"),
-      "SPA CSS must load Space Mono for monospace metadata elements",
+      spaCss.includes("IBM Plex Sans"),
+      "SPA CSS must load IBM Plex Sans for monospace metadata elements",
     );
   });
 
-  it("SSR links Google Fonts for Playfair Display, Inter, and Space Mono", () => {
+  it("SSR links Google Fonts for Cormorant Garamond, Inter, and IBM Plex Sans", () => {
     const html = renderPage(dummyMeta, "<main></main>");
     assert.ok(
       html.includes("fonts.googleapis.com"),
       "SSR layout must link Google Fonts",
     );
     assert.ok(
-      html.includes("Playfair+Display") || html.includes("Playfair Display"),
-      "SSR Google Fonts link must include Playfair Display",
+      html.includes("Cormorant+Garamond") || html.includes("Cormorant Garamond"),
+      "SSR Google Fonts link must include Cormorant Garamond",
     );
     assert.ok(
       html.includes("Inter"),
       "SSR Google Fonts link must include Inter",
     );
     assert.ok(
-      html.includes("Space+Mono") || html.includes("Space Mono"),
-      "SSR Google Fonts link must include Space Mono",
+      html.includes("IBM+Plex+Sans") || html.includes("IBM Plex Sans"),
+      "SSR Google Fonts link must include IBM Plex Sans",
     );
   });
 });
@@ -425,11 +425,11 @@ describe("SSR case study article HTML structure", () => {
     );
   });
 
-  it("inlines --accent:#d94226 in page CSS", () => {
+  it("inlines --accent:#0047AB in page CSS", () => {
     const css = extractInlineCss(html);
     assert.ok(
-      css.includes("--accent:#d94226"),
-      "Inline SSR page CSS must declare --accent:#d94226",
+      css.includes("--accent:#0047AB"),
+      "Inline SSR page CSS must declare --accent:#0047AB",
     );
   });
 });

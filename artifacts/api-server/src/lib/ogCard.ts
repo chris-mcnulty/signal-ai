@@ -22,11 +22,11 @@ const mono = loadFont("DejaVuSansMono.ttf");
 const monoBold = loadFont("DejaVuSansMono-Bold.ttf");
 
 const COLORS = {
-  bg: "#f7f5f2",
-  ink: "#1a1a1a",
-  muted: "#4a4a4a",
-  accent: "#d94226",
-  line: "#d1cdc7",
+  bg: "#ffffff",
+  ink: "#0B2E59",
+  muted: "#4a5568",
+  accent: "#0047AB",
+  line: "#B8C2CC",
 };
 
 export type OgCardInput = {

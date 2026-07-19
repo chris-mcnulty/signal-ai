@@ -1,13 +1,13 @@
 import { SITE, escapeHtml } from "../lib/site";
 
 const CSS = `
-:root{--bg:#f7f5f2;--ink:#1a1a1a;--muted:#4a4a4a;--accent:#d94226;--line:#d1cdc7}
+:root{--bg:#ffffff;--ink:#0B2E59;--muted:#4a5568;--accent:#0047AB;--line:#B8C2CC}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.6}
 a{color:inherit}
-h1,h2,h3,h4,h5{font-family:'Playfair Display',serif}
-.mono{font-family:'Space Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
-header.masthead{border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(247,245,242,.95)}
+h1,h2,h3,h4,h5{font-family:'Cormorant Garamond',serif}
+.mono{font-family:'IBM Plex Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+header.masthead{border-bottom:1px solid var(--line);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.95)}
 .brand{font-size:26px;font-weight:900;letter-spacing:-.02em;text-decoration:none}
 .brand span{color:var(--accent)}
 .tagline{font-size:11px;color:var(--muted)}
@@ -26,7 +26,7 @@ h1.headline{font-size:clamp(34px,6vw,54px);line-height:1.07;letter-spacing:-.01e
 .sources li{margin-bottom:6px}
 .sources a{color:var(--muted);text-decoration:none}
 .sources a:hover{color:var(--accent);text-decoration:underline}
-.company-card{border:1px solid var(--line);background:#fffdf9;padding:24px;margin:0 0 36px}
+.company-card{border:1px solid var(--line);background:#ffffff;padding:24px;margin:0 0 36px}
 .company-card h2{font-size:13px;margin-bottom:14px;color:var(--accent)}
 .company-card .company-name{font-size:22px;font-weight:800;margin-bottom:6px}
 .company-card p.summary{font-size:15px;color:var(--muted);margin-bottom:14px}
@@ -108,7 +108,7 @@ ${verificationMetaTags()}
 <link rel="canonical" href="${escapeHtml(meta.canonicalUrl)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="/case-studies/static/signalai-logo.png">
 <meta property="og:site_name" content="${escapeHtml(SITE.name)}">
 <meta property="og:type" content="${meta.ogType}">
