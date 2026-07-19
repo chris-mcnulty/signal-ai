@@ -239,3 +239,57 @@ id = "a-Uy7ocMSwYQNdS-c36jJ"
 uri = "file://attached_assets/bluetrail-wordmark.png"
 type = "image"
 title = "bluetrAIl — LinkedIn Square (600×600)"
+
+[[outputs]]
+id = "mzAWk02-F9Xu2G76y7Mb_"
+uri = "file://attached_assets/wordmark_concepts/bluetrail_wordmark_contact_sheet.png"
+type = "image"
+title = "All 8 concepts — contact sheet"
+
+[[outputs]]
+id = "EQqtf8I5vZgNY4msA25ui"
+uri = "file://attached_assets/wordmark_concepts/01_navy_hidden_ai.png"
+type = "image"
+title = "01 — Navy, hidden AI"
+
+[[outputs]]
+id = "Z4bDrgXYNA94haAfZWXBd"
+uri = "file://attached_assets/wordmark_concepts/02_midnight_cyan_ai.png"
+type = "image"
+title = "02 — Midnight, cyan AI"
+
+[[outputs]]
+id = "Q-vUkb71lyDGhy_CxmaCj"
+uri = "file://attached_assets/wordmark_concepts/03_all_blue_smallcaps_feel.png"
+type = "image"
+title = "03 — All blue, smallcaps feel"
+
+[[outputs]]
+id = "z5V2Q7t5DhK7Hbw3dDZlS"
+uri = "file://attached_assets/wordmark_concepts/04_blue_copper_ai.png"
+type = "image"
+title = "04 — Blue + copper AI"
+
+[[outputs]]
+id = "8gFRaKSHd8JDcGvr7SARr"
+uri = "file://attached_assets/wordmark_concepts/05_condensed_deep_blue.png"
+type = "image"
+title = "05 — Condensed, deep blue"
+
+[[outputs]]
+id = "2zxvHK2qQ_KkpvSjrqFXC"
+uri = "file://attached_assets/wordmark_concepts/06_italic_trail_motion.png"
+type = "image"
+title = "06 — Italic, trail motion"
+
+[[outputs]]
+id = "eYlCogaBm3AcY33WIDxEH"
+uri = "file://attached_assets/wordmark_concepts/07_white_on_blue_panel.png"
+type = "image"
+title = "07 — White on blue panel"
+
+[[outputs]]
+id = "qkQHTG1G8JsefK-31BXhj"
+uri = "file://attached_assets/wordmark_concepts/08_blue_trail_underline.png"
+type = "image"
+title = "08 — Blue trail underline"
