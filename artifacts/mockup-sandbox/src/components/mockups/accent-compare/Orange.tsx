@@ -31,7 +31,6 @@ export function Orange() {
       <div style={{ borderBottom: `1px solid ${border}`, padding: "1.5rem 2rem 0" }}>
         <hr style={{ border: "none", borderTop: `3px solid ${textPrimary}`, marginBottom: "1rem" }} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1px 1fr 1px 1fr", gap: 0 }}>
-          {/* Lead story */}
           <div style={{ paddingRight: "1.5rem", paddingBottom: "1.5rem" }}>
             <div style={{ background: accent, color: bg, fontFamily: "'Space Mono', monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.12em", padding: "0.2rem 0.5rem", display: "inline-block", marginBottom: "0.75rem" }}>Analysis</div>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.8rem", fontWeight: 900, lineHeight: 1.15, marginBottom: "0.75rem", letterSpacing: "-0.01em" }}>
@@ -43,7 +42,6 @@ export function Orange() {
             <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.65rem", color: textSecondary }}>BlueTrail Staff · Jul 19, 2026</div>
           </div>
           <div style={{ background: border, width: 1 }} />
-          {/* Column 2 */}
           <div style={{ padding: "0 1.5rem 1.5rem" }}>
             <div style={{ marginBottom: "1.25rem", paddingBottom: "1.25rem", borderBottom: `1px solid ${border}` }}>
               <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.1em", color: accent, marginBottom: "0.4rem" }}>Research</div>
@@ -57,7 +55,6 @@ export function Orange() {
             </div>
           </div>
           <div style={{ background: border, width: 1 }} />
-          {/* Column 3 */}
           <div style={{ paddingLeft: "1.5rem", paddingBottom: "1.5rem" }}>
             <div style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.14em", fontWeight: 700, color: textPrimary, borderBottom: `2px solid ${textPrimary}`, paddingBottom: "0.5rem", marginBottom: "0.75rem" }}>In Brief</div>
             {[
@@ -80,8 +77,8 @@ export function Orange() {
       </div>
 
       {/* Label */}
-      <div style={{ padding: "0.5rem 2rem", background: "#ede9e3", fontFamily: "'Space Mono', monospace", fontSize: "0.65rem", color: textSecondary, textAlign: "center", letterSpacing: "0.1em" }}>
-        CURRENT — Orange accent <span style={{ color: accent }}>■</span> #d94226
+      <div style={{ padding: "0.5rem 2rem", background: "#ede9e3", fontFamily: "'Space Mono', monospace", fontSize: "0.62rem", color: textSecondary, textAlign: "center", letterSpacing: "0.1em" }}>
+        CURRENT SITE — Orange <span style={{ color: accent, fontWeight: 700 }}>■</span> #d94226 · Warm cream bg · Playfair Display · Space Mono
       </div>
     </div>
   );
