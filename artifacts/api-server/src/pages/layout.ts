@@ -126,7 +126,7 @@ ${meta.jsonLd.join("\n")}
 </head>
 <body>
 <header class="masthead">
-<a class="brand" href="/">BlueTr<span>AI</span>l Intelligence Report</a>
+<a class="brand" href="/">bluetr<span>AI</span>l Intelligence Report</a>
 <div class="tagline mono">${escapeHtml(SITE.tagline)}</div>
 </header>
 ${bodyHtml}

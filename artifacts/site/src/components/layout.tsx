@@ -215,7 +215,7 @@ function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
       >
         <div className="flex items-center justify-between px-6 py-5 border-b border-news">
           <span className="font-serif text-2xl font-black tracking-tight">
-            BlueTr<span className="text-accent">AI</span>l
+            bluetr<span className="text-accent">AI</span>l
           </span>
           <button
             className="mobile-menu-btn text-news-primary"
@@ -304,7 +304,7 @@ export function Header() {
               data-testid="link-home"
             >
               <span className="font-serif text-3xl md:text-4xl font-black tracking-tight">
-                BlueTr<span className="text-accent">AI</span>l
+                bluetr<span className="text-accent">AI</span>l
               </span>
               <span className="font-mono text-[10px] uppercase tracking-widest text-news-secondary block mt-0.5">
                 Intelligence Report
@@ -335,7 +335,7 @@ export function Footer() {
       <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div>
           <h2 className="font-serif text-3xl font-black tracking-tight mb-1">
-            BlueTr<span className="text-accent">AI</span>l
+            bluetr<span className="text-accent">AI</span>l
           </h2>
           <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
             Intelligence Report
