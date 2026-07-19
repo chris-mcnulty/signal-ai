@@ -15,6 +15,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@types/multer": "^2.2.0",
     "@workspace/api-zod": "workspace:*",
+    "@workspace/bot-signatures": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/image-library": "workspace:*",
     "@workspace/integrations-openai-ai-server": "workspace:*",
