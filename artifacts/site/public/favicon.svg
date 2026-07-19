@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="SignalAI">
-  <title>SignalAI</title>
-  <rect width="64" height="64" rx="10" fill="#1a1a1a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="bluetrAIl">
+  <title>bluetrAIl</title>
+  <rect width="64" height="64" rx="10" fill="#0B2E59"/>
   <text
-    font-family="Georgia, 'Times New Roman', serif"
-    font-weight="900"
-    font-size="38"
-    x="10"
-    y="46"
+    font-family="'DejaVu Serif', Georgia, 'Times New Roman', serif"
+    font-weight="700"
+    font-size="34"
+    x="5"
+    y="45"
     fill="#ffffff"
     xml:space="preserve"
-  >S<tspan fill="#d94226">AI</tspan></text>
+  >b<tspan fill="#0047AB">AI</tspan></text>
 </svg>

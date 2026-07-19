@@ -1,4 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none">
-  <rect width="128" height="128" rx="24" fill="#FF3E00"/>
-  <circle cx="64" cy="64" r="24" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 95" width="480" height="95" role="img" aria-label="bluetrAIl Intelligence Report">
+  <title>bluetrAIl Intelligence Report</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&amp;display=swap');
+      .wm {
+        font-family: 'Cormorant Garamond', 'DejaVu Serif', Georgia, 'Times New Roman', serif;
+        font-weight: 700;
+        font-size: 84px;
+        letter-spacing: -1px;
+      }
+      .navy   { fill: #0B2E59; }
+      .cobalt { fill: #0047AB; }
+    </style>
+  </defs>
+  <text class="wm" x="2" y="80" xml:space="preserve"><tspan class="navy">bluetr</tspan><tspan class="cobalt">AI</tspan><tspan class="navy">l</tspan></text>
 </svg>

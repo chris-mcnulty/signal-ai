@@ -1,3 +1,13 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="bluetrAIl">
+  <title>bluetrAIl</title>
+  <rect width="64" height="64" rx="10" fill="#0B2E59"/>
+  <text
+    font-family="'DejaVu Serif', Georgia, 'Times New Roman', serif"
+    font-weight="700"
+    font-size="34"
+    x="5"
+    y="45"
+    fill="#ffffff"
+    xml:space="preserve"
+  >b<tspan fill="#0047AB">AI</tspan></text>
 </svg>

@@ -293,3 +293,15 @@ id = "qkQHTG1G8JsefK-31BXhj"
 uri = "file://attached_assets/wordmark_concepts/08_blue_trail_underline.png"
 type = "image"
 title = "08 — Blue trail underline"
+
+[[outputs]]
+id = "yVTDvFbAGAeoL8hnyk7wP"
+uri = "file://artifacts/site/public/logo.png"
+type = "image"
+title = "bluetrAIl wordmark (960×189 PNG)"
+
+[[outputs]]
+id = "LkGkVlOMUFlvhendnFeMC"
+uri = "file://artifacts/site/public/logo-square.png"
+type = "image"
+title = "bluetrAIl square logo (512×512 PNG)"
