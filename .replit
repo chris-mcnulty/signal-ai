@@ -110,7 +110,7 @@ externalPort = 80
 [userenv]
 
 [userenv.shared]
-SITE_URL = "https://www.signalaiglobal.com"
+SITE_URL = "https://www.bluetrail.ai"
 SITE_NAME = "BlueTrail Intelligence Report"
 SITE_PUBLISHER = "BlueTrail Intelligence Ltd."
 SITE_TAGLINE = "Blazing the AI trail ahead of the frontier"
