@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500" role="img" aria-label="bluetrAIl monogram">
+  <title>bluetrAIl — bAI monogram</title>
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&amp;display=swap');
+    </style>
+    <clipPath id="sq">
+      <rect width="500" height="500" rx="60"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="500" height="500" rx="60" fill="#0B2E59"/>
+
+  <!-- Trail: winding dashed path from bottom-left to top-right (map-trail style) -->
+  <g clip-path="url(#sq)" opacity="1">
+    <path
+      d="M 52,458 C 110,405 148,348 218,288 C 288,228 348,162 458,58"
+      fill="none"
+      stroke="#B8C2CC"
+      stroke-width="2.5"
+      stroke-dasharray="9,13"
+      stroke-linecap="round"
+      opacity="0.28"
+    />
+
+    <!-- Waypoint markers — faint at the start, brighter toward the summit -->
+    <circle cx="78"  cy="430" r="4.5" fill="#B8C2CC" opacity="0.22"/>
+    <circle cx="115" cy="395" r="5"   fill="#B8C2CC" opacity="0.28"/>
+    <circle cx="153" cy="357" r="5.5" fill="#B8C2CC" opacity="0.34"/>
+    <circle cx="190" cy="318" r="6"   fill="#7AAED6" opacity="0.42"/>
+    <circle cx="232" cy="280" r="6.5" fill="#5B9BD5" opacity="0.50"/>
+    <circle cx="278" cy="243" r="7"   fill="#4A85C0" opacity="0.58"/>
+    <circle cx="328" cy="200" r="7.5" fill="#2D6AAF" opacity="0.65"/>
+    <circle cx="385" cy="148" r="8"   fill="#0047AB" opacity="0.72"/>
+    <circle cx="440" cy="95"  r="9"   fill="#0047AB" opacity="0.85"/>
+
+    <!-- Summit marker — small star/peak at top-right -->
+    <circle cx="458" cy="60" r="5.5" fill="#ffffff" opacity="0.9"/>
+  </g>
+
+  <!-- bAI monogram — sits at the destination of the trail -->
+  <text
+    font-family="'Cormorant Garamond', 'DejaVu Serif', Georgia, serif"
+    font-weight="700"
+    font-size="192"
+    letter-spacing="-3"
+    text-anchor="middle"
+    x="250"
+    y="318"
+    xml:space="preserve"
+  ><tspan fill="#ffffff">b</tspan><tspan fill="#0047AB">AI</tspan></text>
+</svg>
