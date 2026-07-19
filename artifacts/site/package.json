@@ -12,7 +12,8 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
-    "@workspace/bot-signatures": "workspace:*"
+    "@workspace/bot-signatures": "workspace:*",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

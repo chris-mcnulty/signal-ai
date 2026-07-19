@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-react';
 import { Layout, Header, Footer, NetworkError } from '@/components/layout';
 
@@ -78,8 +79,6 @@ export default function SpotlightDetail() {
   const publishedDate = new Date(spotlight.publishedAt).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric'
   });
-
-  const bodyParagraphs = spotlight.body.split('\n\n').filter(p => p.trim() !== '');
 
   return (
     <Layout>
@@ -167,22 +166,23 @@ export default function SpotlightDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           {/* Article Body */}
           <div className="lg:col-span-8 article-body font-sans text-news-primary animate-fade-in-up delay-200 max-w-none">
-            {bodyParagraphs.map((paragraph, index) => {
-              if (index === 0) {
-                return (
-                  <p key={index} className="article-dropcap">
-                    {paragraph}
-                  </p>
-                );
-              }
-              if (paragraph.startsWith('## ')) {
-                return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
-              }
-              if (paragraph.startsWith('> ')) {
-                return <blockquote key={index}>{paragraph.replace('> ', '')}</blockquote>;
-              }
-              return <p key={index}>{paragraph}</p>;
-            })}
+            {(() => {
+              let pCount = 0;
+              return (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => (
+                      <p className={pCount++ === 0 ? 'article-dropcap' : ''}>{children}</p>
+                    ),
+                    a: ({ href, children }) => (
+                      <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+                    ),
+                  }}
+                >
+                  {spotlight.body}
+                </ReactMarkdown>
+              );
+            })()}
           </div>
 
           {/* Sidebar */}
