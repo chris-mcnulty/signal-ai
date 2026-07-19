@@ -11,7 +11,7 @@ function ArticleSkeleton() {
         <div className="w-1/3" />
         <div className="w-1/3 text-center">
           <span className="font-serif text-2xl font-black tracking-tight text-news-primary">
-            Signal<span className="text-accent">AI</span>
+            bluetr<span className="text-accent">AI</span>l
           </span>
         </div>
         <div className="w-1/3" />
@@ -277,7 +277,7 @@ export default function ArticlePage() {
               />
             </div>
             <figcaption className="font-mono text-xs text-news-secondary text-right mt-2">
-              SignalAI Media
+              bluetrAIl Intelligence Report
             </figcaption>
           </figure>
         )}
@@ -378,10 +378,10 @@ export default function ArticlePage() {
       {/* Footer */}
       <footer className="bg-black text-white py-10 px-6 md:px-12 text-center mt-16">
         <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
-          <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">SignalAI</h2>
+          <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">bluetr<span className="text-accent">AI</span>l</h2>
         </Link>
         <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-          © {new Date().getFullYear()} SignalAI Media. All rights reserved.
+          © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
         </p>
       </footer>
     </div>
