@@ -45,12 +45,15 @@ import {
   Upload,
   ImageIcon,
   AlertTriangle,
+  ArrowDownUp,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const API_BASE = "/api";
 
 type TabValue = "all" | "scheduled" | ArticleStatus;
+type SortKey = "editDate" | "publishDate";
 
 const STATUS_BORDER: Record<string, string> = {
   pending: "bg-orange-400",
@@ -73,6 +76,7 @@ type ImportPreview = {
 export default function Queue({ initialTab = "all" }: { initialTab?: TabValue }) {
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortKey>("editDate");
   const [rescheduleTarget, setRescheduleTarget] = useState<{ id: number; title: string } | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>();
 
@@ -214,7 +218,19 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
 
   const scheduledCount = scheduledDrafts.length;
 
-  const filteredDrafts =
+  const sortDrafts = <T extends { updatedAt: string; publishedAt?: string | null }>(list: T[]): T[] => {
+    if (sortBy === "publishDate") {
+      return [...list].sort((a, b) => {
+        if (!a.publishedAt && !b.publishedAt) return 0;
+        if (!a.publishedAt) return 1;
+        if (!b.publishedAt) return -1;
+        return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+      });
+    }
+    return [...list].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  };
+
+  const filteredDrafts = sortDrafts(
     activeTab === "scheduled"
       ? scheduledDrafts.filter(
           (d) =>
@@ -225,7 +241,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           (d) =>
             d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             d.category.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        )
+  );
 
   return (
     <AppLayout>
@@ -235,8 +252,8 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           <p className="text-muted-foreground">Review, approve, and schedule articles for publishing.</p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="relative w-full md:w-64">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative w-full md:w-56">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -246,6 +263,35 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+
+          {/* Sort toggle */}
+          <div className="flex items-center rounded-md border border-border overflow-hidden shrink-0">
+            <button
+              onClick={() => setSortBy("editDate")}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-colors",
+                sortBy === "editDate"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <Clock className="w-3 h-3" />
+              Edit date
+            </button>
+            <button
+              onClick={() => setSortBy("publishDate")}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-colors border-l border-border",
+                sortBy === "publishDate"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              )}
+            >
+              <Globe className="w-3 h-3" />
+              Publish date
+            </button>
+          </div>
+
           <Button
             variant="outline"
             size="sm"
@@ -392,14 +438,20 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
                   </div>
 
                   <div className="flex sm:flex-col items-center sm:items-end gap-2 text-xs text-muted-foreground shrink-0 mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-border">
-                    <div className="flex items-center gap-1" title={format(new Date(draft.updatedAt), "PPPp")}>
-                      <Clock className="w-3 h-3" />
-                      {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true })}
+                    <div className="flex items-center gap-1" title={`Edited ${format(new Date(draft.updatedAt), "PPPp")}`}>
+                      <Clock className="w-3 h-3 shrink-0" />
+                      <span className="whitespace-nowrap">{format(new Date(draft.updatedAt), "MMM d, yyyy")}</span>
                     </div>
-                    {draft.scheduledFor && draft.status === "approved" && (
+                    {draft.publishedAt && (
+                      <div className="flex items-center gap-1 text-green-600 dark:text-green-400" title={`Published ${format(new Date(draft.publishedAt), "PPPp")}`}>
+                        <Globe className="w-3 h-3 shrink-0" />
+                        <span className="whitespace-nowrap">{format(new Date(draft.publishedAt), "MMM d, yyyy")}</span>
+                      </div>
+                    )}
+                    {draft.scheduledFor && draft.status === "approved" && !draft.publishedAt && (
                       <div className="flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium">
-                        <CalendarDays className="w-3 h-3" />
-                        {format(new Date(draft.scheduledFor), "MMM d")}
+                        <CalendarDays className="w-3 h-3 shrink-0" />
+                        <span className="whitespace-nowrap">{format(new Date(draft.scheduledFor), "MMM d")}</span>
                       </div>
                     )}
                     {draft.status === "rejected" && draft.rejectionReason && (
