@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1584 396" width="1584" height="396">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,700;1,400&amp;family=Inter:wght@400&amp;display=swap');
+    </style>
+    <linearGradient id="navyFade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="35%" stop-color="#0B2E59" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#0B2E59" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#0B2E59" stop-opacity="0.94"/>
+    </linearGradient>
+    <linearGradient id="bottomScrim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="55%" stop-color="#0B2E59" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#0B2E59" stop-opacity="0.40"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Gradient overlays -->
+  <rect width="1584" height="396" fill="url(#navyFade)"/>
+  <rect width="1584" height="396" fill="url(#bottomScrim)"/>
+
+  <!-- bluetrAIl wordmark -->
+  <text
+    font-family="'Cormorant Garamond', 'DejaVu Serif', Georgia, serif"
+    font-weight="700"
+    font-size="108"
+    letter-spacing="-1"
+    text-anchor="middle"
+    x="1230"
+    y="188"
+    xml:space="preserve"
+  ><tspan fill="#ffffff">bluetr</tspan><tspan fill="#5B9BD5">AI</tspan><tspan fill="#ffffff">l</tspan></text>
+
+  <!-- Rule -->
+  <line x1="900" y1="212" x2="1554" y2="212" stroke="#5B9BD5" stroke-width="1.2"/>
+
+  <!-- INTELLIGENCE REPORT -->
+  <text
+    font-family="'Inter', 'DejaVu Sans', Arial, sans-serif"
+    font-weight="400"
+    font-size="24"
+    letter-spacing="6"
+    text-anchor="middle"
+    fill="#ffffff"
+    x="1230"
+    y="255"
+  >INTELLIGENCE REPORT</text>
+
+  <!-- Tagline -->
+  <text
+    font-family="'Cormorant Garamond', 'DejaVu Serif', Georgia, serif"
+    font-style="italic"
+    font-size="22"
+    letter-spacing="1"
+    text-anchor="middle"
+    fill="#B8C2CC"
+    x="1230"
+    y="296"
+  >Ahead of the frontier.</text>
+</svg>
