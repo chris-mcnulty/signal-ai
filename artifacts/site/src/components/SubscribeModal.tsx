@@ -69,7 +69,7 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
             <X size={18} />
           </button>
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.6rem", fontWeight: 700, color: "#fff", lineHeight: 1, letterSpacing: "-0.02em" }}>
-            bluetr<span style={{ color: "#F0CA45" }}>AI</span>l
+            bluetr<span style={{ color: "#B8C2CC" }}>AI</span>l
           </div>
           <div style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginTop: 3 }}>
             Intelligence Report

@@ -51,7 +51,7 @@ export async function sendWelcomeEmail(email: string): Promise<void> {
     <div style="font-family:'IBM Plex Sans',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;color:#1a1a1a;">
       <div style="background:#0B2E59;padding:32px 40px;text-align:center;">
         <span style="font-family:'Georgia',serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:-0.02em;">
-          bluetr<span style="color:#F0CA45;">AI</span>l
+          bluetr<span style="color:#B8C2CC;">AI</span>l
         </span>
         <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-top:4px;">Intelligence Report</div>
       </div>

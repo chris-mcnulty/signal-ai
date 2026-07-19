@@ -113,7 +113,7 @@ export default function Home() {
         {/* Masthead branding — centred in the hero */}
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", textAlign: "center", zIndex: 1 }}>
           <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#fff", textShadow: "0 2px 12px rgba(11,46,89,0.4)" }}>
-            bluetr<span style={{ color: "#F0CA45" }}>AI</span>l
+            bluetr<span style={{ color: "#B8C2CC" }}>AI</span>l
           </div>
           <div style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.32em", color: "rgba(255,255,255,0.75)", marginTop: "0.3rem", fontWeight: 500 }}>
             Intelligence Report
