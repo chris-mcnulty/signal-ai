@@ -2,7 +2,9 @@ import React from 'react';
 import { Link } from 'wouter';
 import { ChevronRight } from 'lucide-react';
 import { useListArticles } from '@workspace/api-client-react';
-import { Layout, Header, Footer } from '@/components/layout';
+import { Layout, Footer, NavDrawer, SearchOverlay, useSearch } from '@/components/layout';
+import { Search, Menu } from 'lucide-react';
+import { useState } from 'react';
 
 function articleHref(article: { slug: string; category: string }) {
   if (article.category === 'spotlight') return `/spotlights/${article.slug}`;
@@ -55,6 +57,8 @@ function BriefSkeleton() {
 export default function Home() {
   const { data: articles, isLoading: isArticlesLoading } = useListArticles();
   const { data: inBriefArticles, isLoading: isInBriefLoading } = useListArticles({ category: "news" });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { searchOpen, openSearch, closeSearch } = useSearch();
 
   const leadStory = articles?.[0];
   const sidebarStories = articles?.slice(1, 4) || [];
@@ -64,8 +68,70 @@ export default function Home() {
 
   return (
     <Layout>
-      <Header />
-      
+      {/* ── Unified masthead: nav controls + mountain backdrop in one header ── */}
+      <header style={{
+        position: "relative",
+        backgroundImage: "url(/hero-trail.jpeg)",
+        backgroundSize: "cover",
+        backgroundPosition: "center 30%",
+        minHeight: "220px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
+      }}>
+        {/* gradient overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to bottom, rgba(11,46,89,0.45) 0%, rgba(11,46,89,0.55) 55%, rgba(11,46,89,0.92) 100%)"
+        }} />
+
+        {/* Nav controls row — sits at the top of the hero */}
+        <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 10, padding: "0.75rem 1.25rem", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", padding: "0.35rem", opacity: 0.9 }}
+              data-testid="btn-menu"
+            >
+              <Menu size={22} />
+            </button>
+            <button
+              onClick={openSearch}
+              aria-label="Open search"
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#fff", padding: "0.35rem", opacity: 0.9 }}
+              data-testid="btn-search"
+            >
+              <Search size={22} />
+            </button>
+          </div>
+          <button className="subscribe-cta" data-testid="btn-subscribe">Subscribe</button>
+        </div>
+
+        {/* Masthead branding — centred in the hero */}
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", textAlign: "center", zIndex: 1 }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#fff", textShadow: "0 2px 12px rgba(11,46,89,0.4)" }}>
+            bluetr<span style={{ color: "#4d8ce8" }}>AI</span>l
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.32em", color: "rgba(255,255,255,0.75)", marginTop: "0.3rem", fontWeight: 500 }}>
+            Intelligence Report
+          </div>
+        </div>
+
+        {/* Tagline + date at the bottom of the hero */}
+        <div style={{ position: "relative", zIndex: 1, padding: "1rem 1.5rem 0.875rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", fontStyle: "italic", color: "rgba(255,255,255,0.9)", margin: 0, letterSpacing: "0.01em" }}>
+            Ahead of the frontier.
+          </p>
+          <span style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(184,194,204,0.9)" }}>
+            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </span>
+        </div>
+      </header>
+
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
+
       {/* Ticker / Dateline */}
       <div className="border-b border-news py-2 px-6 md:px-12 flex justify-between items-center text-xs font-mono text-news-secondary uppercase tracking-wider animate-fade-in-up delay-100 overflow-x-auto">
         <div className="shrink-0">{today}</div>
@@ -92,39 +158,6 @@ export default function Home() {
             RSS
           </a>
           <span>Edition No. 143</span>
-        </div>
-      </div>
-
-      {/* Hero banner — full-bleed trail image with masthead overlay */}
-      <div style={{
-        position: "relative",
-        backgroundImage: "url(/hero-trail.jpeg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center 30%",
-        minHeight: "174px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-      }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(11,46,89,0.15) 0%, rgba(11,46,89,0.55) 55%, rgba(11,46,89,0.92) 100%)"
-        }} />
-        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -60%)", textAlign: "center" }}>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#fff", textShadow: "0 2px 12px rgba(11,46,89,0.4)" }}>
-            bluetr<span style={{ color: "#0047AB" }}>AI</span>l
-          </div>
-          <div style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.32em", color: "rgba(255,255,255,0.75)", marginTop: "0.3rem", fontWeight: 500 }}>
-            Intelligence Report
-          </div>
-        </div>
-        <div style={{ position: "relative", zIndex: 1, padding: "1rem 2.5rem 0.875rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", fontStyle: "italic", color: "rgba(255,255,255,0.9)", margin: 0, letterSpacing: "0.01em" }}>
-            Ahead of the frontier.
-          </p>
-          <span style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(184,194,204,0.9)" }}>
-            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-          </span>
         </div>
       </div>
 
@@ -174,7 +207,7 @@ export default function Home() {
                   {(leadStory.heroImageUrl || leadStory.imageUrl) && (
                     <div className="card-image w-full aspect-video bg-[#e8e4de] mb-6 overflow-hidden">
                       <img 
-                        src={leadStory.heroImageUrl || leadStory.imageUrl} 
+                        src={leadStory.heroImageUrl ?? leadStory.imageUrl ?? undefined} 
                         alt={leadStory.title} 
                         className="w-full h-full object-cover"
                       />
@@ -246,7 +279,7 @@ export default function Home() {
                       {story.category !== 'spotlight' && (story.heroImageUrl || story.imageUrl) && (
                         <div className="card-image w-20 h-20 shrink-0 bg-[#e8e4de] overflow-hidden hidden sm:block">
                           <img
-                            src={story.heroImageUrl || story.imageUrl}
+                            src={story.heroImageUrl ?? story.imageUrl ?? undefined}
                             alt={story.title}
                             className="w-full h-full object-cover"
                           />

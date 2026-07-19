@@ -179,7 +179,7 @@ const NAV_LINKS = [
   { href: "/about", label: "About" },
 ];
 
-function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [location] = useLocation();
 
   useEffect(() => {
