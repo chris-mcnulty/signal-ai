@@ -2,10 +2,10 @@
 // Runs every Sunday at 08:00 UTC. Uses setInterval with an hourly tick
 // (same pattern as startCoverageScheduler) so it survives restarts gracefully.
 
-import { isNull, desc, gte, lte } from "drizzle-orm";
+import { isNull, desc, gte, and } from "drizzle-orm";
 import { db, subscribersTable, articlesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { sendWeeklyDigest, isSendGridConfigured } from "./sendgrid";
+import { sendWeeklyDigest, isSendGridConfigured, type DigestArticle } from "./sendgrid";
 import { logger } from "./logger";
 
 const TICK_MS = 60 * 60 * 1000; // 1 hour
@@ -22,7 +22,7 @@ function currentIsoWeek(): string {
   return `${now.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
-function weekLabel(): string {
+export function weekLabel(): string {
   const now = new Date();
   return now.toLocaleDateString("en-US", {
     year: "numeric",
@@ -30,6 +30,50 @@ function weekLabel(): string {
     day: "numeric",
     timeZone: "UTC",
   });
+}
+
+const ARTICLE_SELECT = {
+  title: articlesTable.title,
+  slug: articlesTable.slug,
+  dek: articlesTable.dek,
+  category: articlesTable.category,
+  publishedAt: articlesTable.publishedAt,
+  featured: articlesTable.featured,
+};
+
+export async function selectNewsletterArticles(): Promise<DigestArticle[]> {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const recent = await db
+    .select(ARTICLE_SELECT)
+    .from(articlesTable)
+    .where(
+      and(
+        eq(articlesTable.status, "published"),
+        gte(articlesTable.publishedAt, sevenDaysAgo),
+      ),
+    )
+    .orderBy(desc(articlesTable.publishedAt))
+    .limit(10);
+
+  const pool: DigestArticle[] =
+    recent.length === 0
+      ? await db
+          .select(ARTICLE_SELECT)
+          .from(articlesTable)
+          .where(eq(articlesTable.status, "published"))
+          .orderBy(desc(articlesTable.publishedAt))
+          .limit(5)
+      : recent;
+
+  // Pull the most-recently-published featured article to the front
+  const featuredIdx = pool.findIndex((a) => a.featured);
+  if (featuredIdx > 0) {
+    const [feat] = pool.splice(featuredIdx, 1);
+    pool.unshift(feat);
+  }
+
+  return pool.slice(0, 10);
 }
 
 async function sendWeeklyNewsletterBatch(): Promise<void> {
@@ -44,22 +88,7 @@ async function sendWeeklyNewsletterBatch(): Promise<void> {
     return;
   }
 
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
-  const articles = await db
-    .select({
-      title: articlesTable.title,
-      slug: articlesTable.slug,
-      dek: articlesTable.dek,
-      category: articlesTable.category,
-      publishedAt: articlesTable.publishedAt,
-    })
-    .from(articlesTable)
-    .where(
-      eq(articlesTable.status, "published"),
-    )
-    .orderBy(desc(articlesTable.publishedAt))
-    .limit(5);
+  const articles = await selectNewsletterArticles();
 
   const subscribers = await db
     .select({ email: subscribersTable.email })
@@ -84,7 +113,6 @@ async function sendWeeklyNewsletterBatch(): Promise<void> {
       failed++;
       logger.warn({ email, err }, "newsletter.weekly: failed to send to subscriber");
     }
-    // Small delay to avoid SendGrid rate limits
     await new Promise((r) => setTimeout(r, 50));
   }
 

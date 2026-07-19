@@ -2189,6 +2189,7 @@ components:
           sourceMetadata,
           createdAt,
           updatedAt,
+          featured,
         ]
       properties:
         id:
@@ -2235,6 +2236,8 @@ components:
           type: ["array", "null"]
           items:
             type: string
+        featured:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -2294,6 +2297,9 @@ components:
           type: ["string", "null"]
           format: date-time
           description: Override the publication timestamp; only applies when status is published or approved
+        featured:
+          type: boolean
+          description: Mark this article as the newsletter's featured story
     ApprovalOptions:
       type: object
       properties:

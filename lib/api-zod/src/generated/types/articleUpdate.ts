@@ -31,4 +31,6 @@ export interface ArticleUpdate {
      * @nullable
      */
   publishedAt?: Date | null;
+  /** Mark this article as the newsletter's featured story */
+  featured?: boolean;
 }

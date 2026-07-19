@@ -42,6 +42,7 @@ export interface Article {
   rejectionReason: string | null;
   /** @nullable */
   sourceUrls?: string[] | null;
+  featured: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

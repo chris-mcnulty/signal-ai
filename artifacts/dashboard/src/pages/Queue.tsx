@@ -9,6 +9,7 @@ import {
   getGetDraftsSummaryQueryKey,
   usePublishDraft,
   useApproveDraft,
+  useUpdateDraft,
 } from "@workspace/api-client-react";
 import { ArticleStatus } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -47,6 +48,7 @@ import {
   AlertTriangle,
   ArrowDownUp,
   Globe,
+  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -107,6 +109,7 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
 
   const publishMutation = usePublishDraft();
   const approveMutation = useApproveDraft();
+  const updateMutation = useUpdateDraft();
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: getListDraftsQueryKey() });
@@ -462,6 +465,26 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
                         "{draft.rejectionReason}"
                       </div>
                     )}
+                    <button
+                      type="button"
+                      title={draft.featured ? "Remove newsletter star" : "Star as featured newsletter story"}
+                      className={`p-1 rounded transition-colors ${draft.featured ? "text-amber-500 hover:text-amber-600" : "text-muted-foreground/40 hover:text-amber-400 opacity-0 group-hover:opacity-100"}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        updateMutation.mutate(
+                          { id: draft.id, data: { featured: !draft.featured } },
+                          {
+                            onSuccess: () => {
+                              invalidate();
+                              toast({ title: draft.featured ? "Removed newsletter star" : "Starred for newsletter" });
+                            },
+                          },
+                        );
+                      }}
+                    >
+                      <Star className={`w-3.5 h-3.5 ${draft.featured ? "fill-amber-400" : ""}`} />
+                    </button>
                     <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity sm:block hidden" />
                   </div>
                 </div>

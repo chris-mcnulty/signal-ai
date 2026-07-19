@@ -4,6 +4,9 @@ import { db, editorsTable } from "@workspace/db";
 import { requireEditor } from "../middlewares/requireEditor";
 import { requireAdmin } from "../middlewares/requireAdmin";
 import { randomBytes } from "crypto";
+import { z } from "zod/v4";
+import { isSendGridConfigured, sendWeeklyDigest } from "../lib/sendgrid";
+import { selectNewsletterArticles, weekLabel } from "../lib/scheduler";
 
 const router: IRouter = Router();
 
@@ -135,5 +138,36 @@ router.delete("/admin/editors/:email", requireEditor, requireAdmin, async (req, 
 
   res.status(204).end();
 });
+
+const TestNewsletterBody = z.object({ email: z.string().email() });
+
+router.post(
+  "/admin/newsletter/send-test",
+  requireEditor,
+  async (req, res): Promise<void> => {
+    const parsed = TestNewsletterBody.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.message });
+      return;
+    }
+
+    if (!isSendGridConfigured()) {
+      res.status(503).json({ error: "SendGrid is not configured on this server" });
+      return;
+    }
+
+    const articles = await selectNewsletterArticles();
+    const label = weekLabel();
+
+    await sendWeeklyDigest(parsed.data.email, articles, label);
+
+    res.json({
+      ok: true,
+      sentTo: parsed.data.email,
+      articleCount: articles.length,
+      weekLabel: label,
+    });
+  },
+);
 
 export default router;

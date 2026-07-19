@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download, Star } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -297,6 +297,21 @@ export default function DraftEditor() {
     });
   };
 
+  const handleToggleFeatured = () => {
+    if (!draftId || !draft) return;
+    updateMutation.mutate(
+      { id: draftId, data: { featured: !draft.featured } },
+      {
+        onSuccess: () => {
+          toast({
+            title: draft.featured ? "Removed newsletter star" : "Starred for newsletter",
+          });
+          invalidateAndRefresh();
+        },
+      },
+    );
+  };
+
   const handleExport = async () => {
     if (!draftId) return;
     const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
@@ -510,6 +525,18 @@ export default function DraftEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {!isNew && draft && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleToggleFeatured}
+              disabled={updateMutation.isPending}
+              title={draft.featured ? "Remove newsletter star" : "Star as featured newsletter story"}
+              className={draft.featured ? "text-amber-500 border-amber-300 hover:text-amber-600" : "text-muted-foreground"}
+            >
+              <Star className={`w-4 h-4 ${draft.featured ? "fill-amber-400" : ""}`} />
+            </Button>
+          )}
           {!isNew && draftId && (
             <Button
               variant="outline"

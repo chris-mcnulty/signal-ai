@@ -6,6 +6,7 @@ import {
   timestamp,
   uniqueIndex,
   jsonb,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -46,6 +47,7 @@ export const articlesTable = pgTable(
     sourceMetadata: jsonb("source_metadata"),
     scheduledFor: timestamp("scheduled_for", { withTimezone: true }),
     publishedAt: timestamp("published_at", { withTimezone: true }),
+    featured: boolean("featured").notNull().default(false),
     rejectionReason: text("rejection_reason"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

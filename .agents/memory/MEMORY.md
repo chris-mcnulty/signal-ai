@@ -11,3 +11,4 @@
 - [Radix Select empty reset](radix-select-empty-reset.md) — Radix Select fires onValueChange("") after form.reset; guard with `if (v)` or it wipes the value.
 - [Auth getter at render time](auth-getter-render-time.md) — register API auth token getter during provider render, not useEffect; child queries fire before parent effects.
 - [BlueTrail rebrand](bluetrail-rebrand.md) — site renamed to BlueTrail Intelligence Report; brand config is env-var driven; staff byline backward compat pattern.
+- [Newsletter article selection](newsletter-article-selection.md) — 7-day window with top-5 fallback; featured article (DB boolean) sorts first; test-send via POST /api/admin/newsletter/send-test (requireEditor)

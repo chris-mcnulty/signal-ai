@@ -318,6 +318,7 @@ export interface Article {
   rejectionReason: string | null;
   /** @nullable */
   sourceUrls?: string[] | null;
+  featured: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -365,6 +366,8 @@ export interface ArticleUpdate {
      * @nullable
      */
   publishedAt?: string | null;
+  /** Mark this article as the newsletter's featured story */
+  featured?: boolean;
 }
 
 export interface ApprovalOptions {

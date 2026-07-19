@@ -342,6 +342,7 @@ export const SubmitDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -394,6 +395,7 @@ export const GenerateDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -435,6 +437,7 @@ export const ListDraftsResponseItem = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -489,6 +492,7 @@ export const CreateDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -542,6 +546,7 @@ export const GetDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -569,7 +574,8 @@ export const UpdateDraftBody = zod.object({
   "dek": zod.string().nullish(),
   "imageUrl": zod.string().nullish(),
   "sourceUrls": zod.array(zod.string()).nullish(),
-  "publishedAt": zod.coerce.date().nullish().describe('Override the publication timestamp; only applies when status is published or approved')
+  "publishedAt": zod.coerce.date().nullish().describe('Override the publication timestamp; only applies when status is published or approved'),
+  "featured": zod.boolean().optional().describe('Mark this article as the newsletter\'s featured story')
 })
 
 export const UpdateDraftResponse = zod.object({
@@ -601,6 +607,7 @@ export const UpdateDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -656,6 +663,7 @@ export const ApproveDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -701,6 +709,7 @@ export const RejectDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -742,6 +751,7 @@ export const PublishDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
@@ -783,6 +793,7 @@ export const UnpublishDraftResponse = zod.object({
   "publishedAt": zod.coerce.date().nullable(),
   "rejectionReason": zod.string().nullable(),
   "sourceUrls": zod.array(zod.string()).nullish(),
+  "featured": zod.boolean(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date()
 })
