@@ -37,39 +37,107 @@ router.get("/analytics/overview", requireEditor, async (req, res): Promise<void>
   const { days } = parsed.data;
   const since = rangeStart(days);
 
-  const totalRow = await db
-    .select({ views: sql<number>`count(*)::int` })
-    .from(articleViewsTable)
-    .where(gte(articleViewsTable.viewedAt, since));
+  const [
+    totalRow,
+    uniqueArticlesRow,
+    series,
+    topArticlesRows,
+    referrerRows,
+    deviceRows,
+    browserRows,
+    osRows,
+    botRows,
+  ] = await Promise.all([
+    db
+      .select({ views: sql<number>`count(*)::int` })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`)),
 
-  const uniqueArticlesRow = await db
-    .select({ count: sql<number>`count(distinct ${articleViewsTable.articleId})::int` })
-    .from(articleViewsTable)
-    .where(gte(articleViewsTable.viewedAt, since));
+    db
+      .select({ count: sql<number>`count(distinct ${articleViewsTable.articleId})::int` })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`)),
 
-  const series = await db
-    .select({
-      day: sql<string>`to_char(date_trunc('day', ${articleViewsTable.viewedAt}), 'YYYY-MM-DD')`,
-      views: sql<number>`count(*)::int`,
-    })
-    .from(articleViewsTable)
-    .where(gte(articleViewsTable.viewedAt, since))
-    .groupBy(sql`date_trunc('day', ${articleViewsTable.viewedAt})`)
-    .orderBy(sql`date_trunc('day', ${articleViewsTable.viewedAt})`);
+    db
+      .select({
+        day: sql<string>`to_char(date_trunc('day', ${articleViewsTable.viewedAt}), 'YYYY-MM-DD')`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`))
+      .groupBy(sql`date_trunc('day', ${articleViewsTable.viewedAt})`)
+      .orderBy(sql`date_trunc('day', ${articleViewsTable.viewedAt})`),
 
-  const topArticlesRows = await db
-    .select({
-      id: articlesTable.id,
-      slug: articlesTable.slug,
-      title: articlesTable.title,
-      views: sql<number>`count(*)::int`,
-    })
-    .from(articleViewsTable)
-    .innerJoin(articlesTable, sql`${articleViewsTable.articleId} = ${articlesTable.id}`)
-    .where(gte(articleViewsTable.viewedAt, since))
-    .groupBy(articlesTable.id, articlesTable.slug, articlesTable.title)
-    .orderBy(desc(sql`count(*)`))
-    .limit(10);
+    db
+      .select({
+        id: articlesTable.id,
+        slug: articlesTable.slug,
+        title: articlesTable.title,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .innerJoin(articlesTable, sql`${articleViewsTable.articleId} = ${articlesTable.id}`)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`))
+      .groupBy(articlesTable.id, articlesTable.slug, articlesTable.title)
+      .orderBy(desc(sql`count(*)`))
+      .limit(10),
+
+    db
+      .select({
+        host: sql<string>`coalesce(${articleViewsTable.referrerHost}, '(direct)')`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`))
+      .groupBy(sql`coalesce(${articleViewsTable.referrerHost}, '(direct)')`)
+      .orderBy(desc(sql`count(*)`))
+      .limit(10),
+
+    db
+      .select({
+        label: sql<string>`coalesce(${articleViewsTable.device}, 'unknown')`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`))
+      .groupBy(sql`coalesce(${articleViewsTable.device}, 'unknown')`)
+      .orderBy(desc(sql`count(*)`)),
+
+    db
+      .select({
+        label: sql<string>`coalesce(${articleViewsTable.browser}, 'unknown')`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`))
+      .groupBy(sql`coalesce(${articleViewsTable.browser}, 'unknown')`)
+      .orderBy(desc(sql`count(*)`)),
+
+    db
+      .select({
+        label: sql<string>`coalesce(${articleViewsTable.os}, 'unknown')`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = false`))
+      .groupBy(sql`coalesce(${articleViewsTable.os}, 'unknown')`)
+      .orderBy(desc(sql`count(*)`)),
+
+    db
+      .select({
+        name: sql<string>`coalesce(${articleViewsTable.botName}, 'unknown')`,
+        kind: sql<string>`coalesce(${articleViewsTable.botCategory}, 'other')`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(articleViewsTable)
+      .where(and(gte(articleViewsTable.viewedAt, since), sql`${articleViewsTable.isBot} = true`))
+      .groupBy(
+        sql`coalesce(${articleViewsTable.botName}, 'unknown')`,
+        sql`coalesce(${articleViewsTable.botCategory}, 'other')`,
+      )
+      .orderBy(desc(sql`count(*)`))
+      .limit(15),
+  ]);
 
   const topArticleIds = topArticlesRows.map((r) => r.id);
   const allTimeRows =
@@ -102,6 +170,11 @@ router.get("/analytics/overview", requireEditor, async (req, res): Promise<void>
       views: r.views,
       allTimeViews: allTimeMap.get(r.id) ?? r.views,
     })),
+    referrers: referrerRows.map((r) => ({ host: r.host, views: r.views })),
+    deviceBreakdown: deviceRows.map((r) => ({ label: r.label, views: r.views })),
+    browserBreakdown: browserRows.map((r) => ({ label: r.label, views: r.views })),
+    osBreakdown: osRows.map((r) => ({ label: r.label, views: r.views })),
+    botTraffic: botRows.map((r) => ({ name: r.name, kind: r.kind, views: r.views })),
   });
 });
 

@@ -897,21 +897,37 @@ export interface AnalyticsTopArticle {
   allTimeViews: number;
 }
 
+export interface AnalyticsBreakdownStat {
+  label: string;
+  views: number;
+}
+
+export interface AnalyticsBotStat {
+  name: string;
+  kind: string;
+  views: number;
+}
+
 export type AnalyticsOverviewTotals = {
   views: number;
   uniqueArticles: number;
 };
+
+export interface AnalyticsReferrerStat {
+  host: string;
+  views: number;
+}
 
 export interface AnalyticsOverview {
   rangeDays: number;
   totals: AnalyticsOverviewTotals;
   series: AnalyticsDayStat[];
   topArticles: AnalyticsTopArticle[];
-}
-
-export interface AnalyticsReferrerStat {
-  host: string;
-  views: number;
+  referrers: AnalyticsReferrerStat[];
+  deviceBreakdown: AnalyticsBreakdownStat[];
+  browserBreakdown: AnalyticsBreakdownStat[];
+  osBreakdown: AnalyticsBreakdownStat[];
+  botTraffic: AnalyticsBotStat[];
 }
 
 export type AnalyticsArticleDetailArticle = {

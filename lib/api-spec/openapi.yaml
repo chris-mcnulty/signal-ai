@@ -2959,9 +2959,27 @@ components:
           type: integer
         allTimeViews:
           type: integer
+    AnalyticsBreakdownStat:
+      type: object
+      required: [label, views]
+      properties:
+        label:
+          type: string
+        views:
+          type: integer
+    AnalyticsBotStat:
+      type: object
+      required: [name, kind, views]
+      properties:
+        name:
+          type: string
+        kind:
+          type: string
+        views:
+          type: integer
     AnalyticsOverview:
       type: object
-      required: [rangeDays, totals, series, topArticles]
+      required: [rangeDays, totals, series, topArticles, referrers, deviceBreakdown, browserBreakdown, osBreakdown, botTraffic]
       properties:
         rangeDays:
           type: integer
@@ -2981,6 +2999,26 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AnalyticsTopArticle"
+        referrers:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsReferrerStat"
+        deviceBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsBreakdownStat"
+        browserBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsBreakdownStat"
+        osBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsBreakdownStat"
+        botTraffic:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalyticsBotStat"
     AnalyticsReferrerStat:
       type: object
       required: [host, views]

@@ -5,8 +5,11 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AnalyticsBotStat } from './analyticsBotStat';
+import type { AnalyticsBreakdownStat } from './analyticsBreakdownStat';
 import type { AnalyticsDayStat } from './analyticsDayStat';
 import type { AnalyticsOverviewTotals } from './analyticsOverviewTotals';
+import type { AnalyticsReferrerStat } from './analyticsReferrerStat';
 import type { AnalyticsTopArticle } from './analyticsTopArticle';
 
 export interface AnalyticsOverview {
@@ -14,4 +17,9 @@ export interface AnalyticsOverview {
   totals: AnalyticsOverviewTotals;
   series: AnalyticsDayStat[];
   topArticles: AnalyticsTopArticle[];
+  referrers: AnalyticsReferrerStat[];
+  deviceBreakdown: AnalyticsBreakdownStat[];
+  browserBreakdown: AnalyticsBreakdownStat[];
+  osBreakdown: AnalyticsBreakdownStat[];
+  botTraffic: AnalyticsBotStat[];
 }

@@ -1512,6 +1512,27 @@ export const GetAnalyticsOverviewResponse = zod.object({
   "title": zod.string(),
   "views": zod.number(),
   "allTimeViews": zod.number()
+})),
+  "referrers": zod.array(zod.object({
+  "host": zod.string(),
+  "views": zod.number()
+})),
+  "deviceBreakdown": zod.array(zod.object({
+  "label": zod.string(),
+  "views": zod.number()
+})),
+  "browserBreakdown": zod.array(zod.object({
+  "label": zod.string(),
+  "views": zod.number()
+})),
+  "osBreakdown": zod.array(zod.object({
+  "label": zod.string(),
+  "views": zod.number()
+})),
+  "botTraffic": zod.array(zod.object({
+  "name": zod.string(),
+  "kind": zod.string(),
+  "views": zod.number()
 }))
 })
 
