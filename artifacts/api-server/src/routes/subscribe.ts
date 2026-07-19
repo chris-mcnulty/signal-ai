@@ -1,7 +1,12 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, subscribersTable } from "@workspace/db";
-import { syncContactToSendGrid, sendWelcomeEmail, isSendGridConfigured } from "../lib/sendgrid";
+import {
+  syncContactToSendGrid,
+  sendWelcomeEmail,
+  isSendGridConfigured,
+  verifyUnsubscribeToken,
+} from "../lib/sendgrid";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -72,6 +77,40 @@ router.post("/unsubscribe", async (req, res): Promise<void> => {
     .update(subscribersTable)
     .set({ unsubscribedAt: new Date() })
     .where(eq(subscribersTable.email, normalized));
+  res.json({ ok: true });
+});
+
+// GET used by one-click email unsubscribe links (token-signed)
+router.get("/unsubscribe", async (req, res): Promise<void> => {
+  const { email, token } = req.query as { email?: string; token?: string };
+  if (!email || !token) {
+    res.status(400).json({ error: "email and token are required" });
+    return;
+  }
+  if (!verifyUnsubscribeToken(email, token)) {
+    res.status(403).json({ error: "Invalid unsubscribe token" });
+    return;
+  }
+  const normalized = email.trim().toLowerCase();
+  const [existing] = await db
+    .select({ unsubscribedAt: subscribersTable.unsubscribedAt })
+    .from(subscribersTable)
+    .where(eq(subscribersTable.email, normalized))
+    .limit(1);
+
+  if (!existing) {
+    res.json({ ok: true, alreadyUnsubscribed: true });
+    return;
+  }
+  if (existing.unsubscribedAt) {
+    res.json({ ok: true, alreadyUnsubscribed: true });
+    return;
+  }
+  await db
+    .update(subscribersTable)
+    .set({ unsubscribedAt: new Date() })
+    .where(eq(subscribersTable.email, normalized));
+  logger.info({ email: normalized }, "subscriber unsubscribed via email link");
   res.json({ ok: true });
 });
 

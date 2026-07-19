@@ -335,44 +335,59 @@ export function Header() {
 export function Footer() {
   return (
     <footer className="bg-black text-white py-12 px-6 md:px-12 mt-12">
-      <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-        <div>
-          <h2 className="font-serif text-3xl font-black tracking-tight mb-1">
-            bluetr<span className="text-accent">AI</span>l
-          </h2>
-          <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-            Intelligence Report
-          </p>
-          <p className="font-mono text-xs text-gray-600 mt-2 max-w-xs leading-relaxed">
-            The BlueTrail Report is a trademark of BlueTrail Intelligence Ltd.{" "}
-            © {new Date().getFullYear()} All rights reserved.
-          </p>
+      <div className="max-w-[1600px] mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-10">
+          <div>
+            <h2 className="font-serif text-3xl font-black tracking-tight mb-1">
+              bluetr<span className="text-accent">AI</span>l
+            </h2>
+            <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
+              Intelligence Report
+            </p>
+            <p className="font-mono text-[11px] text-gray-600 mt-3 max-w-xs leading-relaxed">
+              A production of BlueTrail Intelligence Ltd.<br />
+              Ahead of the frontier.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-6 font-mono text-xs uppercase tracking-wider">
+            <Link href="/about" className="hover:text-accent transition-colors" data-testid="link-about">
+              About
+            </Link>
+            <Link href="/privacy" className="hover:text-accent transition-colors">
+              Privacy
+            </Link>
+            <a href="/dashboard/" className="hover:text-accent transition-colors" data-testid="link-editorial">
+              Editorial Login
+            </a>
+            <a
+              href="https://www.linkedin.com/company/bluetrail-intelligence"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-accent transition-colors flex items-center gap-1.5"
+              aria-label="BlueTrail Intelligence on LinkedIn"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+              LinkedIn
+            </a>
+            <a
+              href="/rss.xml"
+              className="hover:text-accent transition-colors flex items-center gap-1.5"
+              data-testid="link-rss"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20 4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+              </svg>
+              RSS Feed
+            </a>
+          </div>
         </div>
-        <div className="flex flex-wrap justify-center gap-6 font-mono text-sm uppercase tracking-wider">
-          <Link
-            href="/about"
-            className="hover:text-accent transition-colors"
-            data-testid="link-about"
-          >
-            About
-          </Link>
-          <a
-            href="/dashboard/"
-            className="hover:text-accent transition-colors"
-            data-testid="link-editorial"
-          >
-            Editorial Login
-          </a>
-          <a
-            href="/rss.xml"
-            className="hover:text-accent transition-colors flex items-center gap-1.5"
-            data-testid="link-rss"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20 4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
-            </svg>
-            RSS Feed
-          </a>
+        <div className="border-t border-gray-900 pt-6">
+          <p className="font-mono text-[10px] text-gray-700 uppercase tracking-widest">
+            © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
+            The bluetrAIl Intelligence Report is a trademark of BlueTrail Intelligence Ltd.
+          </p>
         </div>
       </div>
     </footer>

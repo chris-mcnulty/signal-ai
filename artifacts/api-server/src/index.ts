@@ -3,6 +3,7 @@ import { logger } from "./lib/logger";
 import { startSeoNotifier } from "./lib/indexnow";
 import { logSeoBootStatus } from "./lib/seoSubmit";
 import { startCoverageScheduler } from "./lib/seoCoverage";
+import { startNewsletterScheduler } from "./lib/scheduler";
 import { initEngine } from "./engine";
 import { seedLibraryIfEmpty } from "./lib/seedLibrary";
 import { migrateImagePathsIfNeeded } from "./lib/migrateImagePaths";
@@ -31,6 +32,7 @@ app.listen(port, (err) => {
   logSeoBootStatus();
   startSeoNotifier();
   startCoverageScheduler();
+  startNewsletterScheduler();
   initEngine();
   migrateImagePathsIfNeeded().catch((err) => logger.warn({ err }, "Image path migration failed"));
   seedLibraryIfEmpty().catch((err) => logger.warn({ err }, "Library seed failed"));

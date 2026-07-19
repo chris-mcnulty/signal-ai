@@ -212,6 +212,34 @@ export async function resolveSeoPage(
     };
   }
 
+  if (path === "/privacy") {
+    return {
+      status: "ok",
+      path,
+      kind: "hub",
+      title: `Privacy Statement — ${SITE.name}`,
+      description: "BlueTrail Intelligence privacy statement: how we collect, use, and protect your information.",
+      canonicalUrl: `${baseUrl}/privacy`,
+      ogImageUrl: defaultOgImage(baseUrl),
+      ogType: "website",
+      jsonLd: [organizationPageJsonLd(baseUrl)],
+    };
+  }
+
+  if (path === "/unsubscribe") {
+    return {
+      status: "ok",
+      path,
+      kind: "hub",
+      title: `Unsubscribe — ${SITE.name}`,
+      description: "Unsubscribe from the bluetrAIl Intelligence Report newsletter.",
+      canonicalUrl: `${baseUrl}/unsubscribe`,
+      ogImageUrl: defaultOgImage(baseUrl),
+      ogType: "website",
+      jsonLd: [],
+    };
+  }
+
   const spotlightMatch = /^\/spotlights\/([^/]+)$/.exec(path);
   if (spotlightMatch) {
     const entry = await getSpotlightBySlug(spotlightMatch[1]!);

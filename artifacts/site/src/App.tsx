@@ -15,6 +15,8 @@ import UseCases from "@/pages/use-cases";
 import Opinion from "@/pages/opinion";
 import About from "@/pages/about";
 import AuthorPage from "@/pages/author";
+import PrivacyPage from "@/pages/privacy";
+import UnsubscribePage from "@/pages/unsubscribe";
 import { SeoHead } from "@/lib/seo";
 
 const queryClient = new QueryClient({
@@ -39,6 +41,8 @@ function Router() {
       <Route path="/opinion" component={Opinion} />
       <Route path="/about" component={About} />
       <Route path="/authors/:slug" component={AuthorPage} />
+      <Route path="/privacy" component={PrivacyPage} />
+      <Route path="/unsubscribe" component={UnsubscribePage} />
       <Route component={NotFound} />
     </Switch>
   );

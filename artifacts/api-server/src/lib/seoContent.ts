@@ -81,6 +81,13 @@ export async function listPublicSeoPages(): Promise<SeoPage[]> {
       lastmod: newestUpdate,
       articleId: null,
     },
+    {
+      path: "/privacy",
+      kind: "hub",
+      title: "Privacy Statement",
+      lastmod: null,
+      articleId: null,
+    },
   ];
   for (const article of articles) {
     const kind: SeoPageKind =
