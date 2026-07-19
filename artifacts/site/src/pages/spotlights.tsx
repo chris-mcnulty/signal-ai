@@ -53,7 +53,7 @@ export default function SpotlightsPage() {
           <SpotlightSkeleton />
         ) : spotlights && spotlights.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {spotlights.map((spotlight, index) => (
+            {[...spotlights].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()).map((spotlight, index) => (
               <Link
                 key={spotlight.id}
                 href={`/spotlights/${spotlight.slug}`}
@@ -92,7 +92,7 @@ export default function SpotlightsPage() {
 
                   <div className="flex items-center justify-between border-t border-news pt-4 mt-auto">
                     <div className="font-mono text-xs text-news-secondary uppercase">
-                      {spotlight.company.name}
+                      {new Date(spotlight.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                     <span className="font-mono text-xs text-accent uppercase tracking-widest group-hover:tracking-[0.15em] transition-all">
                       Read &rarr;
