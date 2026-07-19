@@ -24,7 +24,7 @@ export function Cobalt() {
         backgroundImage: "url(/__mockup/images/hero-trail.jpeg)",
         backgroundSize: "cover",
         backgroundPosition: "center 30%",
-        minHeight: "340px",
+        minHeight: "174px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
@@ -39,7 +39,7 @@ export function Cobalt() {
         <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -60%)", textAlign: "center" }}>
           <div style={{ fontFamily: "'Cormorant Garamond', 'Playfair Display', serif", fontSize: "3.5rem", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#fff", textShadow: "0 2px 12px rgba(11,46,89,0.5)" }}>
             <span>bluetr</span>
-            <span style={{ color: "#5ba3ff" }}>AI</span>
+            <span style={{ color: "#0047AB" }}>AI</span>
             <span>l</span>
           </div>
           <div style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.62rem", textTransform: "uppercase", letterSpacing: "0.32em", color: "rgba(255,255,255,0.75)", marginTop: "0.3rem", fontWeight: 500 }}>
@@ -70,15 +70,18 @@ export function Cobalt() {
       {/* Story grid */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1px 1fr 1px 1fr", padding: "0 2.5rem" }}>
         {/* Lead */}
-        <div style={{ paddingRight: "1.75rem", paddingTop: "1.75rem", paddingBottom: "1.75rem" }}>
-          <div style={{ background: cobalt, color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.14em", padding: "0.2rem 0.55rem", display: "inline-block", marginBottom: "0.875rem", fontWeight: 600 }}>Analysis</div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', 'Playfair Display', serif", fontSize: "1.85rem", fontWeight: 700, lineHeight: 1.1, marginBottom: "0.875rem", color: navy }}>
+        <div style={{ paddingRight: "1.75rem", paddingTop: "1.75rem", paddingBottom: "1.75rem", borderTop: `4px solid ${cobalt}` }}>
+          <div style={{ background: cobalt, color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.14em", padding: "0.25rem 0.65rem", display: "inline-block", marginBottom: "1rem", fontWeight: 700 }}>Lead Analysis</div>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', 'Playfair Display', serif", fontSize: "2.55rem", fontWeight: 700, lineHeight: 1.05, marginBottom: "1rem", color: navy }}>
             Enterprise AI Adoption Reaches Inflection Point as Costs Collapse
           </h2>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.875rem", color: textSecondary, lineHeight: 1.65, marginBottom: "0.875rem" }}>
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.95rem", color: textSecondary, lineHeight: 1.7, marginBottom: "1rem" }}>
             Fortune 500 companies are deploying AI at scale across core workflows, driven by a 70% reduction in inference costs over eighteen months.
           </p>
-          <div style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.62rem", color: silver, letterSpacing: "0.04em" }}>BlueTrail Staff · Jul 19, 2026</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <span style={{ display: "inline-block", width: 28, height: 2, background: cobalt }} />
+            <span style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.62rem", color: silver, letterSpacing: "0.06em" }}>BlueTrail Staff · Jul 19, 2026</span>
+          </div>
         </div>
 
         <div style={{ background: silver, width: 1 }} />
