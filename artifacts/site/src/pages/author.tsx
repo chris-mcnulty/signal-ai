@@ -11,7 +11,7 @@ function AuthorSkeleton() {
         <div className="w-1/3" />
         <div className="w-1/3 text-center">
           <span className="font-serif text-xl font-black tracking-tight text-news-primary">
-            Signal<span className="text-accent">AI</span>
+            bluetr<span className="text-accent">AI</span>l
           </span>
         </div>
         <div className="w-1/3" />
@@ -94,7 +94,7 @@ export default function AuthorPage() {
         <div className="w-1/3 text-center">
           <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
             <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
-              Signal<span className="text-accent">AI</span>
+              bluetr<span className="text-accent">AI</span>l
             </h1>
           </Link>
         </div>

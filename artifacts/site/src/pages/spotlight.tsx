@@ -12,7 +12,7 @@ function SpotlightDetailSkeleton() {
         <div className="w-1/3" />
         <div className="w-1/3 text-center">
           <span className="font-serif text-xl font-black tracking-tight text-news-primary">
-            Signal<span className="text-accent">AI</span>
+            bluetr<span className="text-accent">AI</span>l
           </span>
         </div>
         <div className="w-1/3" />

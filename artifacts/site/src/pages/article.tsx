@@ -197,7 +197,7 @@ export default function ArticlePage() {
         <div className="w-1/3 text-center">
           <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
             <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
-              Signal<span className="text-accent">AI</span>
+              bluetr<span className="text-accent">AI</span>l
             </h1>
           </Link>
         </div>
