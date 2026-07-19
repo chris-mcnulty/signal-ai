@@ -25,7 +25,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 px-6 h-14 flex items-center border-b border-border bg-background/90 backdrop-blur-md">
         <div className="flex items-center gap-6">
           <Link href="/queue" className="flex items-center gap-2 font-bold tracking-tight text-lg hover:opacity-80 transition-opacity shrink-0">
-            <span className="text-[#0B2E59]">bluestr<span className="text-[#0047AB]">AI</span>l</span>
+            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 700 }} className="text-[#0B2E59]">bluetr<span className="text-[#0047AB]">AI</span>l</span>
           </Link>
 
           <nav className="flex items-center gap-0.5">
