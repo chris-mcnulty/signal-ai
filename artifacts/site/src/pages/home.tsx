@@ -95,6 +95,39 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Hero banner — full-bleed trail image with masthead overlay */}
+      <div style={{
+        position: "relative",
+        backgroundImage: "url(/hero-trail.jpeg)",
+        backgroundSize: "cover",
+        backgroundPosition: "center 30%",
+        minHeight: "174px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
+      }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to bottom, rgba(11,46,89,0.15) 0%, rgba(11,46,89,0.55) 55%, rgba(11,46,89,0.92) 100%)"
+        }} />
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -60%)", textAlign: "center" }}>
+          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1, color: "#fff", textShadow: "0 2px 12px rgba(11,46,89,0.4)" }}>
+            bluetr<span style={{ color: "#0047AB" }}>AI</span>l
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.6rem", textTransform: "uppercase", letterSpacing: "0.32em", color: "rgba(255,255,255,0.75)", marginTop: "0.3rem", fontWeight: 500 }}>
+            Intelligence Report
+          </div>
+        </div>
+        <div style={{ position: "relative", zIndex: 1, padding: "1rem 2.5rem 0.875rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", fontStyle: "italic", color: "rgba(255,255,255,0.9)", margin: 0, letterSpacing: "0.01em" }}>
+            Ahead of the frontier.
+          </p>
+          <span style={{ fontFamily: "'IBM Plex Sans', 'Inter', sans-serif", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(184,194,204,0.9)" }}>
+            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </span>
+        </div>
+      </div>
+
       <main className="max-w-[1600px] mx-auto p-6 md:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-12">
           

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -59,54 +59,54 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 36 17% 96%;
-  --foreground: 0 0% 10%;
-  --border: 36 10% 80%;
+  --background: 0 0% 100%;
+  --foreground: 213 78% 20%;
+  --border: 210 16% 76%;
 
-  --card: 36 17% 96%;
-  --card-foreground: 0 0% 10%;
-  --card-border: 36 10% 80%;
+  --card: 0 0% 100%;
+  --card-foreground: 213 78% 20%;
+  --card-border: 210 16% 76%;
 
-  --popover: 36 17% 96%;
-  --popover-foreground: 0 0% 10%;
-  --popover-border: 36 10% 80%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 213 78% 20%;
+  --popover-border: 210 16% 76%;
 
-  --primary: 9 70% 50%;
-  --primary-foreground: 36 17% 96%;
+  --primary: 215 100% 34%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 0 0% 29%;
-  --secondary-foreground: 36 17% 96%;
+  --secondary: 213 78% 20%;
+  --secondary-foreground: 0 0% 100%;
 
-  --muted: 36 10% 80%;
-  --muted-foreground: 0 0% 29%;
+  --muted: 210 16% 76%;
+  --muted-foreground: 210 10% 40%;
 
-  --accent: 9 70% 50%;
-  --accent-foreground: 36 17% 96%;
+  --accent: 215 100% 34%;
+  --accent-foreground: 0 0% 100%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --input: 36 10% 80%;
-  --ring: 0 0% 10%;
+  --input: 210 16% 76%;
+  --ring: 213 78% 20%;
   
-  --chart-1: 9 70% 50%;
-  --chart-2: 0 0% 29%;
-  --chart-3: 36 10% 80%;
-  --chart-4: 0 0% 10%;
+  --chart-1: 215 100% 34%;
+  --chart-2: 213 78% 20%;
+  --chart-3: 210 16% 76%;
+  --chart-4: 213 78% 20%;
   --chart-5: 0 0% 50%;
 
-  --sidebar: 36 17% 96%;
-  --sidebar-foreground: 0 0% 10%;
-  --sidebar-border: 36 10% 80%;
-  --sidebar-primary: 9 70% 50%;
-  --sidebar-primary-foreground: 36 17% 96%;
-  --sidebar-accent: 36 10% 80%;
-  --sidebar-accent-foreground: 0 0% 10%;
-  --sidebar-ring: 0 0% 10%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 213 78% 20%;
+  --sidebar-border: 210 16% 76%;
+  --sidebar-primary: 215 100% 34%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 16% 76%;
+  --sidebar-accent-foreground: 213 78% 20%;
+  --sidebar-ring: 213 78% 20%;
 
   --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: 'Playfair Display', serif;
-  --app-font-mono: 'Space Mono', monospace;
+  --app-font-serif: 'Cormorant Garamond', serif;
+  --app-font-mono: 'IBM Plex Sans', sans-serif;
   --radius: 0rem;
 }
 
@@ -119,50 +119,50 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --background: 0 0% 10%;
-  --foreground: 36 17% 96%;
-  --border: 0 0% 29%;
+  --background: 213 78% 10%;
+  --foreground: 0 0% 96%;
+  --border: 213 30% 25%;
 
-  --card: 0 0% 10%;
-  --card-foreground: 36 17% 96%;
-  --card-border: 0 0% 29%;
+  --card: 213 78% 10%;
+  --card-foreground: 0 0% 96%;
+  --card-border: 213 30% 25%;
 
-  --popover: 0 0% 10%;
-  --popover-foreground: 36 17% 96%;
-  --popover-border: 0 0% 29%;
+  --popover: 213 78% 10%;
+  --popover-foreground: 0 0% 96%;
+  --popover-border: 213 30% 25%;
 
-  --primary: 9 70% 50%;
-  --primary-foreground: 36 17% 96%;
+  --primary: 215 100% 55%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 36 10% 80%;
-  --secondary-foreground: 0 0% 10%;
+  --secondary: 210 16% 76%;
+  --secondary-foreground: 213 78% 10%;
 
-  --muted: 0 0% 29%;
-  --muted-foreground: 36 10% 80%;
+  --muted: 213 30% 25%;
+  --muted-foreground: 210 16% 76%;
 
-  --accent: 9 70% 50%;
-  --accent-foreground: 36 17% 96%;
+  --accent: 215 100% 55%;
+  --accent-foreground: 0 0% 100%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --input: 0 0% 29%;
-  --ring: 36 10% 80%;
+  --input: 213 30% 25%;
+  --ring: 210 16% 76%;
   
-  --chart-1: 9 70% 50%;
-  --chart-2: 36 10% 80%;
-  --chart-3: 0 0% 29%;
-  --chart-4: 36 17% 96%;
+  --chart-1: 215 100% 55%;
+  --chart-2: 210 16% 76%;
+  --chart-3: 213 30% 25%;
+  --chart-4: 0 0% 96%;
   --chart-5: 0 0% 50%;
 
-  --sidebar: 0 0% 10%;
-  --sidebar-foreground: 36 17% 96%;
-  --sidebar-border: 0 0% 29%;
-  --sidebar-primary: 9 70% 50%;
-  --sidebar-primary-foreground: 36 17% 96%;
-  --sidebar-accent: 0 0% 29%;
-  --sidebar-accent-foreground: 36 17% 96%;
-  --sidebar-ring: 36 10% 80%;
+  --sidebar: 213 78% 10%;
+  --sidebar-foreground: 0 0% 96%;
+  --sidebar-border: 213 30% 25%;
+  --sidebar-primary: 215 100% 55%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 213 30% 25%;
+  --sidebar-accent-foreground: 0 0% 96%;
+  --sidebar-ring: 210 16% 76%;
 }
 
 @layer base {
@@ -182,11 +182,11 @@
 /* ─── Broadsheet Theme ─────────────────────────────────────────── */
 
 .broadsheet-theme {
-  --bg-color: #f7f5f2;
-  --text-primary: #1a1a1a;
-  --text-secondary: #4a4a4a;
-  --accent: #d94226;
-  --border-color: #d1cdc7;
+  --bg-color: #ffffff;
+  --text-primary: #0B2E59;
+  --text-secondary: #4a5568;
+  --accent: #0047AB;
+  --border-color: #B8C2CC;
   
   background-color: var(--bg-color);
   color: var(--text-primary);
@@ -200,11 +200,11 @@
 .broadsheet-theme h4, 
 .broadsheet-theme h5,
 .font-serif {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
 }
 
 .broadsheet-theme .font-mono {
-  font-family: 'Space Mono', monospace;
+  font-family: 'IBM Plex Sans', sans-serif;
 }
 
 .border-news {
@@ -313,7 +313,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(247, 245, 242, 0.97);
+  background: rgba(255, 255, 255, 0.97);
   display: flex;
   align-items: flex-start;
   padding-top: 6rem;
@@ -329,7 +329,7 @@
 }
 
 .search-overlay input {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 700;
   width: 100%;
@@ -379,7 +379,7 @@
 }
 
 .search-result-category {
-  font-family: 'Space Mono', monospace;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -388,7 +388,7 @@
 }
 
 .search-result-title {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(1rem, 2.5vw, 1.25rem);
   font-weight: 700;
   color: var(--text-primary);
@@ -396,7 +396,7 @@
 }
 
 .search-result-dek {
-  font-family: 'Space Mono', monospace;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.72rem;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -420,14 +420,14 @@
 }
 
 .search-empty-heading {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .search-empty-sub {
-  font-family: 'Space Mono', monospace;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.72rem;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -440,7 +440,7 @@
   background: var(--accent);
   color: #f7f5f2;
   border: 2px solid var(--accent);
-  font-family: 'Space Mono', monospace;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -536,7 +536,7 @@
 }
 
 .article-body blockquote {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1.5rem;
   line-height: 1.5;
   color: var(--text-primary);
@@ -549,7 +549,7 @@
 
 .article-body blockquote::before {
   content: '\201C';
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 4rem;
   line-height: 1;
   color: var(--accent);
@@ -569,7 +569,7 @@
 
 /* Drop cap — flush with baseline */
 .article-dropcap::first-letter {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 5.5rem;
   font-weight: 900;
   float: left;
@@ -601,7 +601,7 @@
 }
 
 .metric-value {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 900;
   line-height: 1;
@@ -612,7 +612,7 @@
 }
 
 .metric-label {
-  font-family: 'Space Mono', monospace;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.14em;

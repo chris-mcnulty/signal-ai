@@ -311,7 +311,7 @@ export function Header() {
               </span>
             </Link>
             <p className="header-tagline font-mono text-xs mt-1 text-news-secondary uppercase tracking-widest">
-              Blazing the AI trail ahead of the frontier
+              Ahead of the frontier.
             </p>
           </div>
 
