@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowLeft, Search, Menu, Building } from 'lucide-react';
 import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-react';
-import { SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { NavDrawer, SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { SubscribeModal } from '@/components/SubscribeModal';
 
 function CaseStudyDetailSkeleton() {
   return (
@@ -44,6 +45,8 @@ export default function CaseStudyDetail() {
   const [, params] = useRoute("/case-studies/:slug");
   const slug = params?.slug || "";
   const { searchOpen, openSearch, closeSearch } = useSearch();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
   const { data: study, isLoading, isError, refetch } = useGetCaseStudy(slug, { 
     query: { 
@@ -114,9 +117,11 @@ export default function CaseStudyDetail() {
         </div>
         <div className="w-1/3 flex justify-end gap-1">
           <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" aria-label="Open menu"><Menu size={18} /></button>
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
         </div>
       </header>
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
 
       <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">

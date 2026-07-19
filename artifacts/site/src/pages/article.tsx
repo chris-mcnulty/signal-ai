@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRoute, Link } from 'wouter';
 import { Search, Menu, ArrowLeft, Share2, Bookmark, Twitter, Linkedin } from 'lucide-react';
 import { useGetArticle, getGetArticleQueryKey } from '@workspace/api-client-react';
-import { SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { NavDrawer, SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { SubscribeModal } from '@/components/SubscribeModal';
 
 function ArticleSkeleton() {
   return (
@@ -134,6 +135,8 @@ export default function ArticlePage() {
   const [, params] = useRoute("/articles/:slug");
   const slug = params?.slug || "";
   const { searchOpen, openSearch, closeSearch } = useSearch();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
   const { data: article, isLoading, isError, refetch } = useGetArticle(slug, { 
     query: { 
@@ -203,10 +206,12 @@ export default function ArticlePage() {
         </div>
         <div className="w-1/3 flex justify-end gap-1">
           <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" aria-label="Open menu"><Menu size={18} /></button>
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
         </div>
       </header>
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
 
       <main className="px-6 py-12 md:py-20">
         {/* Article Header — full width, then body constrained */}

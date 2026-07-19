@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRoute, Link } from 'wouter';
 import { ArrowLeft, Search, Menu, Twitter, Linkedin } from 'lucide-react';
 import { useGetAuthor, useListAuthorArticles } from '@workspace/api-client-react';
-import { SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { NavDrawer, SearchOverlay, useSearch, NetworkError } from '@/components/layout';
+import { SubscribeModal } from '@/components/SubscribeModal';
 
 function AuthorSkeleton() {
   return (
@@ -38,6 +39,8 @@ export default function AuthorPage() {
   const [, params] = useRoute('/authors/:slug');
   const slug = params?.slug || '';
   const { searchOpen, openSearch, closeSearch } = useSearch();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
   const {
     data: author,
@@ -102,11 +105,13 @@ export default function AuthorPage() {
           <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search">
             <Search size={18} />
           </button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" aria-label="Open menu">
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu">
             <Menu size={18} />
           </button>
         </div>
       </header>
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
 
       <main className="max-w-[900px] mx-auto px-6 py-16 md:py-24">

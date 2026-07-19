@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useRoute, Link } from 'wouter';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Search, Menu } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-react';
-import { Layout, Header, Footer, NetworkError } from '@/components/layout';
+import { NavDrawer, SearchOverlay, useSearch, Footer, NetworkError } from '@/components/layout';
+import { SubscribeModal } from '@/components/SubscribeModal';
 
 function SpotlightDetailSkeleton() {
   return (
@@ -35,6 +36,9 @@ function SpotlightDetailSkeleton() {
 export default function SpotlightDetail() {
   const [, params] = useRoute("/spotlights/:slug");
   const slug = params?.slug || "";
+  const { searchOpen, openSearch, closeSearch } = useSearch();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
   const { data: spotlight, isLoading, isError, refetch } = useGetSpotlight(slug, {
     query: {
       enabled: !!slug,
@@ -81,8 +85,28 @@ export default function SpotlightDetail() {
   });
 
   return (
-    <Layout>
-      <Header />
+    <div className="broadsheet-theme">
+      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
+        <div className="flex items-center gap-3 w-1/3">
+          <Link href="/spotlights" className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider">
+            <ArrowLeft size={14} /> Spotlights
+          </Link>
+        </div>
+        <div className="w-1/3 text-center">
+          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
+            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
+              bluetr<span className="text-accent">AI</span>l
+            </h1>
+          </Link>
+        </div>
+        <div className="w-1/3 flex justify-end gap-1">
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
+        </div>
+      </header>
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
 
       <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
 
@@ -256,6 +280,6 @@ export default function SpotlightDetail() {
       </main>
 
       <Footer />
-    </Layout>
+    </div>
   );
 }
