@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, ShieldOff, UserX, UserCheck, X } from "lucide-react";
+import { Loader2, UserPlus, Shield, ShieldOff, UserX, UserCheck, X, Mail, Send } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Redirect } from "wouter";
 
@@ -40,6 +40,9 @@ export default function Team() {
   const [pendingToggle, setPendingToggle] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
+
+  const [testNewsletterEmail, setTestNewsletterEmail] = useState("");
+  const [sendingNewsletter, setSendingNewsletter] = useState(false);
 
   const headers = { Authorization: `Bearer ${sessionKey}`, "Content-Type": "application/json" };
 
@@ -106,6 +109,32 @@ export default function Team() {
       toast({ title: String(e), variant: "destructive" });
     } finally {
       setRemoving(null);
+    }
+  };
+
+  const handleSendTestNewsletter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testNewsletterEmail.trim()) return;
+    setSendingNewsletter(true);
+    try {
+      const res = await fetch(`${API_BASE}/admin/newsletter/send-test`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ email: testNewsletterEmail.trim() }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error((body as { error?: string }).error ?? `HTTP ${res.status}`);
+      }
+      const result = await res.json() as { articleCount: number; weekLabel: string };
+      toast({
+        title: `Test digest sent to ${testNewsletterEmail.trim()}`,
+        description: `${result.articleCount} article${result.articleCount !== 1 ? "s" : ""} included · ${result.weekLabel}`,
+      });
+    } catch (e) {
+      toast({ title: String(e), variant: "destructive" });
+    } finally {
+      setSendingNewsletter(false);
     }
   };
 
@@ -331,6 +360,36 @@ export default function Team() {
             </div>
           )}
         </div>
+
+        {/* Newsletter test-send */}
+        <div className="border border-border rounded-xl overflow-hidden">
+          <div className="px-5 py-3 bg-muted/40 border-b border-border flex items-center gap-2">
+            <Mail className="w-4 h-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Newsletter</h2>
+          </div>
+          <div className="p-5 space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Send yourself a preview of this week's digest — uses the same article selection as the scheduled Sunday send (past 7 days, with featured story first).
+            </p>
+            <form onSubmit={handleSendTestNewsletter} className="flex gap-2 max-w-md">
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={testNewsletterEmail}
+                onChange={(e) => setTestNewsletterEmail(e.target.value)}
+                required
+                className="flex-1"
+              />
+              <Button type="submit" disabled={sendingNewsletter || !testNewsletterEmail.trim()} className="gap-2 shrink-0">
+                {sendingNewsletter
+                  ? <Loader2 className="w-4 h-4 animate-spin" />
+                  : <Send className="w-4 h-4" />}
+                Send test
+              </Button>
+            </form>
+          </div>
+        </div>
+
       </div>
     </AppLayout>
   );
