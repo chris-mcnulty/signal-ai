@@ -150,6 +150,13 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
             {stage === "error" && (
               <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.78rem", color: "#ef4444", marginTop: 6 }}>{errorMsg}</p>
             )}
+
+            {(stage === "idle" || stage === "submitting" || stage === "error") && (
+              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.72rem", color: "#9ca3af", lineHeight: 1.55, marginTop: 10 }}>
+                By subscribing, you agree to receive emails from BlueTrail Intelligence, including newsletters, research, events, podcasts, and related communications from BlueTrail and its affiliated organizations. Your information will not be sold or shared with third parties for marketing purposes. You may unsubscribe at any time.{" "}
+                <a href="/privacy" style={{ color: "#6b7280", textDecoration: "underline" }}>View our Privacy Statement.</a>
+              </p>
+            )}
           </div>
 
           {/* Divider */}
