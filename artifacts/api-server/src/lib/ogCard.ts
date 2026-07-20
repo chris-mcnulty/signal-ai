@@ -80,8 +80,9 @@ function buildCard(input: OgCardInput): Node {
           letterSpacing: -1,
         },
         [
-          el("span", { color: COLORS.ink }, "Signal"),
-          el("span", { color: COLORS.accent }, "AI"),
+          el("span", { color: COLORS.ink }, "bluetr"),
+          el("span", { color: COLORS.muted }, "AI"),
+          el("span", { color: COLORS.ink }, "l"),
         ],
       ),
       el(

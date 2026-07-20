@@ -2,10 +2,22 @@ import { Router, type IRouter } from "express";
 import { getBaseUrl, STAFF_BYLINE, LEGACY_STAFF_BYLINE } from "../lib/site";
 import { getPublishedArticleBySlug, resolveSeoPage } from "../lib/seoPage";
 import { renderArticleOgCard } from "../lib/articleOgCard";
+import { renderDefaultOgCard } from "../lib/defaultOgCard";
 import { renderAgentHtml } from "../lib/agentRenderer";
 import { recordArticleView } from "../lib/articleViews";
 
 const router: IRouter = Router();
+
+router.get("/og/default.png", async (_req, res): Promise<void> => {
+  try {
+    const png = await renderDefaultOgCard();
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.send(png);
+  } catch (err) {
+    res.status(500).send("Failed to render default OG card");
+  }
+});
 
 router.get("/og/articles/:slug", async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.slug)

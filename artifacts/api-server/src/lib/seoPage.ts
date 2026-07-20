@@ -52,7 +52,7 @@ export interface ResolvedSeoPage {
 }
 
 function defaultOgImage(baseUrl: string): string {
-  return `${baseUrl}/opengraph.jpg`;
+  return `${baseUrl}/og/default.png`;
 }
 
 function articleDescription(article: Article): string {

@@ -27,13 +27,6 @@ const COLORS = {
   muted: "#B8C2CC",
   accent: "#0047AB",
   line: "#1a4a7a",
-  dim: "#8ca4bf",
-};
-
-export type ArticleOgCardInput = {
-  title: string;
-  category: string;
-  author?: string;
 };
 
 type Node = {
@@ -49,22 +42,16 @@ function el(
   return { type, props: { style, children } };
 }
 
-function headlineFontSize(title: string): number {
-  if (title.length <= 55) return 58;
-  if (title.length <= 80) return 50;
-  if (title.length <= 110) return 42;
-  return 36;
-}
-
-function buildCard(input: ArticleOgCardInput): Node {
+function buildDefaultCard(): Node {
   const masthead = el(
     "div",
     {
       display: "flex",
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       width: "100%",
-      paddingBottom: 20,
+      paddingBottom: 24,
       borderBottom: `1px solid ${COLORS.line}`,
     },
     [
@@ -75,8 +62,8 @@ function buildCard(input: ArticleOgCardInput): Node {
           alignItems: "baseline",
           fontFamily: "DejaVu Serif",
           fontWeight: 700,
-          fontSize: 38,
-          letterSpacing: -0.5,
+          fontSize: 44,
+          letterSpacing: -1,
         },
         [
           el("span", { color: COLORS.ink }, "bluetr"),
@@ -94,24 +81,9 @@ function buildCard(input: ArticleOgCardInput): Node {
           letterSpacing: 3,
           textTransform: "uppercase",
         },
-        SITE.tagline.toUpperCase(),
+        "Intelligence Report",
       ),
     ],
-  );
-
-  const category = el(
-    "div",
-    {
-      display: "flex",
-      fontFamily: "DejaVu Sans Mono",
-      fontWeight: 700,
-      fontSize: 15,
-      color: COLORS.accent,
-      letterSpacing: 3,
-      textTransform: "uppercase",
-      marginTop: 36,
-    },
-    input.category.toUpperCase(),
   );
 
   const headline = el(
@@ -120,29 +92,15 @@ function buildCard(input: ArticleOgCardInput): Node {
       display: "flex",
       fontFamily: "DejaVu Serif",
       fontWeight: 700,
-      fontSize: headlineFontSize(input.title),
-      lineHeight: 1.15,
+      fontSize: 68,
+      lineHeight: 1.12,
       color: COLORS.ink,
-      marginTop: 20,
-      letterSpacing: -0.5,
+      letterSpacing: -1.5,
       flexGrow: 1,
+      marginTop: 40,
     },
-    input.title,
+    SITE.description,
   );
-
-  const authorLine = input.author
-    ? el(
-        "div",
-        {
-          display: "flex",
-          fontFamily: "DejaVu Sans Mono",
-          fontSize: 16,
-          color: COLORS.muted,
-          letterSpacing: 1,
-        },
-        `By ${input.author}`,
-      )
-    : el("div", { display: "flex" });
 
   const footer = el(
     "div",
@@ -153,21 +111,31 @@ function buildCard(input: ArticleOgCardInput): Node {
       width: "100%",
       paddingTop: 24,
       borderTop: `1px solid ${COLORS.line}`,
-      marginTop: "auto",
     },
     [
-      authorLine,
+      el(
+        "div",
+        {
+          display: "flex",
+          fontFamily: "DejaVu Sans Mono",
+          fontSize: 15,
+          color: COLORS.muted,
+          letterSpacing: 2,
+          textTransform: "uppercase",
+        },
+        "Ahead of the frontier.",
+      ),
       el(
         "div",
         {
           display: "flex",
           fontFamily: "DejaVu Sans Mono",
           fontSize: 13,
-          color: COLORS.muted,
+          color: COLORS.line,
           letterSpacing: 2,
           textTransform: "uppercase",
         },
-        SITE.name,
+        "www.bluetrail.ai",
       ),
     ],
   );
@@ -180,53 +148,30 @@ function buildCard(input: ArticleOgCardInput): Node {
       width: "100%",
       height: "100%",
       backgroundColor: COLORS.bg,
-      padding: "40px 56px 44px",
+      padding: "44px 56px 44px",
       borderTop: `8px solid ${COLORS.accent}`,
     },
-    [masthead, category, headline, footer],
+    [masthead, headline, footer],
   );
 }
 
-const cache = new Map<string, { key: string; png: Buffer }>();
-const MAX_CACHE_ENTRIES = 200;
+let cachedPng: Buffer | null = null;
 
-export async function renderArticleOgCard(
-  slug: string,
-  cacheKey: string,
-  input: ArticleOgCardInput,
-): Promise<Buffer> {
-  const cached = cache.get(slug);
-  if (cached && cached.key === cacheKey) {
-    return cached.png;
-  }
+export async function renderDefaultOgCard(): Promise<Buffer> {
+  if (cachedPng) return cachedPng;
 
-  const svg = await satori(buildCard(input) as never, {
+  const svg = await satori(buildDefaultCard() as never, {
     width: 1200,
     height: 630,
     fonts: [
       { name: "DejaVu Serif", data: serif, weight: 400, style: "normal" },
       { name: "DejaVu Serif", data: serifBold, weight: 700, style: "normal" },
       { name: "DejaVu Sans Mono", data: mono, weight: 400, style: "normal" },
-      {
-        name: "DejaVu Sans Mono",
-        data: monoBold,
-        weight: 700,
-        style: "normal",
-      },
+      { name: "DejaVu Sans Mono", data: monoBold, weight: 700, style: "normal" },
     ],
   });
 
-  const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: 1200 },
-  });
-  const png = Buffer.from(resvg.render().asPng());
-
-  if (cache.size >= MAX_CACHE_ENTRIES) {
-    const oldest = cache.keys().next().value;
-    if (oldest !== undefined) {
-      cache.delete(oldest);
-    }
-  }
-  cache.set(slug, { key: cacheKey, png });
-  return png;
+  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: 1200 } });
+  cachedPng = Buffer.from(resvg.render().asPng());
+  return cachedPng;
 }
