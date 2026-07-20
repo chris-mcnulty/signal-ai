@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import { logger } from "./logger";
 
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY?.trim();
 const SENDGRID_LIST_ID = process.env.SENDGRID_LIST_ID?.trim();
@@ -115,7 +116,7 @@ export async function sendWelcomeEmail(email: string): Promise<void> {
     </div>
   `;
 
-  await fetch("https://api.sendgrid.com/v3/mail/send", {
+  const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${SENDGRID_API_KEY}`,
@@ -127,7 +128,11 @@ export async function sendWelcomeEmail(email: string): Promise<void> {
       subject: "You're subscribed to the bluetrAIl Intelligence Report",
       content: [{ type: "text/html", value: html }],
     }),
-  }).catch(() => {});
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    logger.warn({ email, status: res.status, body }, "sendWelcomeEmail: SendGrid rejected request");
+  }
 }
 
 export interface DigestArticle {
@@ -259,7 +264,7 @@ export async function sendWeeklyDigest(
     </div>
   `;
 
-  await fetch("https://api.sendgrid.com/v3/mail/send", {
+  const sgRes = await fetch("https://api.sendgrid.com/v3/mail/send", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${SENDGRID_API_KEY}`,
@@ -271,5 +276,10 @@ export async function sendWeeklyDigest(
       subject: `bluetrAIl Intelligence Digest — ${weekLabel}`,
       content: [{ type: "text/html", value: html }],
     }),
-  }).catch(() => {});
+  });
+  if (!sgRes.ok) {
+    const body = await sgRes.text().catch(() => "");
+    logger.error({ email: subscriberEmail, status: sgRes.status, body }, "sendWeeklyDigest: SendGrid rejected request");
+    throw new Error(`SendGrid ${sgRes.status}: ${body}`);
+  }
 }
