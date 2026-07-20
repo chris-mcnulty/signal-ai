@@ -64,7 +64,8 @@ export default function Home() {
 
   const leadStory = articles?.[0];
   const sidebarStories = articles?.slice(1, 4) || [];
-  const inBrief = inBriefArticles?.slice(0, 4) || [];
+  const shownSlugs = new Set([leadStory?.slug, ...sidebarStories.map(s => s.slug)].filter(Boolean));
+  const inBrief = (inBriefArticles || []).filter(a => !shownSlugs.has(a.slug)).slice(0, 4);
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
