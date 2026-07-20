@@ -311,3 +311,9 @@ id = "EDVPlaM4-oOY7cfDOawq1"
 uri = "file://artifacts/site/public/logo-square-bai.png"
 type = "image"
 title = "bluetrAIl bAI trail monogram (512×512 PNG)"
+
+[[outputs]]
+id = "qE4GkaZAl5tLEF96DV0Qv"
+uri = "file://artifacts/site/public/og-preview.png"
+type = "image"
+title = "New default OG card (1200×630)"

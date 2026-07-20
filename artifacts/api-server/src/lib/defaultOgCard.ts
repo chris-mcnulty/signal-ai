@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
-import { SITE } from "./site";
 
 const workspaceRoot = process.cwd().endsWith(
   path.join("artifacts", "api-server"),
@@ -21,40 +20,30 @@ const serifBold = loadFont("DejaVuSerif-Bold.ttf");
 const mono = loadFont("DejaVuSansMono.ttf");
 const monoBold = loadFont("DejaVuSansMono-Bold.ttf");
 
-const COLORS = {
+const C = {
   bg: "#0B2E59",
-  ink: "#ffffff",
-  muted: "#B8C2CC",
-  accent: "#0047AB",
-  line: "#1a4a7a",
+  white: "#ffffff",
+  silver: "#B8C2CC",
+  cobalt: "#0047AB",
+  dim: "#1e4a80",
 };
 
-type Node = {
-  type: string;
-  props: Record<string, unknown> & { children?: unknown };
-};
-
-function el(
-  type: string,
-  style: Record<string, unknown>,
-  children?: unknown,
-): Node {
-  return { type, props: { style, children } };
-}
+type Node = { type: string; props: Record<string, unknown> & { children?: unknown } };
+const el = (type: string, style: Record<string, unknown>, children?: unknown): Node =>
+  ({ type, props: { style, children } });
 
 function buildDefaultCard(): Node {
-  const masthead = el(
+  // Large centered wordmark block
+  const wordmark = el(
     "div",
     {
       display: "flex",
-      flexDirection: "row",
+      flexDirection: "column",
       alignItems: "center",
-      justifyContent: "space-between",
-      width: "100%",
-      paddingBottom: 24,
-      borderBottom: `1px solid ${COLORS.line}`,
+      justifyContent: "center",
     },
     [
+      // "bluetrAIl" — dominant
       el(
         "div",
         {
@@ -62,82 +51,74 @@ function buildDefaultCard(): Node {
           alignItems: "baseline",
           fontFamily: "DejaVu Serif",
           fontWeight: 700,
-          fontSize: 44,
-          letterSpacing: -1,
+          fontSize: 128,
+          letterSpacing: -3,
+          lineHeight: 1,
         },
         [
-          el("span", { color: COLORS.ink }, "bluetr"),
-          el("span", { color: COLORS.muted }, "AI"),
-          el("span", { color: COLORS.ink }, "l"),
+          el("span", { color: C.white }, "bluetr"),
+          el("span", { color: C.silver }, "AI"),
+          el("span", { color: C.white }, "l"),
         ],
       ),
+      // "INTELLIGENCE REPORT" subtitle
       el(
         "div",
         {
           display: "flex",
           fontFamily: "DejaVu Sans Mono",
-          fontSize: 13,
-          color: COLORS.muted,
-          letterSpacing: 3,
+          fontWeight: 700,
+          fontSize: 18,
+          color: C.silver,
+          letterSpacing: 8,
           textTransform: "uppercase",
+          marginTop: 10,
         },
         "Intelligence Report",
       ),
     ],
   );
 
-  const headline = el(
+  // Cobalt rule
+  const rule = el("div", {
+    display: "flex",
+    width: 80,
+    height: 3,
+    backgroundColor: C.cobalt,
+    marginTop: 44,
+    marginBottom: 44,
+  });
+
+  // Tagline
+  const tagline = el(
     "div",
     {
       display: "flex",
       fontFamily: "DejaVu Serif",
-      fontWeight: 700,
-      fontSize: 68,
-      lineHeight: 1.12,
-      color: COLORS.ink,
-      letterSpacing: -1.5,
-      flexGrow: 1,
-      marginTop: 40,
+      fontWeight: 400,
+      fontSize: 28,
+      color: C.silver,
+      letterSpacing: 0,
+      fontStyle: "italic",
     },
-    SITE.description,
+    "Ahead of the frontier.",
   );
 
-  const footer = el(
+  // Domain — bottom right
+  const domain = el(
     "div",
     {
       display: "flex",
-      alignItems: "flex-end",
-      justifyContent: "space-between",
-      width: "100%",
-      paddingTop: 24,
-      borderTop: `1px solid ${COLORS.line}`,
+      position: "absolute",
+      bottom: 36,
+      right: 56,
+      fontFamily: "DejaVu Sans Mono",
+      fontSize: 14,
+      color: C.dim,
+      letterSpacing: 2,
+      textTransform: "uppercase",
     },
-    [
-      el(
-        "div",
-        {
-          display: "flex",
-          fontFamily: "DejaVu Sans Mono",
-          fontSize: 15,
-          color: COLORS.muted,
-          letterSpacing: 2,
-          textTransform: "uppercase",
-        },
-        "Ahead of the frontier.",
-      ),
-      el(
-        "div",
-        {
-          display: "flex",
-          fontFamily: "DejaVu Sans Mono",
-          fontSize: 13,
-          color: COLORS.line,
-          letterSpacing: 2,
-          textTransform: "uppercase",
-        },
-        "www.bluetrail.ai",
-      ),
-    ],
+    "www.bluetrail.ai",
   );
 
   return el(
@@ -145,13 +126,15 @@ function buildDefaultCard(): Node {
     {
       display: "flex",
       flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
       width: "100%",
       height: "100%",
-      backgroundColor: COLORS.bg,
-      padding: "44px 56px 44px",
-      borderTop: `8px solid ${COLORS.accent}`,
+      backgroundColor: C.bg,
+      borderTop: `8px solid ${C.cobalt}`,
+      position: "relative",
     },
-    [masthead, headline, footer],
+    [wordmark, rule, tagline, domain],
   );
 }
 
