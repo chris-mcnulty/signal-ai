@@ -17,6 +17,13 @@ import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -54,8 +61,12 @@ import { cn } from "@/lib/utils";
 
 const API_BASE = "/api";
 
+const CASE_STUDY_CATEGORY = "case-study";
+const SPOTLIGHT_CATEGORY = "spotlight";
+
 type TabValue = "all" | "scheduled" | ArticleStatus;
 type SortKey = "editDate" | "publishDate";
+type ArticleTypeFilter = "all" | "article" | "case-study" | "spotlight";
 
 const STATUS_BORDER: Record<string, string> = {
   pending: "bg-orange-400",
@@ -79,6 +90,7 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
   const [activeTab, setActiveTab] = useState<TabValue>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortKey>("editDate");
+  const [articleTypeFilter, setArticleTypeFilter] = useState<ArticleTypeFilter>("all");
   const [rescheduleTarget, setRescheduleTarget] = useState<{ id: number; title: string } | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>();
 
@@ -233,17 +245,26 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
     return [...list].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   };
 
+  const matchesTypeFilter = (category: string) => {
+    if (articleTypeFilter === "all") return true;
+    if (articleTypeFilter === "case-study") return category === CASE_STUDY_CATEGORY;
+    if (articleTypeFilter === "spotlight") return category === SPOTLIGHT_CATEGORY;
+    return category !== CASE_STUDY_CATEGORY && category !== SPOTLIGHT_CATEGORY;
+  };
+
   const filteredDrafts = sortDrafts(
     activeTab === "scheduled"
       ? scheduledDrafts.filter(
           (d) =>
-            d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            d.category.toLowerCase().includes(searchQuery.toLowerCase())
+            matchesTypeFilter(d.category) &&
+            (d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              d.category.toLowerCase().includes(searchQuery.toLowerCase()))
         )
       : allDrafts.filter(
           (d) =>
-            d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            d.category.toLowerCase().includes(searchQuery.toLowerCase())
+            matchesTypeFilter(d.category) &&
+            (d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              d.category.toLowerCase().includes(searchQuery.toLowerCase()))
         )
   );
 
@@ -294,6 +315,18 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
               Publish date
             </button>
           </div>
+
+          <Select value={articleTypeFilter} onValueChange={(v) => { if (v) setArticleTypeFilter(v as ArticleTypeFilter); }}>
+            <SelectTrigger className="w-36 h-8 text-xs shrink-0">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="article">Article</SelectItem>
+              <SelectItem value="case-study">Case Study</SelectItem>
+              <SelectItem value="spotlight">Spotlight</SelectItem>
+            </SelectContent>
+          </Select>
 
           <Button
             variant="outline"
@@ -393,7 +426,7 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
           }}
         />
       ) : filteredDrafts.length === 0 ? (
-        <QueueEmptyState tab={activeTab} searchQuery={searchQuery} />
+        <QueueEmptyState tab={activeTab} searchQuery={searchQuery} articleTypeFilter={articleTypeFilter} />
       ) : (
         <div className="space-y-2">
           {filteredDrafts.map((draft, i) => (
@@ -637,14 +670,25 @@ export default function Queue({ initialTab = "all" }: { initialTab?: TabValue })
   );
 }
 
-function QueueEmptyState({ tab, searchQuery }: { tab: TabValue; searchQuery: string }) {
-  if (searchQuery) {
+const ARTICLE_TYPE_LABELS: Record<ArticleTypeFilter, string> = {
+  all: "All types",
+  article: "Article",
+  "case-study": "Case Study",
+  spotlight: "Spotlight",
+};
+
+function QueueEmptyState({ tab, searchQuery, articleTypeFilter }: { tab: TabValue; searchQuery: string; articleTypeFilter: ArticleTypeFilter }) {
+  if (searchQuery || articleTypeFilter !== "all") {
     return (
       <div className="text-center py-20 border-2 border-dashed border-border rounded-xl">
         <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
           <Search className="w-5 h-5 text-muted-foreground" />
         </div>
-        <h3 className="text-base font-semibold mb-1">No matches for "{searchQuery}"</h3>
+        <h3 className="text-base font-semibold mb-1">
+          {searchQuery
+            ? `No matches for "${searchQuery}"`
+            : `No ${ARTICLE_TYPE_LABELS[articleTypeFilter]} drafts`}
+        </h3>
         <p className="text-sm text-muted-foreground">Try a different search term or clear the filter.</p>
       </div>
     );
