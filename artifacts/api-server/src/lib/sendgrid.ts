@@ -149,6 +149,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   "case-study": "Case Studies",
   spotlight: "Company Spotlights",
   news: "News",
+  ai: "News",
   "use-cases": "Use Cases",
   opinion: "Opinion",
 };

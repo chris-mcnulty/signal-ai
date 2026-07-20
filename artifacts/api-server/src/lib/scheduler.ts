@@ -66,6 +66,17 @@ export async function selectNewsletterArticles(): Promise<DigestArticle[]> {
           .limit(5)
       : recent;
 
+  // Deduplicate by normalised title (keeps first/newest occurrence)
+  const seenTitles = new Set<string>();
+  const deduped = pool.filter((a) => {
+    const key = a.title.trim().toLowerCase();
+    if (seenTitles.has(key)) return false;
+    seenTitles.add(key);
+    return true;
+  });
+  pool.length = 0;
+  pool.push(...deduped);
+
   // Pull the most-recently-published featured article to the front
   const featuredIdx = pool.findIndex((a) => a.featured);
   if (featuredIdx > 0) {
