@@ -180,7 +180,7 @@ const NAV_LINKS = [
   { href: "/about", label: "About" },
 ];
 
-export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function NavDrawer({ open, onClose, onSubscribe }: { open: boolean; onClose: () => void; onSubscribe?: () => void }) {
   const [location] = useLocation();
 
   useEffect(() => {
@@ -249,6 +249,16 @@ export function NavDrawer({ open, onClose }: { open: boolean; onClose: () => voi
         </nav>
 
         <div className="px-6 py-5 border-t border-news">
+          {onSubscribe && (
+            <button
+              type="button"
+              className="subscribe-cta w-full text-center mb-4"
+              data-testid="nav-drawer-subscribe"
+              onClick={() => { onClose(); onSubscribe(); }}
+            >
+              Subscribe
+            </button>
+          )}
           <p className="font-mono text-xs text-news-secondary uppercase tracking-widest leading-relaxed">
             Blazing the AI trail<br />ahead of the frontier
           </p>
@@ -325,7 +335,7 @@ export function Header() {
         </div>
       </header>
 
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
       <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
     </>
@@ -341,10 +351,10 @@ export function Footer() {
             <h2 className="font-serif text-3xl font-black tracking-tight mb-1">
               bluetr<span className="text-accent">AI</span>l
             </h2>
-            <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
+            <p className="font-mono text-xs text-gray-400 uppercase tracking-widest">
               Intelligence Report
             </p>
-            <p className="font-mono text-[11px] text-gray-600 mt-3 max-w-xs leading-relaxed">
+            <p className="font-mono text-[11px] text-gray-400 mt-3 max-w-xs leading-relaxed">
               A production of BlueTrail Intelligence Ltd.<br />
               Ahead of the frontier.
             </p>
@@ -384,7 +394,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-900 pt-6">
-          <p className="font-mono text-[10px] text-gray-700 uppercase tracking-widest">
+          <p className="font-mono text-[10px] text-gray-400 uppercase tracking-widest">
             © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
             The bluetrAIl Intelligence Report is a trademark of BlueTrail Intelligence Ltd.
           </p>

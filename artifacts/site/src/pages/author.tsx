@@ -110,7 +110,7 @@ export default function AuthorPage() {
           </button>
         </div>
       </header>
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
       <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
 
@@ -231,7 +231,7 @@ export default function AuthorPage() {
         <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
           <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">bluetr<span className="text-accent">AI</span>l</h2>
         </Link>
-        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
+        <p className="font-mono text-xs text-gray-400 uppercase tracking-widest">
           © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
         </p>
       </footer>

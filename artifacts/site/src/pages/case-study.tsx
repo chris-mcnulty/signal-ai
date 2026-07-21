@@ -4,6 +4,7 @@ import { ArrowLeft, Search, Menu, Building } from 'lucide-react';
 import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-react';
 import { NavDrawer, SearchOverlay, useSearch, NetworkError } from '@/components/layout';
 import { SubscribeModal } from '@/components/SubscribeModal';
+import { displayAuthor } from '@/lib/utils';
 
 function CaseStudyDetailSkeleton() {
   return (
@@ -120,7 +121,7 @@ export default function CaseStudyDetail() {
           <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
         </div>
       </header>
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
       <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
 
@@ -269,8 +270,8 @@ export default function CaseStudyDetail() {
                 </div>
               ) : (
                 <>
-                  <div className="font-sans font-bold text-base text-news-primary">{study.author}</div>
-                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Enterprise Analyst</div>
+                  <div className="font-sans font-bold text-base text-news-primary">{displayAuthor(study.author)}</div>
+                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">BlueTrail Staff</div>
                 </>
               )}
             </div>
@@ -364,7 +365,7 @@ export default function CaseStudyDetail() {
         <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
           <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">bluetr<span className="text-accent">AI</span>l</h2>
         </Link>
-        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
+        <p className="font-mono text-xs text-gray-400 uppercase tracking-widest">
           © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
         </p>
       </footer>

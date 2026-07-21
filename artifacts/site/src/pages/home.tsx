@@ -132,7 +132,7 @@ export default function Home() {
         </div>
       </header>
 
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
 
       {/* Ticker / Dateline */}

@@ -1,4 +1,4 @@
-import { escapeHtml, SITE } from "./site";
+import { escapeHtml, SITE, displayByline } from "./site";
 import { jsonLdScript } from "./seo";
 import {
   renderPage,
@@ -35,7 +35,7 @@ async function homeBody(baseUrl: string): Promise<string> {
 <span class="kicker mono">${escapeHtml(a.category)}</span>
 <a class="cs-title" href="${escapeHtml(path)}">${escapeHtml(a.title)}</a>
 <p class="cs-dek">${escapeHtml(a.dek)}</p>
-<p class="cs-company">${escapeHtml(a.author)} — ${formatDate(a.publishedAt ?? a.createdAt)}</p>
+<p class="cs-company">${escapeHtml(displayByline(a.author))} — ${formatDate(a.publishedAt ?? a.createdAt)}</p>
 </li>`;
     })
     .join("\n");
@@ -59,7 +59,7 @@ function articlePageBody(page: ResolvedSeoPage): string {
 <span class="kicker mono">${escapeHtml(article.category)}</span>
 <h1 class="headline">${escapeHtml(article.title)}</h1>
 <p class="dek">${escapeHtml(article.dek)}</p>
-<div class="byline">By ${escapeHtml(article.author)} — ${formatDate(article.publishedAt ?? article.createdAt)} — ${article.readingMinutes} min read</div>
+<div class="byline">By ${escapeHtml(displayByline(article.author))} — ${formatDate(article.publishedAt ?? article.createdAt)} — ${article.readingMinutes} min read</div>
 ${heroHtml}
 <div class="article-body">
 ${renderArticleBody(article.body)}

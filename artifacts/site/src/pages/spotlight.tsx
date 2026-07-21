@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink, Search, Menu } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-react';
 import { NavDrawer, SearchOverlay, useSearch, Footer, NetworkError } from '@/components/layout';
+import { displayAuthor } from '@/lib/utils';
 import { SubscribeModal } from '@/components/SubscribeModal';
 
 function SpotlightDetailSkeleton() {
@@ -104,7 +105,7 @@ export default function SpotlightDetail() {
           <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
         </div>
       </header>
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
       <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
 
@@ -246,8 +247,8 @@ export default function SpotlightDetail() {
                 </div>
               ) : (
                 <>
-                  <div className="font-sans font-bold text-base text-news-primary">{spotlight.author}</div>
-                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Staff Writer</div>
+                  <div className="font-sans font-bold text-base text-news-primary">{displayAuthor(spotlight.author)}</div>
+                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">BlueTrail Staff</div>
                 </>
               )}
             </div>
