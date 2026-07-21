@@ -7,7 +7,6 @@ type ArticleRow = {
   slug: string;
   title: string;
   dek: string;
-  excerpt: string | null;
   body: string;
   seoTitle: string | null;
   seoDescription: string | null;
@@ -17,7 +16,6 @@ function correctArticle(article: ArticleRow): Partial<ArticleRow> | null {
   const fields = [
     "title",
     "dek",
-    "excerpt",
     "body",
     "seoTitle",
     "seoDescription",
@@ -48,7 +46,6 @@ async function main(): Promise<void> {
       slug: articlesTable.slug,
       title: articlesTable.title,
       dek: articlesTable.dek,
-      excerpt: articlesTable.excerpt,
       body: articlesTable.body,
       seoTitle: articlesTable.seoTitle,
       seoDescription: articlesTable.seoDescription,

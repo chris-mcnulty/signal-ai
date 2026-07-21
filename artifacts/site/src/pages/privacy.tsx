@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'wouter';
-import { NavDrawer, SearchOverlay, useSearch, Footer, Layout, Header } from '@/components/layout';
-import { SubscribeModal } from '@/components/SubscribeModal';
+import { Layout, Header, Footer } from '@/components/layout';
 
 const SECTIONS = [
   {
@@ -89,16 +88,9 @@ Updates will be posted on this page together with a revised effective date. Cont
 ];
 
 export default function PrivacyPage() {
-  const { searchOpen, openSearch, closeSearch } = useSearch();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
-
   return (
     <Layout>
       <Header />
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
-      <SearchOverlay open={searchOpen} onClose={closeSearch} />
-      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
 
       <main className="max-w-[760px] mx-auto px-6 py-16 md:py-24">
         <div className="mb-12 animate-fade-in-up">

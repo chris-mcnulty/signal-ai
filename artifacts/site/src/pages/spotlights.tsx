@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { useListSpotlights } from '@workspace/api-client-react';
+import { useListSpotlights, getListSpotlightsQueryKey } from '@workspace/api-client-react';
 import { Layout, Header, Footer, NetworkError } from '@/components/layout';
 
 function SpotlightSkeleton() {
@@ -20,7 +20,7 @@ function SpotlightSkeleton() {
 }
 
 export default function SpotlightsPage() {
-  const { data: spotlights, isLoading, isError, refetch } = useListSpotlights({ query: { retry: 1 } });
+  const { data: spotlights, isLoading, isError, refetch } = useListSpotlights({ query: { retry: 1, queryKey: getListSpotlightsQueryKey() } });
 
   if (isError) {
     return (

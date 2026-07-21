@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { useListCaseStudies } from '@workspace/api-client-react';
+import { useListCaseStudies, getListCaseStudiesQueryKey } from '@workspace/api-client-react';
 import { Layout, Header, Footer, NetworkError } from '@/components/layout';
 
 function CaseStudySkeleton() {
@@ -35,7 +35,7 @@ function CaseStudySkeleton() {
 }
 
 export default function CaseStudiesPage() {
-  const { data: caseStudies, isLoading, isError, refetch } = useListCaseStudies({ query: { retry: 1 } });
+  const { data: caseStudies, isLoading, isError, refetch } = useListCaseStudies({ query: { retry: 1, queryKey: getListCaseStudiesQueryKey() } });
 
   if (isError) {
     return (

@@ -1,6 +1,6 @@
 import { useRoute, Link } from 'wouter';
 import { Twitter, Linkedin } from 'lucide-react';
-import { useGetAuthor, useListAuthorArticles } from '@workspace/api-client-react';
+import { useGetAuthor, useListAuthorArticles, getListAuthorArticlesQueryKey } from '@workspace/api-client-react';
 import { DetailHeader, Footer, NetworkError } from '@/components/layout';
 
 function AuthorSkeleton() {
@@ -44,8 +44,13 @@ export default function AuthorPage() {
     refetch: refetchAuthor,
   } = useGetAuthor(slug, { query: { enabled: !!slug } });
 
-  const { data: articlesPage, isLoading: articlesLoading } = useListAuthorArticles(slug, {
-    query: { enabled: !!slug },
+  const {
+    data: articlesPage,
+    isLoading: articlesLoading,
+    isError: articlesError,
+    refetch: refetchArticles,
+  } = useListAuthorArticles(slug, {
+    query: { enabled: !!slug, queryKey: getListAuthorArticlesQueryKey(slug) },
   });
   const articles = articlesPage?.items ?? [];
 
@@ -145,13 +150,27 @@ export default function AuthorPage() {
             <h2 className="font-serif text-2xl font-bold">
               {articlesLoading
                 ? 'Loading articles…'
-                : articles.length === 0
-                  ? 'No published articles'
-                  : `${articles.length} Published Article${articles.length !== 1 ? 's' : ''}`}
+                : articlesError
+                  ? 'Could not load articles'
+                  : articles.length === 0
+                    ? 'No published articles'
+                    : `${articles.length} Published Article${articles.length !== 1 ? 's' : ''}`}
             </h2>
           </div>
 
-          {!articlesLoading && articles.length > 0 && (
+          {articlesError && (
+            <div className="border border-news py-8 px-6 text-center">
+              <p className="font-mono text-xs uppercase tracking-widest text-news-secondary mb-4">Failed to load articles</p>
+              <button
+                onClick={() => refetchArticles()}
+                className="font-mono text-xs uppercase tracking-widest text-accent border border-accent px-4 py-2 hover:bg-accent hover:text-white transition-colors duration-200"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {!articlesLoading && !articlesError && articles.length > 0 && (
             <div className="space-y-0 divide-y divide-news">
               {articles.map((article) => {
                 const publishedDate = article.publishedAt

@@ -1,6 +1,6 @@
 import { Link } from 'wouter';
 import { ChevronRight } from 'lucide-react';
-import { useListArticles } from '@workspace/api-client-react';
+import { useListArticles, getListArticlesQueryKey } from '@workspace/api-client-react';
 import { Layout, Header, Footer, NetworkError } from '@/components/layout';
 import { displayAuthor } from '@/lib/utils';
 
@@ -67,7 +67,7 @@ export function CategoryPage({
 }: CategoryPageProps) {
   const { data: articles, isLoading, isError, refetch } = useListArticles(
     { category },
-    { query: { retry: 1 } }
+    { query: { retry: 1, queryKey: getListArticlesQueryKey({ category }) } }
   );
 
   if (isError) {

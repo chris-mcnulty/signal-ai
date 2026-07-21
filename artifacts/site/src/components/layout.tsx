@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { Search, Menu, X, WifiOff, RotateCcw, ArrowLeft } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SubscribeModal } from "./SubscribeModal";
-import { useListArticles } from "@workspace/api-client-react";
+import { useListArticles, getListArticlesQueryKey } from "@workspace/api-client-react";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -63,9 +63,10 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
   const trimmedQuery = debouncedQuery.trim();
 
+  const searchParams = trimmedQuery ? { q: trimmedQuery } : {};
   const { data: results } = useListArticles(
-    trimmedQuery ? { q: trimmedQuery } : {},
-    { query: { enabled: open && !!trimmedQuery, staleTime: 30_000 } },
+    searchParams,
+    { query: { enabled: open && !!trimmedQuery, staleTime: 30_000, queryKey: getListArticlesQueryKey(searchParams) } },
   );
 
   useEffect(() => {

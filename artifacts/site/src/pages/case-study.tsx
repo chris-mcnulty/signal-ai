@@ -3,6 +3,7 @@ import { Building } from 'lucide-react';
 import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-react';
 import { DetailHeader, Footer, NetworkError } from '@/components/layout';
 import { displayAuthor } from '@/lib/utils';
+import { ArticleBody } from '@/components/ArticleBody';
 
 function CaseStudyDetailSkeleton() {
   return (
@@ -89,7 +90,6 @@ export default function CaseStudyDetail() {
     year: 'numeric', month: 'long', day: 'numeric'
   });
 
-  const bodyParagraphs = study.body.split('\n\n').filter(p => p.trim() !== '');
 
   return (
     <div className="broadsheet-theme">
@@ -184,23 +184,8 @@ export default function CaseStudyDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           {/* Article Body */}
-          <div className="lg:col-span-8 article-body font-sans text-news-primary animate-fade-in-up delay-200 max-w-none">
-            {bodyParagraphs.map((paragraph, index) => {
-              if (index === 0) {
-                return (
-                  <p key={index} className="article-dropcap">
-                    {paragraph}
-                  </p>
-                );
-              }
-              if (paragraph.startsWith('## ')) {
-                return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
-              }
-              if (paragraph.startsWith('> ')) {
-                return <blockquote key={index}>{paragraph.replace('> ', '')}</blockquote>;
-              }
-              return <p key={index}>{paragraph}</p>;
-            })}
+          <div className="lg:col-span-8 animate-fade-in-up delay-200">
+            <ArticleBody body={study.body} />
           </div>
 
           {/* Sidebar */}

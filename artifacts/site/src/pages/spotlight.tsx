@@ -1,9 +1,9 @@
 import { useRoute, Link } from 'wouter';
 import { ExternalLink } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-react';
 import { DetailHeader, Footer, NetworkError } from '@/components/layout';
 import { displayAuthor } from '@/lib/utils';
+import { ArticleBody } from '@/components/ArticleBody';
 
 function SpotlightDetailSkeleton() {
   return (
@@ -165,24 +165,8 @@ export default function SpotlightDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           {/* Article Body */}
-          <div className="lg:col-span-8 article-body font-sans text-news-primary animate-fade-in-up delay-200 max-w-none">
-            {(() => {
-              let pCount = 0;
-              return (
-                <ReactMarkdown
-                  components={{
-                    p: ({ children }) => (
-                      <p className={pCount++ === 0 ? 'article-dropcap' : ''}>{children}</p>
-                    ),
-                    a: ({ href, children }) => (
-                      <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
-                    ),
-                  }}
-                >
-                  {spotlight.body}
-                </ReactMarkdown>
-              );
-            })()}
+          <div className="lg:col-span-8 animate-fade-in-up delay-200">
+            <ArticleBody body={spotlight.body} />
           </div>
 
           {/* Sidebar */}

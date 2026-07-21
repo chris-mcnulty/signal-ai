@@ -7,13 +7,13 @@
  *   SSR  — a direct URL loads the api-server's Express template
  *          (artifacts/api-server/src/pages/caseStudyPages.ts + layout.ts).
  *          CSS selectors: section.metrics > div.metric > div.value
- *          Accent colour defined as: --accent:#d94226  → rgb(217,66,38)
+ *          Accent colour defined as: --accent:#0047AB  → rgb(0,71,171)
  *
  *   SPA  — the React app (artifacts/site) is loaded first at /, then the
  *          wouter router is navigated client-side to the same slug without
  *          a full page reload, rendering case-study.tsx.
  *          CSS selectors: span.metric-value inside div.metric-cell
- *          Accent colour defined as: --accent:#d94226  → rgb(217,66,38)
+ *          Accent colour defined as: --accent:#0047AB  → rgb(0,71,171)
  *
  * Assertions shared by both paths:
  *   1. The metrics grid section is visible.
@@ -28,7 +28,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 const SLUG = "synozur-pe-ai-transformation";
-const ACCENT_RGB = "rgb(217, 66, 38)";
+const ACCENT_RGB = "rgb(0, 71, 171)";
 
 // ---------------------------------------------------------------------------
 // Helpers
