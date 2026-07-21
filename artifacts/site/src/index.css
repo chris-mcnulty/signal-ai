@@ -195,7 +195,7 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.dark .broadsheet-theme {
+html.dark {
   --bg-color: #0a1929;
   --text-primary: #e8edf3;
   --text-secondary: #8fa3b8;
@@ -322,7 +322,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.97);
+  background: color-mix(in srgb, var(--bg-color, #ffffff) 97%, transparent);
   display: flex;
   align-items: flex-start;
   padding-top: 6rem;
@@ -757,7 +757,7 @@
   z-index: 201;
   width: 288px;
   max-width: 85vw;
-  background: var(--bg-news, #f7f5f2);
+  background: var(--bg-color, #f7f5f2);
   border-right: 4px solid var(--border-color, #1a1a1a);
   display: flex;
   flex-direction: column;
