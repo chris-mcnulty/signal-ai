@@ -251,6 +251,80 @@ test.describe("Spotlights listing page — logo containers", () => {
     );
     await expect(allLogoContainers).toHaveCount(2);
   });
+
+  test("displays spotlights sorted newest-first by publishedAt", async ({
+    page,
+  }) => {
+    const older = {
+      ...MOCK_SPOTLIGHT_SUMMARY,
+      id: 10,
+      slug: "older-spotlight",
+      title: "Older Spotlight Article",
+      publishedAt: "2026-05-01T12:00:00.000Z",
+    };
+    const newer = {
+      ...MOCK_SPOTLIGHT_SUMMARY,
+      id: 11,
+      slug: "newer-spotlight",
+      title: "Newer Spotlight Article",
+      publishedAt: "2026-07-10T12:00:00.000Z",
+    };
+    // Intentionally pass older first to confirm the page re-sorts them.
+    await mockSpotlightsList(page, [older, newer]);
+    await page.goto("/spotlights");
+
+    await expect(
+      page.locator('[data-testid^="link-spotlight-"]'),
+    ).toHaveCount(2, { timeout: 15_000 });
+
+    const cards = page.locator('[data-testid^="link-spotlight-"]');
+    // The first card in the DOM must be the newer spotlight.
+    await expect(cards.nth(0)).toHaveAttribute(
+      "data-testid",
+      `link-spotlight-${newer.slug}`,
+    );
+    // The second card must be the older spotlight.
+    await expect(cards.nth(1)).toHaveAttribute(
+      "data-testid",
+      `link-spotlight-${older.slug}`,
+    );
+  });
+
+  test("shows empty state when the API returns an empty array", async ({
+    page,
+  }) => {
+    await mockSpotlightsList(page, []);
+    await page.goto("/spotlights");
+
+    // The empty-state message must appear.
+    await expect(
+      page.getByText("No Spotlights Available"),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // No spotlight cards should be rendered.
+    await expect(
+      page.locator('[data-testid^="link-spotlight-"]'),
+    ).toHaveCount(0);
+  });
+
+  test("shows NetworkError screen when the spotlights API is unreachable", async ({
+    page,
+  }) => {
+    // Abort the request to simulate a network failure.
+    await page.route(/\/api\/spotlights(\?|$)/, (route) => route.abort());
+    await page.goto("/spotlights");
+
+    // The NetworkError component renders a "Try Again" button when the fetch fails.
+    await expect(
+      page.getByRole("button", { name: /try again/i }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // No spotlight cards or empty-state text should appear.
+    await expect(
+      page.locator('[data-testid^="link-spotlight-"]'),
+    ).toHaveCount(0);
+    await expect(page.getByText("No Spotlights Available")).toHaveCount(0);
+  });
 });
 
 // ---------------------------------------------------------------------------
