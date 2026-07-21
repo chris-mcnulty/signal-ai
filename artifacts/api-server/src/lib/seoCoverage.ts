@@ -432,7 +432,27 @@ export async function runSeoCoverageScan(
  * configured, so dev environments never hit external APIs.
  */
 export function startCoverageScheduler(): void {
-  if (!googleCoverageConfigured() && !bingCoverageConfigured()) {
+  const gConf = googleCoverageConfigured();
+  const bConf = bingCoverageConfigured();
+
+  logger.info(
+    {
+      googleConfigured: gConf,
+      bingConfigured: bConf,
+      googleSAPresent: Boolean(
+        process.env.GOOGLE_INDEXING_SA_JSON?.trim() ||
+          process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_KEY?.trim(),
+      ),
+      googleSiteUrlPresent: Boolean(
+        process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL?.trim(),
+      ),
+      bingKeyPresent: Boolean(process.env.BING_API_KEY?.trim()),
+      bingSiteUrlPresent: Boolean(process.env.BING_SITE_URL?.trim()),
+    },
+    "seo.coverage: provider configuration",
+  );
+
+  if (!gConf && !bConf) {
     logger.info(
       "seo.coverage: no provider configured; daily scan disabled (set GOOGLE_INDEXING_SA_JSON + GOOGLE_SEARCH_CONSOLE_SITE_URL and/or BING_API_KEY + BING_SITE_URL)",
     );

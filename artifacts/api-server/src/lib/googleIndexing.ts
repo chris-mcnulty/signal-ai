@@ -20,13 +20,43 @@ export function getGoogleServiceAccount(): ServiceAccountKey | null {
   const raw =
     process.env.GOOGLE_INDEXING_SA_JSON ??
     process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_KEY;
-  if (!raw || raw.trim() === "" || !raw.trim().startsWith("{")) {
-    // Missing or a placeholder value (e.g. "Skip") — treat as not configured.
+  if (!raw || raw.trim() === "") {
     return null;
   }
+
+  // Resolve the JSON string: accept raw JSON or base64-encoded JSON.
+  let jsonStr = raw.trim();
+  if (!jsonStr.startsWith("{")) {
+    // Attempt base64 decode — common when JSON is stored as a secret.
+    try {
+      const decoded = Buffer.from(jsonStr, "base64").toString("utf-8").trim();
+      if (decoded.startsWith("{")) {
+        jsonStr = decoded;
+      } else {
+        if (!invalidKeyLogged) {
+          logger.error(
+            "Google Indexing: service-account key is neither raw JSON nor base64-encoded JSON " +
+              "(value does not start with '{' after decoding); " +
+              "set GOOGLE_INDEXING_SA_JSON to the full contents of the key file",
+          );
+          invalidKeyLogged = true;
+        }
+        return null;
+      }
+    } catch {
+      if (!invalidKeyLogged) {
+        logger.error(
+          "Google Indexing: service-account key could not be decoded; expected raw or base64-encoded JSON",
+        );
+        invalidKeyLogged = true;
+      }
+      return null;
+    }
+  }
+
   let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    parsed = JSON.parse(jsonStr);
   } catch {
     if (!invalidKeyLogged) {
       logger.error(
