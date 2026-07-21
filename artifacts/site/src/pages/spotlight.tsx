@@ -4,6 +4,7 @@ import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-
 import { DetailHeader, Footer, NetworkError } from '@/components/layout';
 import { displayAuthor } from '@/lib/utils';
 import { ArticleBody } from '@/components/ArticleBody';
+import { RelatedArticles } from '@/components/RelatedArticles';
 
 function SpotlightDetailSkeleton() {
   return (
@@ -238,6 +239,8 @@ export default function SpotlightDetail() {
           </aside>
         </div>
       </main>
+
+      <RelatedArticles category="spotlight" excludeSlug={spotlight.slug} />
 
       <Footer />
     </div>

@@ -1,8 +1,9 @@
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X, WifiOff, RotateCcw, ArrowLeft } from "lucide-react";
+import { Search, Menu, X, WifiOff, RotateCcw, ArrowLeft, Moon, Sun } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SubscribeModal } from "./SubscribeModal";
 import { useListArticles, getListArticlesQueryKey } from "@workspace/api-client-react";
+import { useTheme } from "@/context/ThemeContext";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -275,6 +276,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [subscribeOpen, setSubscribeOpen] = useState(false);
   const { searchOpen, openSearch, closeSearch } = useSearch();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   useEffect(() => {
     const onScroll = () => {
@@ -328,7 +330,15 @@ export function Header() {
             </p>
           </div>
 
-          <div className="w-1/3 flex justify-end">
+          <div className="w-1/3 flex justify-end items-center gap-1">
+            <button
+              className="mobile-menu-btn text-news-primary"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              data-testid="btn-theme-toggle"
+              onClick={toggleTheme}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <button className="subscribe-cta" data-testid="btn-subscribe" onClick={() => setSubscribeOpen(true)}>
               Subscribe
             </button>
@@ -360,6 +370,7 @@ export function DetailHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const [subscribeOpen, setSubscribeOpen] = useState(false);
   const { searchOpen, openSearch, closeSearch } = useSearch();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   return (
     <>
@@ -381,6 +392,13 @@ export function DetailHeader({
           </Link>
         </div>
         <div className="w-1/3 flex justify-end gap-1">
+          <button
+            className="mobile-menu-btn hover-dim text-news-primary"
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search">
             <Search size={18} />
           </button>

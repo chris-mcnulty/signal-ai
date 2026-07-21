@@ -192,6 +192,15 @@
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dark .broadsheet-theme {
+  --bg-color: #0a1929;
+  --text-primary: #e8edf3;
+  --text-secondary: #8fa3b8;
+  --accent: #4d8fe8;
+  --border-color: #1e3352;
 }
 
 .broadsheet-theme h1, 

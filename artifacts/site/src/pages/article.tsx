@@ -4,6 +4,7 @@ import { Share2, Twitter, Linkedin } from 'lucide-react';
 import { useGetArticle, getGetArticleQueryKey } from '@workspace/api-client-react';
 import { DetailHeader, Footer, NetworkError } from '@/components/layout';
 import { ArticleBody } from '@/components/ArticleBody';
+import { RelatedArticles } from '@/components/RelatedArticles';
 import { toast } from '@/hooks/use-toast';
 import { displayAuthor, categoryHref } from '@/lib/utils';
 
@@ -280,6 +281,8 @@ export default function ArticlePage() {
             {article.category}
           </Link>
         </div>
+
+        <RelatedArticles category={article.category} excludeSlug={article.slug} />
       </main>
 
       <Footer />

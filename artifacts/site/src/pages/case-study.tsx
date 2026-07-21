@@ -4,6 +4,7 @@ import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-
 import { DetailHeader, Footer, NetworkError } from '@/components/layout';
 import { displayAuthor } from '@/lib/utils';
 import { ArticleBody } from '@/components/ArticleBody';
+import { RelatedArticles } from '@/components/RelatedArticles';
 
 function CaseStudyDetailSkeleton() {
   return (
@@ -314,6 +315,8 @@ export default function CaseStudyDetail() {
           </div>
         </section>
       )}
+
+      <RelatedArticles category="case-study" excludeSlug={study.slug} />
 
       <Footer />
     </div>
