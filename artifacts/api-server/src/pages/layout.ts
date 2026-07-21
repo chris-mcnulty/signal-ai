@@ -109,7 +109,7 @@ ${verificationMetaTags()}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="/case-studies/static/signalai-logo.png">
+<link rel="icon" type="image/png" href="/case-studies/static/bluetrail-logo.png">
 <meta property="og:site_name" content="${escapeHtml(SITE.name)}">
 <meta property="og:type" content="${meta.ogType}">
 <meta property="og:title" content="${escapeHtml(meta.title)}">

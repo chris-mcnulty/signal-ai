@@ -30,7 +30,7 @@ export const articlesTable = pgTable(
     dek: text("dek").notNull().default(""),
     body: text("body").notNull(),
     category: text("category").notNull(),
-    author: text("author").notNull().default("SignalAI Staff"),
+    author: text("author").notNull().default("BlueTrail Staff"),
     authorId: integer("author_id").references(() => authorsTable.id, {
       onDelete: "set null",
     }),

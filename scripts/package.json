@@ -7,6 +7,7 @@
     "hello": "tsx ./src/hello.ts",
     "seed-content": "tsx ./src/seed-content.ts",
     "seed-news": "tsx ./src/seed-news.ts",
+    "migrate-legacy-byline": "tsx ./src/migrate-legacy-byline.ts",
     "correct-british-english": "tsx ./src/correct-british-english.ts",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"

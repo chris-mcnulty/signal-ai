@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
 import { useRoute, Link } from 'wouter';
-import { ArrowLeft, ExternalLink, Search, Menu } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useGetSpotlight, getGetSpotlightQueryKey } from '@workspace/api-client-react';
-import { NavDrawer, SearchOverlay, useSearch, Footer, NetworkError } from '@/components/layout';
-import { SubscribeModal } from '@/components/SubscribeModal';
+import { DetailHeader, Footer, NetworkError } from '@/components/layout';
+import { displayAuthor } from '@/lib/utils';
 
 function SpotlightDetailSkeleton() {
   return (
@@ -36,9 +35,6 @@ function SpotlightDetailSkeleton() {
 export default function SpotlightDetail() {
   const [, params] = useRoute("/spotlights/:slug");
   const slug = params?.slug || "";
-  const { searchOpen, openSearch, closeSearch } = useSearch();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
   const { data: spotlight, isLoading, isError, refetch } = useGetSpotlight(slug, {
     query: {
       enabled: !!slug,
@@ -86,27 +82,7 @@ export default function SpotlightDetail() {
 
   return (
     <div className="broadsheet-theme">
-      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
-        <div className="flex items-center gap-3 w-1/3">
-          <Link href="/spotlights" className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider">
-            <ArrowLeft size={14} /> Spotlights
-          </Link>
-        </div>
-        <div className="w-1/3 text-center">
-          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
-              bluetr<span className="text-accent">AI</span>l
-            </h1>
-          </Link>
-        </div>
-        <div className="w-1/3 flex justify-end gap-1">
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
-        </div>
-      </header>
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <SearchOverlay open={searchOpen} onClose={closeSearch} />
-      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
+      <DetailHeader backHref="/spotlights" backLabel="Spotlights" />
 
       <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
 
@@ -224,7 +200,7 @@ export default function SpotlightDetail() {
                   ) : (
                     <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
                       <span className="font-mono text-sm font-bold text-white leading-none">
-                        {spotlight.author.charAt(0)}
+                        {spotlight.authorProfile.name.charAt(0)}
                       </span>
                     </div>
                   )}
@@ -233,7 +209,7 @@ export default function SpotlightDetail() {
                       href={`/authors/${spotlight.authorProfile.slug}`}
                       className="font-sans font-bold text-base text-news-primary hover:text-accent transition-colors block"
                     >
-                      {spotlight.author}
+                      {spotlight.authorProfile.name}
                     </Link>
                     {spotlight.authorProfile.bio && (
                       <p className="font-mono text-xs text-news-secondary mt-1 leading-relaxed">
@@ -246,8 +222,8 @@ export default function SpotlightDetail() {
                 </div>
               ) : (
                 <>
-                  <div className="font-sans font-bold text-base text-news-primary">{spotlight.author}</div>
-                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Staff Writer</div>
+                  <div className="font-sans font-bold text-base text-news-primary">{displayAuthor(spotlight.author)}</div>
+                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Author</div>
                 </>
               )}
             </div>

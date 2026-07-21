@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRoute, Link } from 'wouter';
-import { Search, Menu, ArrowLeft, Share2, Bookmark, Twitter, Linkedin } from 'lucide-react';
+import { Share2, Twitter, Linkedin } from 'lucide-react';
 import { useGetArticle, getGetArticleQueryKey } from '@workspace/api-client-react';
-import { NavDrawer, SearchOverlay, useSearch, NetworkError } from '@/components/layout';
-import { SubscribeModal } from '@/components/SubscribeModal';
+import { DetailHeader, Footer, NetworkError } from '@/components/layout';
+import { toast } from '@/hooks/use-toast';
+import { displayAuthor, categoryHref } from '@/lib/utils';
 
 function ArticleSkeleton() {
   return (
@@ -134,11 +135,8 @@ function renderInlineLinks(text: string, paraIndex: number): React.ReactNode[] {
 export default function ArticlePage() {
   const [, params] = useRoute("/articles/:slug");
   const slug = params?.slug || "";
-  const { searchOpen, openSearch, closeSearch } = useSearch();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
-  const { data: article, isLoading, isError, refetch } = useGetArticle(slug, { 
+  const { data: article, isLoading, isError, refetch } = useGetArticle(slug, {
     query: { 
       enabled: !!slug, 
       queryKey: getGetArticleQueryKey(slug),
@@ -183,35 +181,49 @@ export default function ArticlePage() {
   });
 
   const heroImage = article.heroImageUrl || article.imageUrl;
+  const authorName = displayAuthor(article.author);
+  // Capture narrowed values so the share handlers (closures) don't lose the
+  // non-undefined narrowing of `article` from the guard above.
+  const shareTitle = article.title;
+  const shareDek = article.dek;
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  function shareTwitter() {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  function shareLinkedIn() {
+    window.open(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+  }
+
+  async function shareArticle() {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: shareTitle, text: shareDek, url: shareUrl });
+        return;
+      } catch {
+        // user cancelled the native share sheet — fall through to copy
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({ title: 'Link copied', description: 'Article URL copied to your clipboard.' });
+    } catch {
+      window.prompt('Copy this link:', shareUrl);
+    }
+  }
 
   return (
     <div className="broadsheet-theme">
-      {/* Header (slim article header) */}
-      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
-        <div className="flex items-center gap-3 w-1/3">
-          <Link
-            href="/"
-            className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider"
-            data-testid="link-back-home"
-          >
-            <ArrowLeft size={14} /> Home
-          </Link>
-        </div>
-        <div className="w-1/3 text-center">
-          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
-              bluetr<span className="text-accent">AI</span>l
-            </h1>
-          </Link>
-        </div>
-        <div className="w-1/3 flex justify-end gap-1">
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
-        </div>
-      </header>
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <SearchOverlay open={searchOpen} onClose={closeSearch} />
-      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
+      <DetailHeader backHref="/" backLabel="Home" backTestId="link-back-home" />
 
       <main className="px-6 py-12 md:py-20">
         {/* Article Header — full width, then body constrained */}
@@ -246,27 +258,26 @@ export default function ArticlePage() {
               ) : (
                 <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
                   <span className="font-mono text-base font-bold text-white leading-none">
-                    {article.author.charAt(0)}
+                    {authorName.charAt(0)}
                   </span>
                 </div>
               )}
               <div>
                 {article.authorProfile ? (
                   <Link href={`/authors/${article.authorProfile.slug}`} className="font-sans font-semibold text-sm text-news-primary hover:text-accent transition-colors">
-                    {article.author}
+                    {article.authorProfile.name}
                   </Link>
                 ) : (
-                  <div className="font-sans font-semibold text-sm text-news-primary">{article.author}</div>
+                  <div className="font-sans font-semibold text-sm text-news-primary">{authorName}</div>
                 )}
                 <div className="font-mono text-xs text-news-secondary uppercase tracking-wider">Author</div>
               </div>
             </div>
             
             <div className="flex gap-1 text-news-secondary">
-              <button className="action-btn" data-testid="btn-share-twitter" aria-label="Share on Twitter"><Twitter size={16} /></button>
-              <button className="action-btn" data-testid="btn-share-linkedin" aria-label="Share on LinkedIn"><Linkedin size={16} /></button>
-              <button className="action-btn" data-testid="btn-bookmark" aria-label="Bookmark"><Bookmark size={16} /></button>
-              <button className="action-btn" data-testid="btn-share" aria-label="Share"><Share2 size={16} /></button>
+              <button className="action-btn" data-testid="btn-share-twitter" aria-label="Share on Twitter / X" onClick={shareTwitter}><Twitter size={16} /></button>
+              <button className="action-btn" data-testid="btn-share-linkedin" aria-label="Share on LinkedIn" onClick={shareLinkedIn}><Linkedin size={16} /></button>
+              <button className="action-btn" data-testid="btn-share" aria-label="Share or copy link" onClick={shareArticle}><Share2 size={16} /></button>
             </div>
           </div>
         </header>
@@ -386,7 +397,7 @@ export default function ArticlePage() {
               ) : (
                 <div className="w-16 h-16 bg-[#1a1a1a] flex items-center justify-center shrink-0">
                   <span className="font-serif text-2xl font-bold text-white leading-none">
-                    {article.author.charAt(0)}
+                    {article.authorProfile.name.charAt(0)}
                   </span>
                 </div>
               )}
@@ -396,7 +407,7 @@ export default function ArticlePage() {
                   href={`/authors/${article.authorProfile.slug}`}
                   className="font-serif text-lg font-bold text-news-primary hover:text-accent transition-colors block mb-2"
                 >
-                  {article.author}
+                  {article.authorProfile.name}
                 </Link>
                 <p className="text-sm text-news-secondary font-sans leading-relaxed">{article.authorProfile.bio}</p>
               </div>
@@ -404,28 +415,20 @@ export default function ArticlePage() {
           </div>
         )}
 
-        {/* Tags */}
-        <div className="article-body mx-auto mt-8 pt-6 border-t border-news flex flex-wrap gap-2 animate-fade-in-up delay-300">
-          {[article.category, 'AI Industry', 'Analysis'].map(tag => (
-            <span
-              key={tag}
-              className="font-mono text-xs uppercase border border-news px-3 py-1.5 hover:bg-[#1a1a1a] hover:text-white cursor-pointer transition-colors duration-200"
-            >
-              {tag}
-            </span>
-          ))}
+        {/* Filed under — real category link */}
+        <div className="article-body mx-auto mt-8 pt-6 border-t border-news flex flex-wrap items-center gap-3 animate-fade-in-up delay-300">
+          <span className="font-mono text-xs uppercase tracking-widest text-news-secondary">Filed under</span>
+          <Link
+            href={categoryHref(article.category)}
+            className="font-mono text-xs uppercase border border-news px-3 py-1.5 hover:bg-[#1a1a1a] hover:text-white transition-colors duration-200"
+            data-testid={`link-category-${article.category}`}
+          >
+            {article.category}
+          </Link>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-10 px-6 md:px-12 text-center mt-16">
-        <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
-          <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">bluetr<span className="text-accent">AI</span>l</h2>
-        </Link>
-        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-          © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 }

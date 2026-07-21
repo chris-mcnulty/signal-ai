@@ -30,7 +30,7 @@ export function publisherJsonLd(baseUrl: string): JsonLd {
     url: `${baseUrl}/`,
     logo: {
       "@type": "ImageObject",
-      url: `${baseUrl}/case-studies/static/signalai-logo.png`,
+      url: `${baseUrl}/case-studies/static/bluetrail-logo.png`,
       width: 512,
       height: 512,
     },

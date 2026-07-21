@@ -1,6 +1,6 @@
 import path from "node:path";
 import express, { Router, type IRouter } from "express";
-import { SITE, escapeHtml, getBaseUrl, formatDate } from "../lib/site";
+import { SITE, escapeHtml, getBaseUrl, formatDate, displayByline } from "../lib/site";
 import {
   listCaseStudiesWithArticles,
   getCaseStudyBySlug,
@@ -259,7 +259,7 @@ ${article.sourceUrls
 <hr class="hero-rule">
 <h1 class="headline">${escapeHtml(article.title)}</h1>
 <p class="dek">${escapeHtml(article.dek)}</p>
-<div class="byline mono">By ${escapeHtml(article.author)} · ${escapeHtml(SITE.name)}</div>
+<div class="byline mono">By ${escapeHtml(displayByline(article.author))} · ${escapeHtml(SITE.name)}</div>
 ${heroImageHtml}
 <aside class="company-card">
 <h2 class="mono">Company profile</h2>

@@ -18,6 +18,15 @@ export const STAFF_BYLINE = process.env.SITE_STAFF_BYLINE ?? "BlueTrail Staff";
 /** Legacy byline from the prior brand — kept for backward compat with existing DB rows. */
 export const LEGACY_STAFF_BYLINE = "SignalAI Staff";
 
+/**
+ * Map the legacy staff byline to the current brand for display, so older seeded
+ * rows never surface the retired name to readers. Any other author is returned
+ * unchanged.
+ */
+export function displayByline(author: string): string {
+  return author === LEGACY_STAFF_BYLINE ? STAFF_BYLINE : author;
+}
+
 export function getPublicBaseUrl(): string | null {
   // Explicit canonical origin wins (e.g. a custom domain). Set SITE_URL when
   // the site is served from a domain other than the Replit deployment domain.

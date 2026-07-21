@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Rss, Mail, Check, ExternalLink } from "lucide-react";
 const API_BASE = `${import.meta.env.BASE_URL}api`;
 
@@ -9,8 +9,30 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
   const [stage, setStage] = useState<Stage>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [rssCopied, setRssCopied] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
   const rssUrl = "https://www.bluetrail.ai/rss.xml";
+
+  // Lock background scroll, focus the email field, close on Escape, and restore
+  // focus to the trigger when the modal closes.
+  useEffect(() => {
+    if (!open) return;
+    previouslyFocused.current = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    const focusTimer = setTimeout(() => emailInputRef.current?.focus(), 50);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      clearTimeout(focusTimer);
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      previouslyFocused.current?.focus?.();
+    };
+  }, [open, onClose]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,6 +80,9 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
       <div
         className="relative w-full sm:max-w-md bg-white"
         style={{ borderRadius: "2px 2px 0 0", boxShadow: "0 -4px 40px rgba(0,0,0,0.25)" }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="subscribe-modal-title"
       >
         {/* Header */}
         <div style={{ background: "#0B2E59", padding: "28px 32px 20px" }}>
@@ -68,8 +93,8 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
           >
             <X size={18} />
           </button>
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.6rem", fontWeight: 700, color: "#fff", lineHeight: 1, letterSpacing: "-0.02em" }}>
-            bluetr<span style={{ color: "#B8C2CC" }}>AI</span>l
+          <div id="subscribe-modal-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.6rem", fontWeight: 700, color: "#fff", lineHeight: 1, letterSpacing: "-0.02em" }}>
+            <span className="sr-only">Subscribe to </span>bluetr<span style={{ color: "#B8C2CC" }}>AI</span>l
           </div>
           <div style={{ fontFamily: "'IBM Plex Sans', sans-serif", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", marginTop: 3 }}>
             Intelligence Report
@@ -90,14 +115,14 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
             </div>
 
             {stage === "success" && (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#f0faf4", border: "1px solid #b7e4c7", borderRadius: 2 }}>
+              <div role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#f0faf4", border: "1px solid #b7e4c7", borderRadius: 2 }}>
                 <Check size={16} color="#2d6a4f" />
                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.85rem", color: "#2d6a4f" }}>You're subscribed. Welcome aboard.</span>
               </div>
             )}
 
             {stage === "already" && (
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 2 }}>
+              <div role="status" aria-live="polite" style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 2 }}>
                 <Check size={16} color="#0047AB" />
                 <span style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.85rem", color: "#0047AB" }}>You're already subscribed.</span>
               </div>
@@ -105,11 +130,16 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
 
             {(stage === "idle" || stage === "submitting" || stage === "error") && (
               <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8 }}>
+                <label htmlFor="subscribe-email" className="sr-only">Email address</label>
                 <input
+                  id="subscribe-email"
+                  ref={emailInputRef}
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
                   placeholder="your@email.com"
                   disabled={stage === "submitting"}
                   style={{
@@ -117,9 +147,10 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
                     fontFamily: "'Inter', sans-serif",
                     fontSize: "0.875rem",
                     padding: "10px 14px",
-                    border: stage === "error" ? "1px solid #ef4444" : "1px solid #d1d5db",
+                    border: stage === "error" ? "1px solid #ef4444" : emailFocused ? "1px solid #0047AB" : "1px solid #d1d5db",
                     borderRadius: 2,
                     outline: "none",
+                    boxShadow: emailFocused ? "0 0 0 3px rgba(0,71,171,0.25)" : "none",
                     background: stage === "submitting" ? "#f9fafb" : "#fff",
                     color: "#111",
                   }}
@@ -148,7 +179,7 @@ export function SubscribeModal({ open, onClose }: { open: boolean; onClose: () =
             )}
 
             {stage === "error" && (
-              <p style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.78rem", color: "#ef4444", marginTop: 6 }}>{errorMsg}</p>
+              <p role="alert" aria-live="assertive" style={{ fontFamily: "'Inter', sans-serif", fontSize: "0.78rem", color: "#ef4444", marginTop: 6 }}>{errorMsg}</p>
             )}
 
             {(stage === "idle" || stage === "submitting" || stage === "error") && (

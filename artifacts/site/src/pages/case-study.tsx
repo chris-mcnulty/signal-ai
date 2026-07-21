@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
 import { useRoute, Link } from 'wouter';
-import { ArrowLeft, Search, Menu, Building } from 'lucide-react';
+import { Building } from 'lucide-react';
 import { useGetCaseStudy, getGetCaseStudyQueryKey } from '@workspace/api-client-react';
-import { NavDrawer, SearchOverlay, useSearch, NetworkError } from '@/components/layout';
-import { SubscribeModal } from '@/components/SubscribeModal';
+import { DetailHeader, Footer, NetworkError } from '@/components/layout';
+import { displayAuthor } from '@/lib/utils';
 
 function CaseStudyDetailSkeleton() {
   return (
@@ -44,11 +43,8 @@ function CaseStudyDetailSkeleton() {
 export default function CaseStudyDetail() {
   const [, params] = useRoute("/case-studies/:slug");
   const slug = params?.slug || "";
-  const { searchOpen, openSearch, closeSearch } = useSearch();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [subscribeOpen, setSubscribeOpen] = useState(false);
 
-  const { data: study, isLoading, isError, refetch } = useGetCaseStudy(slug, { 
+  const { data: study, isLoading, isError, refetch } = useGetCaseStudy(slug, {
     query: { 
       enabled: !!slug, 
       queryKey: getGetCaseStudyQueryKey(slug),
@@ -97,32 +93,7 @@ export default function CaseStudyDetail() {
 
   return (
     <div className="broadsheet-theme">
-      {/* Slim header */}
-      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
-        <div className="flex items-center gap-3 w-1/3">
-          <Link
-            href="/case-studies"
-            className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider"
-            data-testid="link-back-list"
-          >
-            <ArrowLeft size={14} /> Case Studies
-          </Link>
-        </div>
-        <div className="w-1/3 text-center">
-          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
-              bluetr<span className="text-accent">AI</span>l
-            </h1>
-          </Link>
-        </div>
-        <div className="w-1/3 flex justify-end gap-1">
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search"><Search size={18} /></button>
-          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu"><Menu size={18} /></button>
-        </div>
-      </header>
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
-      <SearchOverlay open={searchOpen} onClose={closeSearch} />
+      <DetailHeader backHref="/case-studies" backLabel="Case Studies" backTestId="link-back-list" />
 
       <main className="max-w-[1000px] mx-auto px-6 py-12 md:py-20">
         
@@ -247,7 +218,7 @@ export default function CaseStudyDetail() {
                   ) : (
                     <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
                       <span className="font-mono text-sm font-bold text-white leading-none">
-                        {study.author.charAt(0)}
+                        {study.authorProfile.name.charAt(0)}
                       </span>
                     </div>
                   )}
@@ -256,7 +227,7 @@ export default function CaseStudyDetail() {
                       href={`/authors/${study.authorProfile.slug}`}
                       className="font-sans font-bold text-base text-news-primary hover:text-accent transition-colors block"
                     >
-                      {study.author}
+                      {study.authorProfile.name}
                     </Link>
                     {study.authorProfile.bio && (
                       <p className="font-mono text-xs text-news-secondary mt-1 leading-relaxed">
@@ -269,8 +240,8 @@ export default function CaseStudyDetail() {
                 </div>
               ) : (
                 <>
-                  <div className="font-sans font-bold text-base text-news-primary">{study.author}</div>
-                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Enterprise Analyst</div>
+                  <div className="font-sans font-bold text-base text-news-primary">{displayAuthor(study.author)}</div>
+                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Author</div>
                 </>
               )}
             </div>
@@ -359,15 +330,7 @@ export default function CaseStudyDetail() {
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-10 px-6 md:px-12 text-center">
-        <Link href="/" className="inline-block hover:opacity-80 transition-opacity mb-4">
-          <h2 className="font-serif text-2xl font-black tracking-tight text-white/50">bluetr<span className="text-accent">AI</span>l</h2>
-        </Link>
-        <p className="font-mono text-xs text-gray-500 uppercase tracking-widest">
-          © {new Date().getFullYear()} BlueTrail Intelligence Ltd. All rights reserved.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 }
