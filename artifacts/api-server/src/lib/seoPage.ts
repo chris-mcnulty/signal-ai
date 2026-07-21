@@ -51,8 +51,8 @@ export interface ResolvedSeoPage {
   article?: Article;
 }
 
-function defaultOgImage(baseUrl: string): string {
-  return `${baseUrl}/og/default.png`;
+export function defaultOgImage(baseUrl: string): string {
+  return `${baseUrl}/opengraph.jpg`;
 }
 
 function articleDescription(article: Article): string {
