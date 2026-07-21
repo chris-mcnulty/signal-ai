@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -28,10 +29,13 @@ import {
   XCircle,
   AlertTriangle,
   Search,
+  ExternalLink,
+  Pencil,
 } from "lucide-react";
 
 export default function Seo() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const [coverageKind, setCoverageKind] = useState<string | undefined>();
 
@@ -315,6 +319,7 @@ export default function Seo() {
                   <th className="px-4 py-2.5 font-medium">Kind</th>
                   <th className="px-4 py-2.5 font-medium text-red-600 dark:text-red-400">Missing</th>
                   <th className="px-4 py-2.5 font-medium">Suggested description</th>
+                  <th className="px-4 py-2.5 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
@@ -329,7 +334,7 @@ export default function Seo() {
                         <td className="absolute left-0 top-0 bottom-0 w-1 bg-red-400 rounded-l" />
                       )}
                       <td className="px-4 py-2.5 pl-5">
-                        <div className="font-medium truncate max-w-[220px]">{f.title}</div>
+                        <div className="font-medium truncate max-w-[200px]">{f.title}</div>
                         <div className="font-mono text-xs text-muted-foreground">{f.path}</div>
                       </td>
                       <td className="px-4 py-2.5">
@@ -342,10 +347,33 @@ export default function Seo() {
                           ))}
                         </div>
                       </td>
-                      <td className="px-4 py-2.5 text-muted-foreground text-xs max-w-[280px]">
+                      <td className="px-4 py-2.5 text-muted-foreground text-xs max-w-[240px]">
                         <span className="line-clamp-2">
                           {f.suggested.seoDescription ?? "—"}
                         </span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 gap-1 text-xs"
+                            onClick={() => navigate(`/drafts/${f.id}`)}
+                            title="Edit in dashboard"
+                          >
+                            <Pencil className="w-3 h-3" />
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 gap-1 text-xs text-muted-foreground"
+                            onClick={() => window.open(`https://www.bluetrail.ai${f.path}`, "_blank")}
+                            title="View live page"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );

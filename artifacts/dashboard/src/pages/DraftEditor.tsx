@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download, Star } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download, Star, Search } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -112,6 +112,8 @@ const formSchema = z.object({
   imageUrl: z.string().optional().default(""),
   body: z.string().min(1, "Body is required"),
   sourceUrls: z.array(z.string()).optional().default([]),
+  seoTitle: z.string().optional().default(""),
+  seoDescription: z.string().optional().default(""),
 });
 
 export default function DraftEditor() {
@@ -172,6 +174,8 @@ export default function DraftEditor() {
         imageUrl: draft.imageUrl || "",
         body: draft.body,
         sourceUrls: draft.sourceUrls ?? [],
+        seoTitle: draft.seoTitle ?? "",
+        seoDescription: draft.seoDescription ?? "",
       });
       const pa = (draft as { publishedAt?: string | null }).publishedAt;
       setPublishedAtLocal(pa ? toDatetimeLocalInput(pa) : "");
@@ -191,6 +195,8 @@ export default function DraftEditor() {
         body: values.body,
         sourceUrls: cleanUrls.length ? cleanUrls : null,
         publishedAt: publishedAtLocal ? new Date(publishedAtLocal).toISOString() : null,
+        seoTitle: values.seoTitle?.trim() || null,
+        seoDescription: values.seoDescription?.trim() || null,
       };
 
       if (isNew) {
@@ -860,6 +866,59 @@ export default function DraftEditor() {
                 )}
               />
 
+              {/* SEO / Meta overrides */}
+              <div className="border border-border rounded-lg overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/40">
+                  <Search className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">SEO &amp; Meta</span>
+                </div>
+                <div className="p-4 space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="seoTitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>SEO Title</FormLabel>
+                          <span className={`text-xs tabular-nums ${(field.value?.length ?? 0) > 65 ? "text-red-500" : "text-muted-foreground"}`}>
+                            {field.value?.length ?? 0}/65
+                          </span>
+                        </div>
+                        <FormControl>
+                          <Input
+                            placeholder="Leave blank to use the article title"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="seoDescription"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Meta Description</FormLabel>
+                          <span className={`text-xs tabular-nums ${(field.value?.length ?? 0) > 160 ? "text-red-500" : "text-muted-foreground"}`}>
+                            {field.value?.length ?? 0}/160
+                          </span>
+                        </div>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Leave blank to derive from dek / body"
+                            className="resize-none h-16 text-sm"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
               <FormField
                 control={form.control}
                 name="sourceUrls"
@@ -1190,10 +1249,10 @@ export default function DraftEditor() {
                       draftId={draftId}
                       onApplySeo={(proposal) => {
                         if (proposal.seoTitle) {
-                          form.setValue("title", proposal.seoTitle, { shouldDirty: true });
+                          form.setValue("seoTitle", proposal.seoTitle, { shouldDirty: true });
                         }
                         if (proposal.metaDescription) {
-                          form.setValue("dek", proposal.metaDescription, { shouldDirty: true });
+                          form.setValue("seoDescription", proposal.metaDescription, { shouldDirty: true });
                         }
                       }}
                     />
