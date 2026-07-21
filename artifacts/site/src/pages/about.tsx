@@ -16,7 +16,14 @@ export default function AboutPage() {
             Blazing the AI<br className="hidden md:block" /> Trail Ahead
           </h1>
           <p className="text-xl md:text-2xl text-news-secondary font-serif leading-relaxed max-w-3xl">
-            Forward-looking, free coverage of commercial AI — for the people building, deploying, and living with it.
+            Forward-looking, free coverage of commercial AI — for the people building, deploying, and living with it. We are in early access now. The full launch is coming soon.
+          </p>
+        </div>
+
+        <div className="mb-8 border border-news bg-[#f7f5f0] px-6 py-5 animate-fade-in-up">
+          <div className="font-mono text-xs font-bold uppercase tracking-widest text-accent mb-2">Early Access Edition</div>
+          <p className="font-serif text-base text-news-primary leading-relaxed">
+            BlueTrail Intelligence Report is currently in a soft-launch phase. Coverage is live and free to read. Our official launch — with a full editorial slate and expanded reporting — is on its way.
           </p>
         </div>
 
