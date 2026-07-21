@@ -294,23 +294,60 @@ export default function ArticlePage() {
             dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.body) }}
           />
         ) : (
-          <div className="article-body font-sans text-news-primary animate-fade-in-up delay-200 mx-auto">
-            {article.body.split('\n\n').filter(p => p.trim() !== '').map((paragraph, index) => {
-              if (paragraph.startsWith('## ')) {
-                return <h2 key={index}>{paragraph.replace('## ', '')}</h2>;
-              }
-              if (paragraph.startsWith('> ')) {
-                return <blockquote key={index}>{renderInlineLinks(paragraph.replace('> ', ''), index)}</blockquote>;
-              }
-              if (index === 0) {
-                return (
-                  <p key={index} className="article-dropcap">
-                    {renderInlineLinks(paragraph, index)}
-                  </p>
-                );
-              }
-              return <p key={index}>{renderInlineLinks(paragraph, index)}</p>;
-            })}
+          <div className="article-body prose prose-neutral max-w-none font-sans text-news-primary animate-fade-in-up delay-200 mx-auto">
+            {(() => {
+              let firstParaSeen = false;
+              return article.body.split('\n\n').filter(b => b.trim() !== '').map((block, index) => {
+                const trimmed = block.trim();
+
+                if (trimmed.startsWith('# ')) {
+                  return <h2 key={index}>{renderInlineLinks(trimmed.slice(2), index)}</h2>;
+                }
+                if (trimmed.startsWith('## ')) {
+                  return <h2 key={index}>{renderInlineLinks(trimmed.slice(3), index)}</h2>;
+                }
+                if (trimmed.startsWith('### ')) {
+                  return <h3 key={index}>{renderInlineLinks(trimmed.slice(4), index)}</h3>;
+                }
+                if (trimmed.startsWith('> ')) {
+                  return <blockquote key={index}>{renderInlineLinks(trimmed.slice(2), index)}</blockquote>;
+                }
+
+                // Bullet list: every non-empty line starts with "- " or "* "
+                const lines = trimmed.split('\n').filter(l => l.trim() !== '');
+                if (lines.length > 1 && lines.every(l => /^[-*] /.test(l.trim()))) {
+                  return (
+                    <ul key={index}>
+                      {lines.map((line, li) => (
+                        <li key={li}>{renderInlineLinks(line.trim().replace(/^[-*] /, ''), index * 1000 + li)}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+
+                // Numbered list: every non-empty line starts with "N. "
+                if (lines.length > 1 && lines.every(l => /^\d+\.\s/.test(l.trim()))) {
+                  return (
+                    <ol key={index}>
+                      {lines.map((line, li) => (
+                        <li key={li}>{renderInlineLinks(line.trim().replace(/^\d+\.\s+/, ''), index * 1000 + li)}</li>
+                      ))}
+                    </ol>
+                  );
+                }
+
+                const isFirst = !firstParaSeen;
+                firstParaSeen = true;
+                if (isFirst) {
+                  return (
+                    <p key={index} className="article-dropcap">
+                      {renderInlineLinks(trimmed, index)}
+                    </p>
+                  );
+                }
+                return <p key={index}>{renderInlineLinks(trimmed, index)}</p>;
+              });
+            })()}
           </div>
         )}
         
