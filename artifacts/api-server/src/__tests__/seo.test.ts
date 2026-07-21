@@ -2,7 +2,12 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from "supertest";
 import app from "../app";
 import { pool } from "@workspace/db";
-import { listCaseStudiesWithArticles } from "../lib/content";
+import {
+  listCaseStudiesWithArticles,
+  listPublishedArticles,
+  CASE_STUDY_CATEGORY,
+  SPOTLIGHT_CATEGORY,
+} from "../lib/content";
 import { acquireSeoTestLock, releaseSeoTestLock } from "./testDbLock";
 
 type JsonLd = Record<string, unknown>;
@@ -140,6 +145,142 @@ describe("case study detail page structured data", () => {
       ).toBeDefined();
       const crumbs = breadcrumb!["itemListElement"] as JsonLd[];
       expect(crumbs.length).toBe(3);
+    }
+  });
+});
+
+const RASTER_EXTENSIONS = [".png", ".jpg", ".jpeg", ".webp", ".gif"];
+
+function extractMetaContent(html: string, nameOrProperty: string): string | null {
+  const escaped = nameOrProperty.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const fwd = new RegExp(
+    `<meta[^>]+(?:property|name)="${escaped}"[^>]+content="([^"]*)"`,
+    "i",
+  );
+  const rev = new RegExp(
+    `<meta[^>]+content="([^"]*)"[^>]+(?:property|name)="${escaped}"`,
+    "i",
+  );
+  const m = fwd.exec(html) ?? rev.exec(html);
+  return m ? (m[1] ?? null) : null;
+}
+
+function ogImageExtension(url: string): string {
+  const withoutQuery = url.split("?")[0]!;
+  const lastDot = withoutQuery.lastIndexOf(".");
+  return lastDot >= 0 ? withoutQuery.slice(lastDot).toLowerCase() : "";
+}
+
+describe("case study detail page og:image", () => {
+  it("has a non-SVG raster og:image on every case study detail page", async () => {
+    for (const slug of slugs) {
+      const res = await request(app).get(`/case-studies/${slug}`);
+      expect(res.status, `GET /case-studies/${slug}`).toBe(200);
+
+      const ogImage = extractMetaContent(res.text, "og:image");
+      expect(
+        ogImage,
+        `og:image meta tag missing on /case-studies/${slug}`,
+      ).toBeTruthy();
+
+      const ext = ogImageExtension(ogImage!);
+      expect(
+        ext,
+        `og:image on /case-studies/${slug} has no file extension (got "${ogImage}")`,
+      ).not.toBe("");
+      expect(
+        ext,
+        `og:image on /case-studies/${slug} must not be SVG (got "${ogImage}")`,
+      ).not.toBe(".svg");
+      expect(
+        RASTER_EXTENSIONS.includes(ext),
+        `og:image on /case-studies/${slug} must use a raster extension — got "${ext}"`,
+      ).toBe(true);
+    }
+  });
+
+  it("has twitter:image matching og:image on every case study detail page", async () => {
+    for (const slug of slugs) {
+      const res = await request(app).get(`/case-studies/${slug}`);
+      expect(res.status, `GET /case-studies/${slug}`).toBe(200);
+
+      const ogImage = extractMetaContent(res.text, "og:image");
+      const twitterImage = extractMetaContent(res.text, "twitter:image");
+      expect(
+        twitterImage,
+        `twitter:image meta tag missing on /case-studies/${slug}`,
+      ).toBeTruthy();
+      expect(
+        twitterImage,
+        `twitter:image must match og:image on /case-studies/${slug}`,
+      ).toBe(ogImage);
+    }
+  });
+});
+
+describe("article page og:image", () => {
+  let articleSlugs: string[] = [];
+
+  beforeAll(async () => {
+    const all = await listPublishedArticles();
+    articleSlugs = all
+      .filter(
+        (a) => a.category !== CASE_STUDY_CATEGORY && a.category !== SPOTLIGHT_CATEGORY,
+      )
+      .slice(0, 3)
+      .map((a) => a.slug);
+  }, 30_000);
+
+  it("has a non-SVG raster og:image on article pages", async () => {
+    if (articleSlugs.length === 0) {
+      console.warn("No non-case-study/spotlight articles found; skipping article og:image check");
+      return;
+    }
+    for (const slug of articleSlugs) {
+      const res = await request(app).get(`/articles/${slug}`);
+      expect(res.status, `GET /articles/${slug}`).toBe(200);
+
+      const ogImage = extractMetaContent(res.text, "og:image");
+      expect(
+        ogImage,
+        `og:image meta tag missing on /articles/${slug}`,
+      ).toBeTruthy();
+
+      const ext = ogImageExtension(ogImage!);
+      expect(
+        ext,
+        `og:image on /articles/${slug} has no file extension (got "${ogImage}")`,
+      ).not.toBe("");
+      expect(
+        ext,
+        `og:image on /articles/${slug} must not be SVG (got "${ogImage}")`,
+      ).not.toBe(".svg");
+      expect(
+        RASTER_EXTENSIONS.includes(ext),
+        `og:image on /articles/${slug} must use a raster extension — got "${ext}"`,
+      ).toBe(true);
+    }
+  });
+
+  it("has twitter:image matching og:image on article pages", async () => {
+    if (articleSlugs.length === 0) {
+      console.warn("No non-case-study/spotlight articles found; skipping article twitter:image check");
+      return;
+    }
+    for (const slug of articleSlugs) {
+      const res = await request(app).get(`/articles/${slug}`);
+      expect(res.status, `GET /articles/${slug}`).toBe(200);
+
+      const ogImage = extractMetaContent(res.text, "og:image");
+      const twitterImage = extractMetaContent(res.text, "twitter:image");
+      expect(
+        twitterImage,
+        `twitter:image meta tag missing on /articles/${slug}`,
+      ).toBeTruthy();
+      expect(
+        twitterImage,
+        `twitter:image must match og:image on /articles/${slug}`,
+      ).toBe(ogImage);
     }
   });
 });
