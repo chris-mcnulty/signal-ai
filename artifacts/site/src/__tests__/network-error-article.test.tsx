@@ -16,6 +16,7 @@ vi.mock('@workspace/api-client-react', () => ({
   useGetArticle: vi.fn(),
   useListArticles: vi.fn().mockReturnValue({ data: [], isLoading: false }),
   getGetArticleQueryKey: vi.fn().mockReturnValue(['article', 'test-article']),
+  getListArticlesQueryKey: vi.fn().mockReturnValue(['articles']),
 }));
 
 vi.mock('@/components/ui/sheet', () => ({

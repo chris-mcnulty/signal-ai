@@ -15,6 +15,8 @@ vi.mock('wouter', () => ({
 vi.mock('@workspace/api-client-react', () => ({
   useListCaseStudies: vi.fn(),
   useListArticles: vi.fn().mockReturnValue({ data: [], isLoading: false }),
+  getListArticlesQueryKey: vi.fn().mockReturnValue(['articles']),
+  getListCaseStudiesQueryKey: vi.fn().mockReturnValue(['case-studies']),
 }));
 
 vi.mock('@/components/ui/sheet', () => ({
