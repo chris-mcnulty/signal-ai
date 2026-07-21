@@ -296,9 +296,23 @@ export async function runSeoCoverageScan(
     urlCount = scanPages.length;
 
     let googleToken: string | null = null;
-    const googleSiteUrl =
+    // Normalise the site URL:
+    // - For URL-prefix properties Google requires a trailing slash
+    //   (https://www.bluetrail.ai/ not https://www.bluetrail.ai).
+    // - Domain properties use the sc-domain: prefix and must NOT have a slash.
+    const rawGoogleSiteUrl =
       process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL?.trim() ?? "";
+    const googleSiteUrl =
+      rawGoogleSiteUrl.startsWith("sc-domain:")
+        ? rawGoogleSiteUrl
+        : rawGoogleSiteUrl && !rawGoogleSiteUrl.endsWith("/")
+          ? `${rawGoogleSiteUrl}/`
+          : rawGoogleSiteUrl;
     if (gConf) {
+      logger.info(
+        { googleSiteUrl, origin },
+        "seo.coverage: starting Google probes",
+      );
       try {
         const account = getGoogleServiceAccount();
         if (account) {
