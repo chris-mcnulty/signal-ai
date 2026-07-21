@@ -582,6 +582,11 @@ html.dark .broadsheet-theme {
   font-weight: 700;
   margin-top: 3rem;
   margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+html.dark .article-body h2 {
+  color: #e8edf3;
 }
 
 .article-body h3 {
@@ -589,6 +594,31 @@ html.dark .broadsheet-theme {
   font-weight: 700;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+html.dark .article-body h3 {
+  color: #e8edf3;
+}
+
+html.dark .prose {
+  --tw-prose-body: #e8edf3;
+  --tw-prose-headings: #e8edf3;
+  --tw-prose-lead: #8fa3b8;
+  --tw-prose-links: #4d8fe8;
+  --tw-prose-bold: #e8edf3;
+  --tw-prose-counters: #8fa3b8;
+  --tw-prose-bullets: #8fa3b8;
+  --tw-prose-hr: #1e3352;
+  --tw-prose-quotes: #e8edf3;
+  --tw-prose-quote-borders: #1e3352;
+  --tw-prose-captions: #8fa3b8;
+  --tw-prose-code: #e8edf3;
+  --tw-prose-pre-code: #e8edf3;
+  --tw-prose-pre-bg: #0a1929;
+  --tw-prose-th-borders: #1e3352;
+  --tw-prose-td-borders: #1e3352;
+  color: #e8edf3;
 }
 
 .article-body ul,
