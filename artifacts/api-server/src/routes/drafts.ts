@@ -338,9 +338,8 @@ router.post("/drafts/import", async (req, res): Promise<void> => {
       seoTitle: data.seoTitle ?? null,
       seoDescription: data.seoDescription ?? null,
       sourceUrls: data.sourceUrls ?? null,
-      status: data.status ?? "pending",
-      publishedAt:
-        data.status === "published" ? data.publishedAt ?? new Date() : null,
+      status: "pending",
+      publishedAt: null,
       source: "manual",
     })
     .returning();
