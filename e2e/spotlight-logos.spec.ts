@@ -439,4 +439,129 @@ test.describe("Spotlight article page — company logo block", () => {
       companyBlock.getByText(MOCK_SPOTLIGHT_DETAIL.company.industry),
     ).toBeVisible();
   });
+
+  test("renders a valid website anchor link when the company has a website URL", async ({
+    page,
+  }) => {
+    const slug = MOCK_SPOTLIGHT_DETAIL.slug;
+    await mockSpotlightDetail(page, slug, MOCK_SPOTLIGHT_DETAIL);
+    await page.goto(`/spotlights/${slug}`);
+
+    await expect(page.locator("hr.hero-rule")).toBeVisible({ timeout: 15_000 });
+
+    const companyBlock = page
+      .locator(".bg-white.border.border-news")
+      .filter({ hasText: MOCK_SPOTLIGHT_DETAIL.company.name })
+      .first();
+
+    // Website link must be present and point to the correct URL.
+    const websiteLink = companyBlock.locator(
+      `a[href="${MOCK_SPOTLIGHT_DETAIL.company.website}"]`,
+    );
+    await expect(websiteLink).toBeVisible();
+    await expect(websiteLink).toHaveAttribute(
+      "href",
+      MOCK_SPOTLIGHT_DETAIL.company.website,
+    );
+
+    // Must open in a new tab.
+    await expect(websiteLink).toHaveAttribute("target", "_blank");
+    await expect(websiteLink).toHaveAttribute("rel", /noopener/);
+  });
+
+  test("shows the company blurb paragraph beneath the company name", async ({
+    page,
+  }) => {
+    const slug = MOCK_SPOTLIGHT_DETAIL.slug;
+    await mockSpotlightDetail(page, slug, MOCK_SPOTLIGHT_DETAIL);
+    await page.goto(`/spotlights/${slug}`);
+
+    await expect(page.locator("hr.hero-rule")).toBeVisible({ timeout: 15_000 });
+
+    const companyBlock = page
+      .locator(".bg-white.border.border-news")
+      .filter({ hasText: MOCK_SPOTLIGHT_DETAIL.company.name })
+      .first();
+
+    // Blurb paragraph must contain the expected text.
+    const blurb = companyBlock.locator("p").filter({
+      hasText: MOCK_SPOTLIGHT_DETAIL.company.blurb,
+    });
+    await expect(blurb).toBeVisible();
+    await expect(blurb).toContainText(MOCK_SPOTLIGHT_DETAIL.company.blurb);
+  });
+
+  test("company metadata block is fully visible at desktop viewport (1280×720)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    const slug = MOCK_SPOTLIGHT_DETAIL.slug;
+    await mockSpotlightDetail(page, slug, MOCK_SPOTLIGHT_DETAIL);
+    await page.goto(`/spotlights/${slug}`);
+
+    await expect(page.locator("hr.hero-rule")).toBeVisible({ timeout: 15_000 });
+
+    const companyBlock = page
+      .locator(".bg-white.border.border-news")
+      .filter({ hasText: MOCK_SPOTLIGHT_DETAIL.company.name })
+      .first();
+
+    await expect(companyBlock).toBeVisible();
+
+    // All key elements must be visible at desktop width.
+    await expect(
+      companyBlock.getByRole("heading", { name: MOCK_SPOTLIGHT_DETAIL.company.name }),
+    ).toBeVisible();
+    await expect(
+      companyBlock.getByText(MOCK_SPOTLIGHT_DETAIL.company.industry),
+    ).toBeVisible();
+    await expect(
+      companyBlock.locator(`a[href="${MOCK_SPOTLIGHT_DETAIL.company.website}"]`),
+    ).toBeVisible();
+    await expect(
+      companyBlock.locator("p").filter({ hasText: MOCK_SPOTLIGHT_DETAIL.company.blurb }),
+    ).toBeVisible();
+  });
+
+  test("company metadata block is fully visible at mobile viewport (390×844)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    const slug = MOCK_SPOTLIGHT_DETAIL.slug;
+    await mockSpotlightDetail(page, slug, MOCK_SPOTLIGHT_DETAIL);
+    await page.goto(`/spotlights/${slug}`);
+
+    await expect(page.locator("hr.hero-rule")).toBeVisible({ timeout: 15_000 });
+
+    const companyBlock = page
+      .locator(".bg-white.border.border-news")
+      .filter({ hasText: MOCK_SPOTLIGHT_DETAIL.company.name })
+      .first();
+
+    await expect(companyBlock).toBeVisible();
+
+    // All key elements must be visible at mobile width (stacked layout).
+    await expect(
+      companyBlock.getByRole("heading", { name: MOCK_SPOTLIGHT_DETAIL.company.name }),
+    ).toBeVisible();
+    await expect(
+      companyBlock.getByText(MOCK_SPOTLIGHT_DETAIL.company.industry),
+    ).toBeVisible();
+    await expect(
+      companyBlock.locator(`a[href="${MOCK_SPOTLIGHT_DETAIL.company.website}"]`),
+    ).toBeVisible();
+    await expect(
+      companyBlock.locator("p").filter({ hasText: MOCK_SPOTLIGHT_DETAIL.company.blurb }),
+    ).toBeVisible();
+
+    // Logo container must still render at 96 × 96 px.
+    const logoContainer = companyBlock.locator(".w-24.h-24").first();
+    await expect(logoContainer).toBeVisible();
+    const box = await logoContainer.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeCloseTo(96, 0);
+    expect(box!.height).toBeCloseTo(96, 0);
+  });
 });
