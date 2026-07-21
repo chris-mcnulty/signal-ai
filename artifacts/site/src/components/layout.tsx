@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Menu, X, WifiOff, RotateCcw } from "lucide-react";
+import { Search, Menu, X, WifiOff, RotateCcw, ArrowLeft } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SubscribeModal } from "./SubscribeModal";
 import { useListArticles } from "@workspace/api-client-react";
@@ -335,6 +335,59 @@ export function Header() {
         </div>
       </header>
 
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
+      <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
+    </>
+  );
+}
+
+/**
+ * Slim sticky header for article/detail pages: a back link, the centered
+ * wordmark, and search/menu controls. Self-contained — it owns the nav drawer,
+ * search overlay, and subscribe modal so detail pages don't each re-wire them.
+ */
+export function DetailHeader({
+  backHref,
+  backLabel,
+  backTestId,
+}: {
+  backHref: string;
+  backLabel: string;
+  backTestId?: string;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [subscribeOpen, setSubscribeOpen] = useState(false);
+  const { searchOpen, openSearch, closeSearch } = useSearch();
+
+  return (
+    <>
+      <header className="site-header border-b border-news px-6 md:px-12 flex items-center justify-between sticky top-0 bg-news/95 backdrop-blur z-50">
+        <div className="flex items-center gap-3 w-1/3">
+          <Link
+            href={backHref}
+            className="hover-dim text-news-primary flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider"
+            data-testid={backTestId}
+          >
+            <ArrowLeft size={14} /> {backLabel}
+          </Link>
+        </div>
+        <div className="w-1/3 text-center">
+          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
+            <h1 className="font-serif text-xl font-black tracking-tight text-news-primary leading-none">
+              bluetr<span className="text-accent">AI</span>l
+            </h1>
+          </Link>
+        </div>
+        <div className="w-1/3 flex justify-end gap-1">
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={openSearch} aria-label="Open search">
+            <Search size={18} />
+          </button>
+          <button className="mobile-menu-btn hover-dim text-news-primary" onClick={() => setMenuOpen(true)} aria-label="Open menu">
+            <Menu size={18} />
+          </button>
+        </div>
+      </header>
       <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onSubscribe={() => setSubscribeOpen(true)} />
       <SearchOverlay open={searchOpen} onClose={closeSearch} />
       <SubscribeModal open={subscribeOpen} onClose={() => setSubscribeOpen(false)} />
