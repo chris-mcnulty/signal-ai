@@ -19,6 +19,19 @@ function SpotlightSkeleton() {
   );
 }
 
+function safePublishedAt(value: string | null | undefined): number {
+  if (!value) return 0;
+  const t = new Date(value).getTime();
+  return isNaN(t) ? 0 : t;
+}
+
+function formatPublishedAt(value: string | null | undefined): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export default function SpotlightsPage() {
   const { data: spotlights, isLoading, isError, refetch } = useListSpotlights({ query: { retry: 1, queryKey: getListSpotlightsQueryKey() } });
 
@@ -53,7 +66,7 @@ export default function SpotlightsPage() {
           <SpotlightSkeleton />
         ) : spotlights && spotlights.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...spotlights].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()).map((spotlight, index) => (
+            {[...spotlights].sort((a, b) => safePublishedAt(b.publishedAt) - safePublishedAt(a.publishedAt)).map((spotlight, index) => (
               <Link
                 key={spotlight.id}
                 href={`/spotlights/${spotlight.slug}`}
@@ -92,7 +105,7 @@ export default function SpotlightsPage() {
 
                   <div className="flex items-center justify-between border-t border-news pt-4 mt-auto">
                     <div className="font-mono text-xs text-news-secondary uppercase">
-                      {new Date(spotlight.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {formatPublishedAt(spotlight.publishedAt)}
                     </div>
                     <span className="font-mono text-xs text-accent uppercase tracking-widest group-hover:tracking-[0.15em] transition-all">
                       Read &rarr;

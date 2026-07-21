@@ -307,6 +307,59 @@ test.describe("Spotlights listing page — logo containers", () => {
     ).toHaveCount(0);
   });
 
+  test("renders grid without crashing when one spotlight has a null publishedAt", async ({
+    page,
+  }) => {
+    const nullDate = {
+      ...MOCK_SPOTLIGHT_SUMMARY,
+      id: 20,
+      slug: "null-date-spotlight",
+      title: "Spotlight With No Published Date",
+      publishedAt: null,
+    };
+    await mockSpotlightsList(page, [MOCK_SPOTLIGHT_SUMMARY, nullDate]);
+    await page.goto("/spotlights");
+
+    // Both cards must render — the grid must not crash.
+    await expect(
+      page.locator('[data-testid^="link-spotlight-"]'),
+    ).toHaveCount(2, { timeout: 15_000 });
+
+    // The card with null publishedAt must be present.
+    await expect(
+      page.locator(`[data-testid="link-spotlight-${nullDate.slug}"]`),
+    ).toBeVisible();
+  });
+
+  test("does not show 'Invalid Date' in any card when publishedAt is missing or malformed", async ({
+    page,
+  }) => {
+    const nullDate = {
+      ...MOCK_SPOTLIGHT_SUMMARY,
+      id: 21,
+      slug: "null-date-spotlight-2",
+      title: "Spotlight Null Date 2",
+      publishedAt: null,
+    };
+    const badDate = {
+      ...MOCK_SPOTLIGHT_SUMMARY,
+      id: 22,
+      slug: "bad-date-spotlight",
+      title: "Spotlight Bad Date",
+      publishedAt: "not-a-date",
+    };
+    await mockSpotlightsList(page, [nullDate, badDate]);
+    await page.goto("/spotlights");
+
+    // Both cards must render.
+    await expect(
+      page.locator('[data-testid^="link-spotlight-"]'),
+    ).toHaveCount(2, { timeout: 15_000 });
+
+    // "Invalid Date" must not appear anywhere on the page.
+    await expect(page.getByText("Invalid Date")).toHaveCount(0);
+  });
+
   test("shows NetworkError screen when the spotlights API is unreachable", async ({
     page,
   }) => {
