@@ -203,6 +203,14 @@ html.dark {
   --border-color: #1e3352;
 }
 
+html.dark .broadsheet-theme {
+  --bg-color: #0a1929;
+  --text-primary: #e8edf3;
+  --text-secondary: #8fa3b8;
+  --accent: #4d8fe8;
+  --border-color: #1e3352;
+}
+
 .broadsheet-theme h1, 
 .broadsheet-theme h2, 
 .broadsheet-theme h3, 
