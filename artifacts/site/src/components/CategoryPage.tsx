@@ -2,6 +2,7 @@ import { Link } from 'wouter';
 import { ChevronRight } from 'lucide-react';
 import { useListArticles } from '@workspace/api-client-react';
 import { Layout, Header, Footer, NetworkError } from '@/components/layout';
+import { displayAuthor } from '@/lib/utils';
 
 /**
  * Shared layout for the category listing pages (News, Opinion, Use Cases).
@@ -136,7 +137,7 @@ export function CategoryPage({
                   )}
                   <div className="flex justify-between items-center border-t border-b border-news py-3 mt-4">
                     <div className="font-mono text-sm uppercase">
-                      By <span className="font-bold text-news-primary">{featured.author}</span>
+                      By <span className="font-bold text-news-primary">{displayAuthor(featured.author)}</span>
                     </div>
                     <span className="flex items-center gap-1 font-mono text-sm text-accent uppercase tracking-widest group-hover:gap-2 transition-all">
                       Read Article <ChevronRight size={16} />
@@ -172,7 +173,7 @@ export function CategoryPage({
                             {article.dek}
                           </p>
                           <div className="flex items-center gap-4 font-mono text-xs text-news-secondary uppercase">
-                            <span>By {article.author}</span>
+                            <span>By {displayAuthor(article.author)}</span>
                             <span>{article.readingMinutes} min read</span>
                           </div>
                         </div>

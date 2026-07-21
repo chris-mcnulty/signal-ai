@@ -265,7 +265,7 @@ export default function ArticlePage() {
               <div>
                 {article.authorProfile ? (
                   <Link href={`/authors/${article.authorProfile.slug}`} className="font-sans font-semibold text-sm text-news-primary hover:text-accent transition-colors">
-                    {article.author}
+                    {article.authorProfile.name}
                   </Link>
                 ) : (
                   <div className="font-sans font-semibold text-sm text-news-primary">{authorName}</div>
@@ -397,7 +397,7 @@ export default function ArticlePage() {
               ) : (
                 <div className="w-16 h-16 bg-[#1a1a1a] flex items-center justify-center shrink-0">
                   <span className="font-serif text-2xl font-bold text-white leading-none">
-                    {article.author.charAt(0)}
+                    {article.authorProfile.name.charAt(0)}
                   </span>
                 </div>
               )}
@@ -407,7 +407,7 @@ export default function ArticlePage() {
                   href={`/authors/${article.authorProfile.slug}`}
                   className="font-serif text-lg font-bold text-news-primary hover:text-accent transition-colors block mb-2"
                 >
-                  {article.author}
+                  {article.authorProfile.name}
                 </Link>
                 <p className="text-sm text-news-secondary font-sans leading-relaxed">{article.authorProfile.bio}</p>
               </div>

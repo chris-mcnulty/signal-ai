@@ -218,7 +218,7 @@ export default function CaseStudyDetail() {
                   ) : (
                     <div className="w-10 h-10 bg-[#1a1a1a] flex items-center justify-center shrink-0">
                       <span className="font-mono text-sm font-bold text-white leading-none">
-                        {study.author.charAt(0)}
+                        {study.authorProfile.name.charAt(0)}
                       </span>
                     </div>
                   )}
@@ -227,7 +227,7 @@ export default function CaseStudyDetail() {
                       href={`/authors/${study.authorProfile.slug}`}
                       className="font-sans font-bold text-base text-news-primary hover:text-accent transition-colors block"
                     >
-                      {study.author}
+                      {study.authorProfile.name}
                     </Link>
                     {study.authorProfile.bio && (
                       <p className="font-mono text-xs text-news-secondary mt-1 leading-relaxed">
@@ -241,7 +241,7 @@ export default function CaseStudyDetail() {
               ) : (
                 <>
                   <div className="font-sans font-bold text-base text-news-primary">{displayAuthor(study.author)}</div>
-                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">BlueTrail Staff</div>
+                  <div className="font-mono text-xs text-news-secondary uppercase tracking-wider mt-1">Author</div>
                 </>
               )}
             </div>
