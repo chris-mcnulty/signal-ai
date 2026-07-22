@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useGetDraftSpotlight,
   getGetDraftSpotlightQueryKey,
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Globe, Download } from "lucide-react";
+import { Loader2, Save, Globe, Download, Upload } from "lucide-react";
 
 function toDatetimeLocalInput(iso: string | null | undefined): string {
   if (!iso) return "";
@@ -57,6 +57,8 @@ export function SpotlightPanel({
   const [fields, setFields] = useState<SpotlightFields>(emptySpotlight);
   const [loadedFor, setLoadedFor] = useState<number | null>(null);
   const [importUrl, setImportUrl] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoFileRef = useRef<HTMLInputElement>(null);
   const [publishedAtLocal, setPublishedAtLocal] = useState(() =>
     publishedAt ? toDatetimeLocalInput(publishedAt) : ""
   );
@@ -80,6 +82,40 @@ export function SpotlightPanel({
 
   const setField = (key: keyof SpotlightFields, value: string) =>
     setFields((f) => ({ ...f, [key]: value }));
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const sessionKey = sessionStorage.getItem("dashboard_api_key");
+    if (!sessionKey) {
+      toast({ title: "Not authenticated", variant: "destructive" });
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", "General");
+    formData.append("label", file.name);
+    setLogoUploading(true);
+    try {
+      const res = await fetch("/api/library/images", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${sessionKey}` },
+        body: formData,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error((body as { error?: string }).error ?? `HTTP ${res.status}`);
+      }
+      const data = (await res.json()) as { path: string };
+      setField("companyLogoUrl", data.path);
+      toast({ title: "Logo uploaded — save to apply" });
+    } catch (err) {
+      toast({ title: `Upload failed: ${String(err)}`, variant: "destructive" });
+    } finally {
+      setLogoUploading(false);
+      if (logoFileRef.current) logoFileRef.current.value = "";
+    }
+  };
 
   const handleImport = () => {
     if (!importUrl.trim()) return;
@@ -217,12 +253,37 @@ export function SpotlightPanel({
           />
         </div>
         <div>
-          <label className="text-xs font-medium">Logo URL</label>
-          <Input
-            value={fields.companyLogoUrl}
-            onChange={(e) => setField("companyLogoUrl", e.target.value)}
-            placeholder="https://…/logo.png"
-          />
+          <label className="text-xs font-medium">Logo</label>
+          <div className="flex gap-1.5 mt-1">
+            <Input
+              value={fields.companyLogoUrl}
+              onChange={(e) => setField("companyLogoUrl", e.target.value)}
+              placeholder="https://…/logo.png or upload →"
+              className="text-sm"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="shrink-0 gap-1.5 px-2.5"
+              disabled={logoUploading}
+              onClick={() => logoFileRef.current?.click()}
+              title="Upload logo file"
+            >
+              {logoUploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Upload className="h-3.5 w-3.5" />
+              )}
+            </Button>
+            <input
+              ref={logoFileRef}
+              type="file"
+              accept=".svg,.png,.jpg,.jpeg,image/svg+xml,image/png,image/jpeg"
+              className="hidden"
+              onChange={handleLogoUpload}
+            />
+          </div>
         </div>
         <div className="md:col-span-2">
           <label className="text-xs font-medium">Company blurb</label>
