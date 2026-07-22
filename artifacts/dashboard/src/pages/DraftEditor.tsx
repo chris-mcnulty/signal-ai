@@ -103,6 +103,101 @@ const CATEGORY_OPTIONS = [
   { value: "use-cases", label: "Use Cases" },
 ];
 
+function clampText(text: string, max: number) {
+  return text.length > max ? text.slice(0, max - 1) + "…" : text;
+}
+
+function SeoPreview({
+  seoTitle,
+  seoDescription,
+  title,
+  dek,
+  imageUrl,
+  slug,
+}: {
+  seoTitle?: string;
+  seoDescription?: string;
+  title?: string;
+  dek?: string;
+  imageUrl?: string;
+  slug?: string;
+}) {
+  const [tab, setTab] = useState<"google" | "social">("google");
+
+  const effectiveTitle = seoTitle?.trim() || title?.trim() || "Untitled";
+  const effectiveDesc =
+    seoDescription?.trim() ||
+    dek?.trim() ||
+    "No description — add a dek or meta description.";
+  const displayUrl = slug
+    ? `bluetrail.ai › articles › ${slug}`
+    : "bluetrail.ai › articles › …";
+  const fullUrl = slug
+    ? `https://www.bluetrail.ai/articles/${slug}`
+    : null;
+
+  return (
+    <div className="rounded-md border border-border overflow-hidden text-xs">
+      {/* Tabs */}
+      <div className="flex border-b border-border bg-muted/30">
+        <button
+          type="button"
+          onClick={() => setTab("google")}
+          className={`px-3 py-1.5 font-medium transition-colors ${tab === "google" ? "text-foreground border-b-2 border-primary -mb-px" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          Google preview
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("social")}
+          className={`px-3 py-1.5 font-medium transition-colors ${tab === "social" ? "text-foreground border-b-2 border-primary -mb-px" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          Social / OG card
+        </button>
+      </div>
+
+      {tab === "google" && (
+        <div className="p-3 bg-white dark:bg-neutral-950 space-y-0.5">
+          <div className="text-[11px] text-[#202124] dark:text-neutral-300 truncate">{displayUrl}</div>
+          <div
+            className="text-[17px] leading-snug text-[#1a0dab] dark:text-[#8ab4f8] hover:underline cursor-pointer truncate"
+            title={effectiveTitle}
+            onClick={() => fullUrl && window.open(fullUrl, "_blank")}
+          >
+            {clampText(effectiveTitle, 60)}
+          </div>
+          <div className="text-[#4d5156] dark:text-neutral-400 leading-snug line-clamp-2">
+            {clampText(effectiveDesc, 160)}
+          </div>
+          {!seoTitle?.trim() && (
+            <p className="text-[10px] text-amber-600 dark:text-amber-400 pt-1">Using article title as fallback — add an SEO title to override.</p>
+          )}
+          {!seoDescription?.trim() && (
+            <p className="text-[10px] text-amber-600 dark:text-amber-400">Using {dek?.trim() ? "dek" : "no description"} as fallback — add a meta description to control this.</p>
+          )}
+        </div>
+      )}
+
+      {tab === "social" && (
+        <div className="p-3 bg-muted/20 flex gap-3 items-start">
+          <div className="w-24 h-16 rounded overflow-hidden bg-muted flex-shrink-0 border border-border">
+            {imageUrl ? (
+              <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">No image</div>
+            )}
+          </div>
+          <div className="min-w-0 space-y-0.5">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground">bluetrail.ai</div>
+            <div className="font-semibold text-sm leading-snug line-clamp-2">{clampText(effectiveTitle, 70)}</div>
+            <div className="text-[11px] text-muted-foreground line-clamp-2">{clampText(effectiveDesc, 100)}</div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
@@ -915,6 +1010,16 @@ export default function DraftEditor() {
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+
+                  {/* Live preview */}
+                  <SeoPreview
+                    seoTitle={form.watch("seoTitle")}
+                    seoDescription={form.watch("seoDescription")}
+                    title={form.watch("title")}
+                    dek={form.watch("dek")}
+                    imageUrl={form.watch("imageUrl")}
+                    slug={draft?.slug ?? undefined}
                   />
                 </div>
               </div>
