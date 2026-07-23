@@ -12,3 +12,4 @@
 - [Auth getter at render time](auth-getter-render-time.md) — register API auth token getter during provider render, not useEffect; child queries fire before parent effects.
 - [BlueTrail rebrand](bluetrail-rebrand.md) — site renamed to BlueTrail Intelligence Report; brand config is env-var driven; staff byline backward compat pattern.
 - [Newsletter article selection](newsletter-article-selection.md) — 7-day window with top-5 fallback; featured article (DB boolean) sorts first; test-send via POST /api/admin/newsletter/send-test (requireEditor)
+- [Anti-slop pipeline](anti-slop-pipeline.md) — canonical rules in slop-rules.ts; engine prompts all include the banned list; POST /drafts/:id/polish (detect|polish mode) in engine.ts; eval.md checklist baked into polish system prompt as self-check gate

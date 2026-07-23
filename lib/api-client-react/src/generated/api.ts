@@ -56,6 +56,8 @@ import type {
   ListDraftsParams,
   ListEngineJobsParams,
   ListSeoCoverageUrlsParams,
+  PolishDraftRequest,
+  PolishDraftResult,
   RejectionOptions,
   RepurposeRequest,
   ResearchBriefing,
@@ -3921,6 +3923,79 @@ export const useSeoOptimizeDraft = <TError = ErrorType<ErrorMessage>,
         TContext
       > => {
       return useMutation(getSeoOptimizeDraftMutationOptions(options));
+    }
+
+export const getPolishDraftUrl = (id: number,) => {
+
+
+
+
+  return `/api/drafts/${id}/polish`
+}
+
+/**
+ * In detect mode, returns a list of flagged patterns (name, quoted line, fix hint) without rewriting anything. In polish mode, returns a cleaned body and dek plus a "what changed" summary. Neither mode auto-saves — the caller decides whether to apply the result.
+ * @summary Detect or fix AI-slop writing patterns in a draft
+ */
+export const polishDraft = async (id: number,
+    polishDraftRequest: PolishDraftRequest, options?: RequestInit): Promise<PolishDraftResult> => {
+
+  return customFetch<PolishDraftResult>(getPolishDraftUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(polishDraftRequest)
+  }
+);}
+
+
+
+
+
+export const getPolishDraftMutationOptions = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof polishDraft>>, TError,{id: number;data: BodyType<PolishDraftRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof polishDraft>>, TError,{id: number;data: BodyType<PolishDraftRequest>}, TContext> => {
+
+const mutationKey = ['polishDraft'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof polishDraft>>, {id: number;data: BodyType<PolishDraftRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  polishDraft(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PolishDraftMutationResult = NonNullable<Awaited<ReturnType<typeof polishDraft>>>
+    export type PolishDraftMutationBody = BodyType<PolishDraftRequest>
+    export type PolishDraftMutationError = ErrorType<ErrorMessage>
+
+    /**
+ * @summary Detect or fix AI-slop writing patterns in a draft
+ */
+export const usePolishDraft = <TError = ErrorType<ErrorMessage>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof polishDraft>>, TError,{id: number;data: BodyType<PolishDraftRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof polishDraft>>,
+        TError,
+        {id: number;data: BodyType<PolishDraftRequest>},
+        TContext
+      > => {
+      return useMutation(getPolishDraftMutationOptions(options));
     }
 
 export const getFindDraftCitationsUrl = (id: number,) => {

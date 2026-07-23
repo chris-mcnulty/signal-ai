@@ -58,6 +58,7 @@ import { enqueueEngineJob } from "../engine/job-queue";
 import { repurposeArticle } from "../engine/repurpose";
 import { optimizeArticleSeo } from "../engine/seo";
 import { findArticleCitations } from "../engine/citations";
+import { detectSlop, polishDraft } from "../engine/polish-engine";
 import { expandFromBrief } from "../lib/aiDrafting";
 import { buildVariantsCsv } from "../engine/repurpose-core";
 import { coercePlatform, type RepurposePlatform } from "../engine/repurpose-core";
@@ -523,6 +524,44 @@ router.post(
     } catch (err) {
       req.log.error({ err }, "Citation finding failed");
       res.status(502).json({ error: "AI citation finding failed" });
+    }
+  },
+);
+
+router.post(
+  "/drafts/:id/polish",
+  requireEditor,
+  aiRateLimit,
+  async (req, res): Promise<void> => {
+    const id = parseInt(req.params.id ?? "", 10);
+    if (isNaN(id)) {
+      res.status(400).json({ error: "Invalid draft id" });
+      return;
+    }
+    const mode = req.body?.mode;
+    if (mode !== "detect" && mode !== "polish") {
+      res.status(400).json({ error: "mode must be 'detect' or 'polish'" });
+      return;
+    }
+    const [article] = await db
+      .select()
+      .from(articlesTable)
+      .where(eq(articlesTable.id, id));
+    if (!article) {
+      res.status(404).json({ error: "Draft not found" });
+      return;
+    }
+    const body = article.body ?? "";
+    const dek = article.dek ?? null;
+    try {
+      const result =
+        mode === "detect"
+          ? await detectSlop(body, dek)
+          : await polishDraft(body, dek);
+      res.json(result);
+    } catch (err) {
+      req.log.error({ err }, "Writing polish failed");
+      res.status(502).json({ error: "AI writing check failed" });
     }
   },
 );

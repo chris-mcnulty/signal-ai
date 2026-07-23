@@ -886,6 +886,60 @@ export interface CitationsResult {
   citations: string[];
 }
 
+/**
+ * detect — find and name patterns without rewriting; polish — apply minimum edits and return cleaned text.
+ */
+export type PolishDraftRequestMode = typeof PolishDraftRequestMode[keyof typeof PolishDraftRequestMode];
+
+
+export const PolishDraftRequestMode = {
+  detect: 'detect',
+  polish: 'polish',
+} as const;
+
+export interface PolishDraftRequest {
+  /** detect — find and name patterns without rewriting; polish — apply minimum edits and return cleaned text. */
+  mode: PolishDraftRequestMode;
+}
+
+export interface PolishFinding {
+  /** Short name of the pattern (e.g. "throat-clearing", "weasel-attribution") */
+  patternName: string;
+  /** The exact sentence or phrase from the draft that triggered this finding */
+  quotedLine: string;
+  /** 3-8 word suggestion for how to fix it */
+  fixHint: string;
+}
+
+export type PolishDraftResultMode = typeof PolishDraftResultMode[keyof typeof PolishDraftResultMode];
+
+
+export const PolishDraftResultMode = {
+  detect: 'detect',
+  polish: 'polish',
+} as const;
+
+export interface PolishDraftResult {
+  mode: PolishDraftResultMode;
+  /** Patterns found (detect mode) or patterns fixed (polish mode) */
+  findings: PolishFinding[];
+  /**
+     * Cleaned article body in Markdown (polish mode only)
+     * @nullable
+     */
+  body?: string | null;
+  /**
+     * Cleaned dek (polish mode, null if unchanged or detect mode)
+     * @nullable
+     */
+  dek?: string | null;
+  /**
+     * Short bulleted summary of edits made (polish mode only)
+     * @nullable
+     */
+  whatChanged?: string | null;
+}
+
 export interface AnalyticsDayStat {
   /** ISO date string (YYYY-MM-DD) */
   day: string;

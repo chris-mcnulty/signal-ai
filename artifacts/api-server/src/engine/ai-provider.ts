@@ -18,7 +18,8 @@ export type AIFeature =
   | "ideation"
   | "copywriting"
   | "repurpose"
-  | "seo_optimization";
+  | "seo_optimization"
+  | "polish";
 
 export interface AICompletionOptions {
   systemPrompt?: string;
@@ -50,6 +51,7 @@ const FEATURE_TTL_MS: Record<AIFeature, number> = {
   copywriting: 15 * 60 * 1000,
   repurpose: 30 * 60 * 1000,
   seo_optimization: 30 * 60 * 1000,
+  polish: 5 * 60 * 1000, // draft-specific; short TTL so edits see fresh results
 };
 
 const MAX_CACHE_ENTRIES = 500;

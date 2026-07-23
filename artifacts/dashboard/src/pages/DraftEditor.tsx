@@ -49,6 +49,8 @@ import {
   useFindDraftCitations,
   useImportSpotlightUrl,
   useUpsertDraftSpotlight,
+  usePolishDraft,
+  type PolishDraftResult,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListDraftsQueryKey, getGetDraftsSummaryQueryKey } from "@workspace/api-client-react";
@@ -238,6 +240,7 @@ export default function DraftEditor() {
   const findCitationsMutation = useFindDraftCitations();
   const importSpotlightUrlMutation = useImportSpotlightUrl();
   const upsertDraftSpotlightMutation = useUpsertDraftSpotlight();
+  const polishMutation = usePolishDraft();
 
   const [spotlightImportUrl, setSpotlightImportUrl] = useState("");
 
@@ -398,6 +401,42 @@ export default function DraftEditor() {
     });
   };
 
+  const handleDetect = () => {
+    if (!draftId) return;
+    setPolishMode("detect");
+    setPolishResult(null);
+    polishMutation.mutate(
+      { id: draftId, data: { mode: "detect" } },
+      {
+        onSuccess: (result) => setPolishResult(result),
+        onError: () => toast({ title: "Writing check failed", variant: "destructive" }),
+      },
+    );
+  };
+
+  const handlePolish = () => {
+    if (!draftId) return;
+    setPolishMode("polish");
+    setPolishResult(null);
+    polishMutation.mutate(
+      { id: draftId, data: { mode: "polish" } },
+      {
+        onSuccess: (result) => setPolishResult(result),
+        onError: () => toast({ title: "Polish failed", variant: "destructive" }),
+      },
+    );
+  };
+
+  const handleApplyPolish = () => {
+    if (!polishResult || polishResult.mode !== "polish" || !polishResult.body) return;
+    form.setValue("body", polishResult.body, { shouldDirty: true });
+    if (polishResult.dek) {
+      form.setValue("dek", polishResult.dek, { shouldDirty: true });
+    }
+    setPolishResult(null);
+    toast({ title: "Polish applied — save the draft to keep changes" });
+  };
+
   const handleToggleFeatured = () => {
     if (!draftId || !draft) return;
     updateMutation.mutate(
@@ -490,6 +529,9 @@ export default function DraftEditor() {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [isApproveOpen, setIsApproveOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
+  const [writingCheckOpen, setWritingCheckOpen] = useState(false);
+  const [polishResult, setPolishResult] = useState<PolishDraftResult | null>(null);
+  const [polishMode, setPolishMode] = useState<"detect" | "polish">("detect");
   const [publishedAtLocal, setPublishedAtLocal] = useState("");
 
   const [genOpen, setGenOpen] = useState(false);
@@ -1361,6 +1403,115 @@ export default function DraftEditor() {
                         }
                       }}
                     />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Writing Check Panel — collapsible */}
+            {!isNew && draft && draftId && (
+              <div className="border border-border rounded-xl overflow-hidden">
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-muted/40 hover:bg-muted/60 transition-colors text-left"
+                  onClick={() => setWritingCheckOpen((v) => !v)}
+                >
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Writing Check</span>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${writingCheckOpen ? "rotate-180" : ""}`} />
+                </button>
+                {writingCheckOpen && (
+                  <div className="p-4 space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 gap-1.5 text-xs"
+                        onClick={handleDetect}
+                        disabled={polishMutation.isPending}
+                      >
+                        {polishMutation.isPending && polishMode === "detect" ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Search className="w-3 h-3" />
+                        )}
+                        Detect patterns
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 gap-1.5 text-xs"
+                        onClick={handlePolish}
+                        disabled={polishMutation.isPending}
+                      >
+                        {polishMutation.isPending && polishMode === "polish" ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Wand2 className="w-3 h-3" />
+                        )}
+                        Polish draft
+                      </Button>
+                    </div>
+
+                    {polishResult && polishResult.mode === "detect" && (
+                      <div>
+                        {polishResult.findings.length === 0 ? (
+                          <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+                            <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                            No slop patterns detected.
+                          </p>
+                        ) : (
+                          <div className="space-y-1.5">
+                            <p className="text-xs text-muted-foreground">
+                              {polishResult.findings.length} pattern{polishResult.findings.length !== 1 ? "s" : ""} found:
+                            </p>
+                            <ul className="space-y-1.5 max-h-64 overflow-y-auto">
+                              {polishResult.findings.map((f, i) => (
+                                <li
+                                  key={i}
+                                  className="text-xs bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded p-2 space-y-0.5"
+                                >
+                                  <div className="font-medium text-amber-800 dark:text-amber-300">{f.patternName}</div>
+                                  <div className="text-muted-foreground italic line-clamp-2">"{f.quotedLine}"</div>
+                                  <div className="text-foreground">Fix: {f.fixHint}</div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {polishResult && polishResult.mode === "polish" && polishResult.body && (
+                      <div className="space-y-2.5">
+                        {polishResult.whatChanged && (
+                          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded p-3">
+                            <p className="text-xs font-medium text-blue-800 dark:text-blue-300 mb-1">What changed</p>
+                            <div className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed">
+                              {polishResult.whatChanged}
+                            </div>
+                          </div>
+                        )}
+                        {polishResult.findings.length > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {polishResult.findings.length} pattern{polishResult.findings.length !== 1 ? "s" : ""} fixed.
+                          </p>
+                        )}
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full text-xs gap-1.5"
+                          onClick={handleApplyPolish}
+                        >
+                          <Check className="w-3 h-3" />
+                          Apply changes
+                        </Button>
+                        <p className="text-[10px] text-muted-foreground text-center">
+                          Replaces body{polishResult.dek ? " and dek" : ""} in the editor. Save manually to keep.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

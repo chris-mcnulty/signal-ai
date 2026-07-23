@@ -1460,6 +1460,63 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessage"
+  /drafts/{id}/polish:
+    post:
+      operationId: polishDraft
+      tags: [engine]
+      summary: Detect or fix AI-slop writing patterns in a draft
+      description: >
+        In detect mode, returns a list of flagged patterns (name, quoted line, fix hint) without rewriting anything.
+        In polish mode, returns a cleaned body and dek plus a "what changed" summary. Neither mode auto-saves — the caller decides whether to apply the result.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PolishDraftRequest"
+      responses:
+        "200":
+          description: Writing check result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolishDraftResult"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "404":
+          description: Draft not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+        "502":
+          description: AI generation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
   /drafts/{id}/find-citations:
     post:
       operationId: findDraftCitations
@@ -2942,6 +2999,50 @@ components:
           type: array
           items:
             type: string
+    PolishDraftRequest:
+      type: object
+      required: [mode]
+      properties:
+        mode:
+          type: string
+          enum: [detect, polish]
+          description: >
+            detect — find and name patterns without rewriting;
+            polish — apply minimum edits and return cleaned text.
+    PolishFinding:
+      type: object
+      required: [patternName, quotedLine, fixHint]
+      properties:
+        patternName:
+          type: string
+          description: Short name of the pattern (e.g. "throat-clearing", "weasel-attribution")
+        quotedLine:
+          type: string
+          description: The exact sentence or phrase from the draft that triggered this finding
+        fixHint:
+          type: string
+          description: 3-8 word suggestion for how to fix it
+    PolishDraftResult:
+      type: object
+      required: [mode, findings]
+      properties:
+        mode:
+          type: string
+          enum: [detect, polish]
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/PolishFinding"
+          description: Patterns found (detect mode) or patterns fixed (polish mode)
+        body:
+          type: ["string", "null"]
+          description: Cleaned article body in Markdown (polish mode only)
+        dek:
+          type: ["string", "null"]
+          description: Cleaned dek (polish mode, null if unchanged or detect mode)
+        whatChanged:
+          type: ["string", "null"]
+          description: Short bulleted summary of edits made (polish mode only)
     AnalyticsDayStat:
       type: object
       required: [day, views]

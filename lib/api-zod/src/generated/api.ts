@@ -1462,6 +1462,31 @@ export const SeoOptimizeDraftResponse = zod.object({
 
 
 /**
+ * In detect mode, returns a list of flagged patterns (name, quoted line, fix hint) without rewriting anything. In polish mode, returns a cleaned body and dek plus a "what changed" summary. Neither mode auto-saves — the caller decides whether to apply the result.
+ * @summary Detect or fix AI-slop writing patterns in a draft
+ */
+export const PolishDraftParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const PolishDraftBody = zod.object({
+  "mode": zod.enum(['detect', 'polish']).describe('detect — find and name patterns without rewriting; polish — apply minimum edits and return cleaned text.\n')
+})
+
+export const PolishDraftResponse = zod.object({
+  "mode": zod.enum(['detect', 'polish']),
+  "findings": zod.array(zod.object({
+  "patternName": zod.string().describe('Short name of the pattern (e.g. \"throat-clearing\", \"weasel-attribution\")'),
+  "quotedLine": zod.string().describe('The exact sentence or phrase from the draft that triggered this finding'),
+  "fixHint": zod.string().describe('3-8 word suggestion for how to fix it')
+})).describe('Patterns found (detect mode) or patterns fixed (polish mode)'),
+  "body": zod.string().nullish().describe('Cleaned article body in Markdown (polish mode only)'),
+  "dek": zod.string().nullish().describe('Cleaned dek (polish mode, null if unchanged or detect mode)'),
+  "whatChanged": zod.string().nullish().describe('Short bulleted summary of edits made (polish mode only)')
+})
+
+
+/**
  * @summary Suggest real source URLs for an existing article using AI
  */
 export const FindDraftCitationsParams = zod.object({
