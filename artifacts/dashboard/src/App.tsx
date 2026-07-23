@@ -1,5 +1,6 @@
 import { Switch, Route, Link, Router as WouterRouter, Redirect } from 'wouter';
 import { QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -90,16 +91,18 @@ export function Routes() {
 
 function App() {
   return (
-    <WouterRouter base={basePath}>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Routes />
-            <Toaster />
-          </TooltipProvider>
-        </QueryClientProvider>
-      </AuthProvider>
-    </WouterRouter>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <WouterRouter base={basePath}>
+        <AuthProvider>
+          <QueryClientProvider client={queryClient}>
+            <TooltipProvider>
+              <Routes />
+              <Toaster />
+            </TooltipProvider>
+          </QueryClientProvider>
+        </AuthProvider>
+      </WouterRouter>
+    </ThemeProvider>
   );
 }
 
