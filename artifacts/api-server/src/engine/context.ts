@@ -7,6 +7,7 @@ import {
   type GroundingContextTag,
 } from "@workspace/db";
 import { inArray } from "drizzle-orm";
+import { buildAntiSlopBlock } from "./writing-rules";
 
 /**
  * Prompt-context resolver — simplified port of Orbit's voice-service +
@@ -75,18 +76,7 @@ export const LANGUAGE_STANDARDS =
   "Write as a professional journalist: third-person point of view, attribution-based claims, and precise, fact-driven prose. " +
   "Use American English spelling and idioms throughout — never British variants (use 'program' not 'programme', 'organization' not 'organisation', 'standardization' not 'standardisation', 'color' not 'colour', etc.). " +
   "Maintain a clear, authoritative register appropriate for a professional editorial publication.\n\n" +
-  "## Banned words and structural rules\n" +
-  "Never use these words or phrases: " +
-  "delve, leverage, utilize, harness, foster, facilitate, empower, unlock, synergize, spearhead, streamline, " +
-  "robust, seamless, cutting-edge, groundbreaking, revolutionary, unprecedented, transformative, game-changing, disruptive, " +
-  "holistic, comprehensive, pivotal, innovative, paradigm shift, " +
-  "actually, basically, simply, truly, certainly, incredibly, remarkably, fundamentally, crucially, vitally, undoubtedly, " +
-  "in conclusion, in summary, it is important to note, it is worth noting, needless to say, going forward, moving forward, " +
-  "in today's fast-paced world, in today's digital age, in an era of.\n" +
-  "Avoid structural anti-patterns: throat-clearing openers, binary-contrast setups, faux-insight openers (\"The real question is...\"), " +
-  "colon reveals, importance puffery, weasel attribution without a named source, fake-profound kicker lines, " +
-  "summary-recap endings, dramatic one-sentence fragments for emphasis, and formatting slop (emoji headings, decorative bold, bullets that should be prose). " +
-  "End every piece on a concrete point, takeaway, or next action — never a recap.";
+  buildAntiSlopBlock("full");
 
 /**
  * Resolve the brand voice and grounding documents into a system prompt

@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { getImageForCategory } from "@workspace/image-library/core";
 import { completeJsonForFeature } from "./ai-provider";
 import { resolvePromptContext } from "./context";
+import { buildAntiSlopBlock } from "./writing-rules";
 import { uniqueSlug } from "../lib/articles";
 import { logger } from "../lib/logger";
 
@@ -26,7 +27,8 @@ import { logger } from "../lib/logger";
  * requirements without mocking the database or calling the AI provider.
  */
 export const COPYWRITER_SYSTEM_PROMPT_BASE =
-  "You are the staff writer for this publication. You write clear, structured, insight-dense articles in the brand voice, from a professional journalist's point of view: third-person, attribution-based, and precise. Use American English spelling and conventions throughout — never British variants. Respond with valid JSON only.";
+  "You are the staff writer for this publication. You write clear, structured, insight-dense articles in the brand voice, from a professional journalist's point of view: third-person, attribution-based, and precise. Use American English spelling and conventions throughout — never British variants. Respond with valid JSON only.\n\n" +
+  buildAntiSlopBlock("full");
 
 export interface CopywriteJobInput {
   briefId: number;

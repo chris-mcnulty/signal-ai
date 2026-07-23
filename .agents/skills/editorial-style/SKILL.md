@@ -9,7 +9,7 @@ description: |
   writing" guide and the no-ai-slop skill.
 ---
 
-# BlueTrail Intelligence Report — Editorial Style Guide
+# BlueTrail Intelligence Report Editorial Style Guide
 
 "Separating the signal from the AI noise." Every word we publish must sound like
 a professional journalist wrote it — not a chatbot. This guide defines what that
@@ -19,8 +19,7 @@ means in practice.
 
 ## VOICE
 
-BlueTrail Intelligence Report is an authoritative, opinionated AI-industry
-publication. The voice is:
+BlueTrail Intelligence Report is an authoritative, opinionated AI-industry publication. The voice is:
 - **Third-person**, attribution-based. Claims need sources or attribution.
 - **American English** throughout (program not programme, color not colour, organization not organisation).
 - **Direct and specific.** Concrete details over vague superlatives.
@@ -28,125 +27,146 @@ publication. The voice is:
 
 ---
 
-## BANNED WORDS
+## BANNED VOCABULARY
 
-Never use the following words or phrases in any BlueTrail copy. No exceptions unless
-they appear inside a direct quotation from an external source.
+Never use these words or phrases in any form (including as adjectives, adverbs, or gerunds) in any BlueTrail copy. No exceptions unless they appear inside a direct quotation from an external source.
 
 ### High-frequency AI tells
-delve, leverage (verb), utilize, harness, foster, facilitate, empower, unlock,
-synergize, spearhead, streamline, navigate (metaphorical)
+delve, leverage (verb), utilize, harness, foster, facilitate, empower, unlock, synergize, spearhead, streamline, navigate (metaphorical), align with, delve, enhance, garner, highlight (as verb), interplay, intricate / intricacies, showcase / showcasing, underscore / underscores
 
 ### Hype adjectives / nouns
-robust, seamless, cutting-edge, groundbreaking, revolutionary, unprecedented,
-transformative, game-changing, game-changer, disruptive, holistic, comprehensive,
-dynamic, pivotal, innovative, paradigm, paradigm shift, ecosystem (metaphorical),
-landscape (metaphorical), journey (metaphorical)
+robust, seamless, cutting-edge, groundbreaking, revolutionary, unprecedented, transformative, game-changing, game-changer, disruptive, holistic, comprehensive, dynamic, pivotal, innovative, paradigm, paradigm shift, ecosystem (metaphorical), landscape (metaphorical), journey (metaphorical), enduring, key (as adjective meaning "important"), tapestry (abstract), testament, valuable, vibrant
 
 ### Empty intensifiers
-actually, basically, simply, literally, truly, certainly, incredibly, remarkably,
-fundamentally, essentially, obviously, importantly, significantly, crucially,
-vitally, undoubtedly
+actually, basically, simply, literally, truly, certainly, incredibly, remarkably, fundamentally, essentially, obviously, importantly, significantly, crucially, vitally, undoubtedly, additionally
 
 ### Empty adjectives
-exciting, thrilling, amazing, awesome, powerful, tailored, curated, bespoke
+exciting, thrilling, amazing, awesome, powerful, tailored, curated, bespoke, emphasizing
 
-### Throat-clearing phrases
-in conclusion, in summary, to summarize, to recap, it is important to note,
-it is worth noting, it should be noted, needless to say, as we know, of course,
-at the end of the day, the bottom line is, going forward, moving forward,
-in today's fast-paced world, in today's digital age, in an era of,
-more than ever before
+### Throat-clearing and empty phrases
+- in conclusion, in summary, to summarize, to recap
+- it is important to note, it is worth noting, it should be noted
+- needless to say, as we know, of course
+- at the end of the day, the bottom line is
+- going forward, moving forward
+- in today's fast-paced world, in today's digital age, in an era of, evolving landscape
+- more than ever before
+- In order to achieve this goal (use "To achieve this")
+- Due to the fact that (use "because")
+- At this point in time (use "now")
+- Has the ability to (use "can")
+- Serves as a testament to
+- Stands as a reminder
+- Sets the stage for
+- Reflects broader
 
 ---
 
-## STRUCTURAL PATTERNS TO ELIMINATE
+## NAMED STRUCTURAL PATTERNS TO ELIMINATE
 
-### 1. Binary contrasts
-"X is no longer Y, it's Z" — restate the point directly.
+### 1. Binary contrasts / faux-insight setups
+**Pattern:** "X is no longer Y, it's Z" or "It's not just about X, it's about Y." "Not only X but also Y."
 > ❌ "AI is no longer a novelty — it's infrastructure."
 > ✅ "Companies now run core operations on AI models."
+> ❌ "It's not just about the model — it's about the entire ecosystem."
+> ✅ "The ecosystem matters as much as the model."
 
-### 2. Negative listing
-Listing what something is NOT before saying what it IS.
+### 2. Negative listing / negative parallelisms
+Listing what something is NOT before saying what it IS. Includes clipped fragments like "no guessing," "no wasted motion."
 > ❌ "This isn't just a product update. It's a strategic bet."
 > ✅ "OpenAI is repositioning the product as a strategic platform."
 
 ### 3. Throat-clearing openers
-Sentences that say nothing before the real sentence starts.
+The first paragraph restates the headline without adding information. Sentences that say nothing before the real sentence starts.
 > ❌ "In today's fast-paced world, AI is changing everything."
-> ✅ Just start with the fact.
+> ❌ "In an era of unprecedented change…"
+> ✅ Just start with the news/fact.
 
 ### 4. Faux-insight setups
-> ❌ "The real question is..." / "What most people miss..." / "Here's the thing:"
+> ❌ "The real question is..." / "What makes this different is…" / "The real story here is…" / "What most people miss..." / "Here's the thing:"
 > ✅ State the insight directly.
 
 ### 5. Colon reveals
+A sentence builds artificial suspense, then delivers an obvious conclusion after a colon.
 > ❌ "There is one thing that matters: the data."
 > ✅ "The data is what matters — but not all data equally."
+> ❌ "The answer is simple: invest in AI."
+> ✅ State the point directly.
 
-### 6. Superficial analysis
+### 6. Superficial -ing analyses (trailing clauses)
 Restating the claim without evidence or mechanism.
 > ❌ "This move underscores the importance of safety."
 > ✅ "The company hired 40 safety researchers in Q2, doubling the team."
+> ❌ "The partnership expands its reach, showcasing its commitment to safety."
+> ✅ "The partnership gives it access to three new markets."
 
-### 7. Importance puffery
-Calling something crucial/vital/important without explaining why.
+### 7. Significance inflation / importance puffery
+Calling something crucial/vital/important/pivotal/landmark/historic/revolutionary/unprecedented without explaining why.
 > ❌ "This is a crucially important development."
 > ✅ Explain the consequence: "The ruling affects every model over 10^25 FLOPs."
+> ❌ "This marks a pivotal moment in the evolution of AI regulation."
+> ✅ Replace with the specific fact: "The rule takes effect in January."
 
 ### 8. Weasel attribution
 Vague sources instead of named ones.
-> ❌ "Experts say..." / "Studies show..." / "Many believe..."
+> ❌ "Experts say..." / "Industry observers note," / "Studies show..." / "Many believe..." / "Some critics argue," / "Several sources indicate."
 > ✅ "According to a 2024 McKinsey survey of 1,200 companies..."
 
-### 9. Fake-strong verbs
-underscores, highlights, showcases, demonstrates, speaks to, reflects, symbolizes —
-when used as a substitute for "is," "shows," or "means."
+### 9. Fake-strong verbs (copula avoidance failures)
+underscores, highlights, showcases, demonstrates, speaks to, reflects, symbolizes, serves as, stands as, marks, represents, boasts, features, offers — when used as a substitute for "is," "shows," "has," or "means."
 > ❌ "This showcases the company's commitment to safety."
 > ✅ "The company has spent $400M on safety research since 2022."
+> ❌ "Gallery 825 serves as LAAA's exhibition space and boasts 3,000 sq ft."
+> ✅ "Gallery 825 is LAAA's exhibition space. It has four rooms totaling 3,000 sq ft."
 
-### 10. Synonym cycling
-Repeating the same idea with different words in adjacent sentences.
+### 10. Synonym cycling (elegant variation)
+Repeating the same idea with different words in adjacent sentences. Use the same noun consistently. Do not rotate "protagonist → main character → central figure → hero."
 
 ### 11. Dramatic fragmentation
-One-sentence. Paragraphs. For. Emphasis. Cut them.
+One-sentence. Paragraphs. For. Emphasis. Cut them. Avoid deliberate one-sentence paragraphs deployed for drama rather than structure.
 
 ### 12. Robotic rhythm
-All sentences near the same length, same subject-verb-object pattern.
-Mix sentence structures.
+All sentences near the same length, same subject-verb-object pattern. Mix sentence structures. Vary sentence length deliberately.
 
 ### 13. Rhetorical setups
 Opening or transitioning with a question the piece then answers.
 > ❌ "What does this mean for enterprise AI? It means..."
 > ✅ Just state the implication.
+> ❌ "The real question is," "At its core," "What really matters," "Fundamentally," "The heart of the matter"
 
 ### 14. Fake-profound kickers
 Closing metaphor or pseudo-wisdom that doesn't follow from the piece.
 > ❌ "In the end, it's not about the model — it's about trust."
-> ✅ Delete it. End on the last concrete fact.
+> ❌ "One thing is clear: the future of AI will be shaped by the choices we make today."
+> ✅ Delete it. End on the last concrete, forward-looking fact.
 
 ### 15. Summary-recap endings
-A closing paragraph restating the article's main points. Cut it.
-End on a concrete point, takeaway, or next action.
+A closing paragraph restating the article's main points. Cut it. Let the last substantive paragraph be the ending.
 
 ### 16. Formatting slop
-Emoji headings, decorative bold, bullets that should be prose,
-headers over sections of fewer than three paragraphs.
+Emoji headings, decorative bold, bullets that should be prose, headers over sections of fewer than three paragraphs.
+
+### 17. Formulaic Boilerplate
+Cut sections like "Challenges and Future Prospects," "Looking Ahead," and similar. Convert to specific reported facts.
+
+### 18. Notability claims
+**Banned:** "independent coverage," vague media name-drops without specifics.
+> ❌ "Her work has been covered by The New York Times, BBC, and Wired."
+> ✅ "In a 2024 NYT interview, she argued that..."
 
 ---
 
 ## STYLE RULES (HARD CONSTRAINTS)
 
-### Em dashes — use sparingly
-Em dashes are a strong AI tell. Default: none in short copy. In longer pieces
-(800+ words), at most 1-2, only when they genuinely help. If in doubt, use a
-period or comma instead.
+### No em dashes or en dashes — ever
+This is the single most reliable AI tell. Replace every `—` and `–` before finishing. No exceptions.
+Substitutes: period, comma, colon, parentheses, restructured sentence.
+Also catch: spaced em dashes (` — `), double hyphens (` -- `).
+**Before returning any copy, scan for `—` and `–`. Any hit = not done.**
 
 ### Sentence-case headings
 > ❌ "## Strategic Negotiations And Global Partnerships"
 > ✅ "## Strategic negotiations and global partnerships"
-
 Exception: proper nouns, titles, code.
 
 ### Colon case
@@ -158,7 +178,7 @@ Sentence case after a colon unless a proper noun, title, or code follows.
 Bold only genuinely critical information, rarely. Not to compensate for weak prose.
 
 ### No emojis in copy
-No 🚀 💡 ✅ or any decorative emojis.
+No 🚀 💡 ✅ or any decorative emojis in article body, deks, or social variants.
 
 ### No inline-header bullet lists
 Convert "**Label:** explanation" lists into prose or plain bullets.
@@ -168,60 +188,42 @@ Use active voice with human subjects where possible.
 > ❌ "The results were announced by the company."
 > ✅ "The company announced the results."
 
-### American English
+### Straight quotes
+Use straight quotes `"` not curly quotes `"`.
+
+### American English only
 program, organization, color, labor, center — never British variants.
 
 ---
 
 ## CONTENT PATTERNS TO ELIMINATE
 
-### Significance inflation
-**Banned words:** stands as, is a testament to, vital/significant/crucial/pivotal role,
-underscores its importance, reflects broader, symbolizing, setting the stage for,
-marks a shift, key turning point, evolving landscape, indelible mark.
-> ❌ "This marks a pivotal moment in the evolution of AI regulation."
-> ✅ "The rule takes effect in January and covers models above 10^25 FLOPs."
-
-### Notability claims
-**Banned:** "independent coverage," vague media name-drops without specifics.
-> ❌ "Her work has been covered by The New York Times, BBC, and Wired."
-> ✅ "In a 2024 NYT interview, she argued that..."
-
-### Superficial -ing analyses
-Trailing clauses that add nothing.
-> ❌ "The partnership expands its reach, showcasing its commitment to safety."
-> ✅ "The partnership gives it access to three new markets."
-
 ### Promotional language
-**Banned:** boasts, vibrant, rich (figurative), profound, nestled, in the heart of,
-renowned, breathtaking, stunning, enhancing its.
+**Banned:** boasts, vibrant, rich (figurative), profound, nestled, in the heart of, renowned, breathtaking, stunning, enhancing its.
 > ❌ "Nestled in the heart of Silicon Valley, the company boasts groundbreaking AI."
 > ✅ "The company, based in Palo Alto, makes hardware accelerators for LLM inference."
 
-### Formulaic sections
-Cut "Challenges and Future Prospects," "Looking Ahead," and similar boilerplate.
-Convert to specific facts.
+### Chatbot correspondence artifacts
+Delete: "Great question!", "I hope this helps!", "Let me know if you'd like me to expand."
+Write the content directly.
 
----
+### Knowledge-cutoff disclaimers
+> "While specific details are not extensively documented in available sources…"
+State what is known. If unknown, omit or say plainly it is not documented.
 
-## FILLER AND HEDGING
+### Sycophantic tone
+> "You're absolutely right. That's an excellent point."
+State the economic/analytical point directly.
 
-### Filler phrases → replacements
-- "In order to achieve this goal" → "To achieve this"
-- "Due to the fact that" → "Because"
-- "At this point in time" → "Now"
-- "Has the ability to" → "Can"
-- "It is important to note that" → [delete, just say the thing]
-- "Let's dive in" → [delete]
-- "Let's explore" → [delete]
+### Signposting and announcements
+**Banned:** "Let's dive in," "Let's explore," "Here's what you need to know," "Without further ado"
+Start with the content.
 
-### Persuasive authority tropes
-**Banned phrases:** "The real question is," "At its core," "What really matters,"
-"The heart of the matter," "Fundamentally."
+### Fragmented headers (warm-up sentences)
+Delete one-liner paragraphs that restate the heading.
 
-### Generic positive conclusions
-> ❌ "The future looks bright. Exciting times lie ahead."
-> ✅ End with a specific fact or concrete next event.
+### Excessive bullet lists
+Convert bullet lists of fewer than 4 items into a prose sentence.
 
 ---
 
@@ -238,9 +240,18 @@ Do not rewrite anything in detect mode. Do not score the draft. Do not claim AI 
 
 ## EDIT WORKFLOW (when asked to clean or polish copy)
 
-Make the minimum effective changes. Then check every item below before returning.
+### 1. The Process
+1. **Draft** the copy or accept the provided draft.
+2. **Scan for banned vocabulary** (§ Banned Vocabulary). Replace each hit with a concrete, specific alternative.
+3. **Scan for structural patterns** (§ Named Structural Patterns). Flag each by name. Revise.
+4. **Apply editing principles** (see below).
+5. **Check em dashes** — search for `—` and `–`. Fix every one before continuing.
+6. **Verify attribution** — any factual claim without a named source needs one or must be rewritten.
+7. **Verify formatting** — headings, colons, boldface, quotes, and English variants.
+8. **Run final checklist** (Quality Gate).
+9. **Return** the clean copy with a brief "What changed" note.
 
-**Editing principles:**
+### 2. Editing Principles
 1. Preserve the writer's point without adding claims, examples, stats, quotes, or opinions.
 2. Preserve distinctive vocabulary, cadence, bluntness, humor, uncertainty, digressions, and level of polish.
 3. Leave strong human sentences alone. Do not rewrite for consistency.
@@ -252,30 +263,19 @@ Make the minimum effective changes. Then check every item below before returning
 9. Fix genuinely tangled sentences; keep clear spoken cadence, fragments, and changes in pace.
 10. End on a concrete point, takeaway, or next action — never a recap.
 
-**Quality gate — check every item before returning:**
-- [ ] Banned words removed?
+### 3. Quality Gate (Final Read Checklist)
+- [ ] Banned words and phrases removed?
 - [ ] Binary contrasts, throat-clearing openers, rhetorical setups removed?
 - [ ] Faux-insight setups, colon reveals, superficial analysis fixed?
 - [ ] Importance puffery and weasel attribution replaced with plain facts or flagged?
 - [ ] Fake-profound kicker lines deleted?
 - [ ] Summary-recap ending cut?
-- [ ] Formatting slop removed?
-- [ ] Em dashes within limit (0 for short copy, ≤2 for long)?
+- [ ] Formatting slop and chatbot artifacts removed?
+- [ ] **NO em or en dashes remaining?** (Search for `—` and `–`)
 - [ ] Colons sentence case where required?
 - [ ] Draft avoids robotic symmetry, repeated sentence shapes, stacked punchy fragments?
 - [ ] Would the writer recognize this as their own voice?
 - [ ] Does the output include the full edited copy AND a short "What changed" section?
-
----
-
-## PROCESS
-
-For any copy task (article, dek, SEO description, social variant, UI copy):
-1. Draft the copy
-2. Scan for every pattern above — especially banned words, weasel attribution, significance inflation, and promotional language
-3. Revise until clean
-4. Final check: search for em dashes (`—`, `–`). Any unexplained hit = not done.
-5. Return the copy with a brief "What changed" note if editing existing text.
 
 ---
 

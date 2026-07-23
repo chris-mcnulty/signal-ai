@@ -45,6 +45,8 @@ import { submitUrls, type SubmitTrigger } from "../lib/seoSubmit";
 import { pathForArticle } from "../lib/seoContent";
 import { getBaseUrl } from "../lib/site";
 import type { Request } from "express";
+import { buildAntiSlopBlock, STRUCTURAL_PATTERNS } from "../engine/writing-rules";
+import { completeJsonForFeature } from "../engine/ai-provider";
 
 const router: IRouter = Router();
 
@@ -685,6 +687,150 @@ router.post("/drafts/:id/unpublish", async (req, res): Promise<void> => {
   }
   notifySearchEngines(req, article, "delete", "unpublish-hook");
   res.json(UnpublishDraftResponse.parse(article));
+});
+
+// ── Writing quality: detect / polish ────────────────────────────────────────
+
+const PolishBody = z.object({
+  mode: z.enum(["detect", "polish"]),
+});
+
+router.post("/drafts/:id/polish", async (req, res): Promise<void> => {
+  const params = GetDraftParams.safeParse(req.params);
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+  const parsed = PolishBody.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const [row] = await db
+    .select({ body: articlesTable.body, dek: articlesTable.dek, title: articlesTable.title })
+    .from(articlesTable)
+    .where(eq(articlesTable.id, params.data.id));
+  if (!row) {
+    res.status(404).json({ error: "Draft not found" });
+    return;
+  }
+
+  const { mode } = parsed.data;
+  const antiSlopBlock = buildAntiSlopBlock("full");
+  const patternNames = STRUCTURAL_PATTERNS.map((p) => p.name).join(", ");
+
+  // 50 000 chars covers any realistic article body while staying within model context limits.
+  const POLISH_BODY_LIMIT = 50000;
+
+  if (mode === "detect") {
+    const systemPrompt =
+      "You are a copy editor specializing in identifying AI writing patterns. " +
+      "Your job is detection only: do not rewrite, rephrase, or score any part of the draft. " +
+      "For each problem found, name the pattern, quote the exact offending phrase, and give a short fix hint. " +
+      "Respond with valid JSON only — an array, no wrapper object.\n\n" +
+      antiSlopBlock;
+
+    const prompt =
+      `Analyze the following article for AI writing slop. Return a JSON array where each element has:\n` +
+      `- "pattern": one of these pattern names (${patternNames}) or "banned-word"\n` +
+      `- "quote": the exact offending sentence or phrase (max 120 chars)\n` +
+      `- "fix": a 3-5 word suggestion for how to fix it (e.g. "use specific fact instead")\n\n` +
+      `If the article is clean, return an empty array [].\n\n` +
+      `## Article title\n${row.title}\n\n` +
+      `## Dek\n${row.dek ?? "(none)"}\n\n` +
+      `## Body\n${row.body.slice(0, POLISH_BODY_LIMIT)}`;
+
+    let findings: unknown[] = [];
+    try {
+      const { data } = await completeJsonForFeature<unknown>(
+        "copywriting",
+        prompt,
+        { systemPrompt, maxTokens: 2048 },
+      );
+      findings = Array.isArray(data) ? data : [];
+    } catch (err) {
+      req.log.error({ err }, "Polish detect failed");
+      res.status(502).json({ error: "AI analysis failed" });
+      return;
+    }
+
+    res.json({ mode: "detect", findings });
+    return;
+  }
+
+  // polish mode
+  const systemPrompt =
+    "You are a copy editor specializing in removing AI writing patterns from journalism. " +
+    "Your job is a light-touch edit: remove slop, preserve the writer's voice. " +
+    "Respond with valid JSON only.\n\n" +
+    antiSlopBlock +
+    "\n\n" +
+    "## Editing principles — follow these exactly\n" +
+    "1. Do not add any claims, examples, statistics, quotes, or opinions that are not already in the draft.\n" +
+    "2. Preserve the writer's distinctive vocabulary, cadence, bluntness, humor, uncertainty, digressions, and level of polish.\n" +
+    "3. Leave strong human sentences alone. Do not rewrite them for consistency or to make every paragraph equally tidy.\n" +
+    "4. Cut only in proportion to the actual slop found. Do not compress aggressively or strip character.\n" +
+    "5. Keep personal setup that adds context, tension, or character — only move it if it genuinely buries the reader's need.\n" +
+    "6. Front-load points where doing so improves clarity, but do not force every unit into the same structure.\n" +
+    "7. Use active voice with human subjects where the existing draft already supports it. Do not restructure passive constructions that read naturally.\n" +
+    "8. Keep useful edge and preserve structure unless that structure is actively hurting the piece.\n" +
+    "9. Fix genuinely tangled sentences. Do not touch clear spoken cadence, deliberate fragments, or changes of pace.\n\n" +
+    "## Final read — check before returning\n" +
+    "- The draft must not have robotic symmetry: three consecutive same-length sentences or stacked punchy fragments.\n" +
+    "- The writer should recognize the edited draft as their own voice.\n" +
+    "- The draft should sound natural if read aloud to a sharp colleague.";
+
+  // Preserve any body content beyond the context limit so it is never dropped.
+  const bodyForModel = row.body.slice(0, POLISH_BODY_LIMIT);
+  const bodyTail = row.body.length > POLISH_BODY_LIMIT
+    ? row.body.slice(POLISH_BODY_LIMIT)
+    : "";
+
+  const prompt =
+    `Polish the article below. Remove all banned words, banned structural patterns, and em/en dashes. ` +
+    `Preserve all factual content, sources, and the author's intended meaning.\n\n` +
+    `Return a JSON object with:\n` +
+    `- "body": the full cleaned article body in Markdown\n` +
+    `- "dek": the cleaned dek (or null if there was no dek)\n` +
+    `- "whatChanged": a plain-English summary of the changes made (2-4 sentences)\n\n` +
+    `## Article title\n${row.title}\n\n` +
+    `## Dek\n${row.dek ?? "(none)"}\n\n` +
+    `## Body\n${bodyForModel}`;
+
+  interface PolishResponse {
+    body?: string;
+    dek?: string | null;
+    whatChanged?: string;
+  }
+
+  let polished: PolishResponse = {};
+  try {
+    const { data } = await completeJsonForFeature<PolishResponse>(
+      "copywriting",
+      prompt,
+      { systemPrompt, maxTokens: 8192 },
+    );
+    polished = data;
+  } catch (err) {
+    req.log.error({ err }, "Polish rewrite failed");
+    res.status(502).json({ error: "AI polish failed" });
+    return;
+  }
+
+  // Re-attach any tail content that was beyond the context window — guarantees
+  // no content is ever dropped when the draft body exceeds POLISH_BODY_LIMIT.
+  const polishedBody =
+    typeof polished.body === "string"
+      ? polished.body.trim() + (bodyTail ? "\n\n" + bodyTail : "")
+      : row.body;
+
+  res.json({
+    mode: "polish",
+    body: polishedBody,
+    dek: typeof polished.dek === "string" ? polished.dek.trim() || null : row.dek,
+    whatChanged: typeof polished.whatChanged === "string" ? polished.whatChanged.trim() : "",
+  });
 });
 
 // ── Case-study metadata (company, proof points, quotes) ─────────────────────

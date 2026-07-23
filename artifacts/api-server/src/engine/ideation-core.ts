@@ -6,6 +6,8 @@
  * assessment against the brand voice. No I/O, so it is unit-testable.
  */
 
+import { buildAntiSlopBlock } from "./writing-rules";
+
 export const MIN_INTERVIEW_BRIEFS = 5;
 export const MAX_INTERVIEW_BRIEFS = 10;
 
@@ -172,7 +174,8 @@ export function getIdeationSystemPrompt(): string {
     "You are an editorial strategist for a single-publication website. You propose distinct, well-grounded " +
     "article concepts that fit the publication's voice and respond to real signals from research. " +
     "You never fabricate facts. Write all text in American English — never British spellings or idioms. " +
-    "Maintain a professional journalist's register throughout. Respond with valid JSON only."
+    "Maintain a professional journalist's register throughout. Respond with valid JSON only.\n\n" +
+    buildAntiSlopBlock("compact")
   );
 }
 

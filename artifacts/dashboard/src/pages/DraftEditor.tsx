@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { DraftStatusBadge } from "@/components/DraftStatusBadge";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download, Star, Search } from "lucide-react";
+import { ArrowLeft, Save, Trash2, CheckCircle, XCircle, Send, Globe, CalendarIcon, ChevronDown, ChevronUp, Wand2, Loader2, ImagePlus, RefreshCw, Check, PlusCircle, X, ChevronsUpDown, UserCircle2, Download, Star, Search, ShieldCheck, AlertCircle } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -401,42 +401,6 @@ export default function DraftEditor() {
     });
   };
 
-  const handleDetect = () => {
-    if (!draftId) return;
-    setPolishMode("detect");
-    setPolishResult(null);
-    polishMutation.mutate(
-      { id: draftId, data: { mode: "detect" } },
-      {
-        onSuccess: (result) => setPolishResult(result),
-        onError: () => toast({ title: "Writing check failed", variant: "destructive" }),
-      },
-    );
-  };
-
-  const handlePolish = () => {
-    if (!draftId) return;
-    setPolishMode("polish");
-    setPolishResult(null);
-    polishMutation.mutate(
-      { id: draftId, data: { mode: "polish" } },
-      {
-        onSuccess: (result) => setPolishResult(result),
-        onError: () => toast({ title: "Polish failed", variant: "destructive" }),
-      },
-    );
-  };
-
-  const handleApplyPolish = () => {
-    if (!polishResult || polishResult.mode !== "polish" || !polishResult.body) return;
-    form.setValue("body", polishResult.body, { shouldDirty: true });
-    if (polishResult.dek) {
-      form.setValue("dek", polishResult.dek, { shouldDirty: true });
-    }
-    setPolishResult(null);
-    toast({ title: "Polish applied — save the draft to keep changes" });
-  };
-
   const handleToggleFeatured = () => {
     if (!draftId || !draft) return;
     updateMutation.mutate(
@@ -530,8 +494,7 @@ export default function DraftEditor() {
   const [isApproveOpen, setIsApproveOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const [writingCheckOpen, setWritingCheckOpen] = useState(false);
-  const [polishResult, setPolishResult] = useState<PolishDraftResult | null>(null);
-  const [polishMode, setPolishMode] = useState<"detect" | "polish">("detect");
+  const [writingCheckLoading, setWritingCheckLoading] = useState(false);
   const [publishedAtLocal, setPublishedAtLocal] = useState("");
 
   const [genOpen, setGenOpen] = useState(false);
@@ -539,6 +502,77 @@ export default function DraftEditor() {
   const [genLoading, setGenLoading] = useState(false);
   const [genPreview, setGenPreview] = useState<string | null>(null);
   const [libraryRefreshKey, setLibraryRefreshKey] = useState(0);
+
+  interface DetectFinding {
+    pattern: string;
+    quote: string;
+    fix: string;
+  }
+  interface PolishResult {
+    body: string;
+    dek: string | null;
+    whatChanged: string;
+    originalBody: string;
+    originalDek: string | null;
+  }
+  const [detectFindings, setDetectFindings] = useState<DetectFinding[] | null>(null);
+  const [polishResult, setPolishResult] = useState<PolishResult | null>(null);
+
+  const handleDetect = async () => {
+    if (!draftId) return;
+    setWritingCheckLoading(true);
+    setDetectFindings(null);
+    setPolishResult(null);
+    try {
+      const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
+      const res = await fetch(`${API_BASE}/drafts/${draftId}/polish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+        body: JSON.stringify({ mode: "detect" }),
+      });
+      if (!res.ok) throw new Error("Detect failed");
+      const json = await res.json() as { findings: DetectFinding[] };
+      setDetectFindings(json.findings ?? []);
+    } catch {
+      toast({ title: "Pattern detection failed. Try again.", variant: "destructive" });
+    } finally {
+      setWritingCheckLoading(false);
+    }
+  };
+
+  const handlePolish = async () => {
+    if (!draftId) return;
+    setWritingCheckLoading(true);
+    setPolishResult(null);
+    setDetectFindings(null);
+    const originalBody = form.getValues("body") ?? "";
+    const originalDek = form.getValues("dek") ?? null;
+    try {
+      const apiKey = sessionStorage.getItem("dashboard_api_key") ?? "";
+      const res = await fetch(`${API_BASE}/drafts/${draftId}/polish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+        body: JSON.stringify({ mode: "polish" }),
+      });
+      if (!res.ok) throw new Error("Polish failed");
+      const json = await res.json() as PolishResult & { mode: string };
+      setPolishResult({ body: json.body, dek: json.dek, whatChanged: json.whatChanged, originalBody, originalDek });
+    } catch {
+      toast({ title: "Polish failed. Try again.", variant: "destructive" });
+    } finally {
+      setWritingCheckLoading(false);
+    }
+  };
+
+  const handleApplyPolish = () => {
+    if (!polishResult) return;
+    form.setValue("body", polishResult.body, { shouldDirty: true });
+    if (polishResult.dek !== null) {
+      form.setValue("dek", polishResult.dek, { shouldDirty: true });
+    }
+    setPolishResult(null);
+    toast({ title: "Polish applied — save the draft to persist changes" });
+  };
 
   const openGenerator = () => {
     const title = form.getValues("title");
@@ -1408,7 +1442,7 @@ export default function DraftEditor() {
               </div>
             )}
 
-            {/* Writing Check Panel — collapsible */}
+            {/* Writing check panel */}
             {!isNew && draft && draftId && (
               <div className="border border-border rounded-xl overflow-hidden">
                 <button
@@ -1416,100 +1450,136 @@ export default function DraftEditor() {
                   className="w-full flex items-center justify-between px-4 py-3 bg-muted/40 hover:bg-muted/60 transition-colors text-left"
                   onClick={() => setWritingCheckOpen((v) => !v)}
                 >
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Writing Check</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Writing check</span>
                   <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${writingCheckOpen ? "rotate-180" : ""}`} />
                 </button>
                 {writingCheckOpen && (
                   <div className="p-4 space-y-3">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Detect AI writing patterns or get a clean rewrite. Changes are not saved automatically.
+                    </p>
                     <div className="flex gap-2">
                       <Button
                         type="button"
-                        variant="outline"
                         size="sm"
+                        variant="outline"
                         className="flex-1 gap-1.5 text-xs"
+                        disabled={writingCheckLoading}
                         onClick={handleDetect}
-                        disabled={polishMutation.isPending}
                       >
-                        {polishMutation.isPending && polishMode === "detect" ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
+                        {writingCheckLoading && !polishResult ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Checking…</>
                         ) : (
-                          <Search className="w-3 h-3" />
+                          <><ShieldCheck className="w-3.5 h-3.5" /> Detect patterns</>
                         )}
-                        Detect patterns
                       </Button>
                       <Button
                         type="button"
-                        variant="outline"
                         size="sm"
+                        variant="outline"
                         className="flex-1 gap-1.5 text-xs"
+                        disabled={writingCheckLoading}
                         onClick={handlePolish}
-                        disabled={polishMutation.isPending}
                       >
-                        {polishMutation.isPending && polishMode === "polish" ? (
-                          <Loader2 className="w-3 h-3 animate-spin" />
+                        {writingCheckLoading && !detectFindings ? (
+                          <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Polishing…</>
                         ) : (
-                          <Wand2 className="w-3 h-3" />
+                          <><Wand2 className="w-3.5 h-3.5" /> Polish draft</>
                         )}
-                        Polish draft
                       </Button>
                     </div>
 
-                    {polishResult && polishResult.mode === "detect" && (
-                      <div>
-                        {polishResult.findings.length === 0 ? (
-                          <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
-                            <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                            No slop patterns detected.
-                          </p>
-                        ) : (
-                          <div className="space-y-1.5">
-                            <p className="text-xs text-muted-foreground">
-                              {polishResult.findings.length} pattern{polishResult.findings.length !== 1 ? "s" : ""} found:
-                            </p>
-                            <ul className="space-y-1.5 max-h-64 overflow-y-auto">
-                              {polishResult.findings.map((f, i) => (
-                                <li
-                                  key={i}
-                                  className="text-xs bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded p-2 space-y-0.5"
-                                >
-                                  <div className="font-medium text-amber-800 dark:text-amber-300">{f.patternName}</div>
-                                  <div className="text-muted-foreground italic line-clamp-2">"{f.quotedLine}"</div>
-                                  <div className="text-foreground">Fix: {f.fixHint}</div>
-                                </li>
-                              ))}
-                            </ul>
+                    {/* Detect results */}
+                    {detectFindings !== null && (
+                      <div className="space-y-2">
+                        {detectFindings.length === 0 ? (
+                          <div className="flex items-center gap-2 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30 rounded-md px-3 py-2">
+                            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                            No patterns found. Clean draft.
                           </div>
+                        ) : (
+                          <>
+                            <p className="text-xs font-medium text-muted-foreground">{detectFindings.length} pattern{detectFindings.length !== 1 ? "s" : ""} found:</p>
+                            <div className="space-y-2 max-h-64 overflow-y-auto">
+                              {detectFindings.map((f, i) => (
+                                <div key={i} className="rounded-md border border-border bg-muted/30 p-2.5 space-y-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <AlertCircle className="w-3 h-3 text-amber-500 shrink-0" />
+                                    <span className="text-xs font-medium text-amber-600 dark:text-amber-400">{f.pattern}</span>
+                                  </div>
+                                  <p className="text-xs text-foreground/80 italic leading-snug">"{f.quote}"</p>
+                                  <p className="text-xs text-muted-foreground">Fix: {f.fix}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </>
                         )}
+                        <button
+                          type="button"
+                          onClick={() => setDetectFindings(null)}
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          Clear results
+                        </button>
                       </div>
                     )}
 
-                    {polishResult && polishResult.mode === "polish" && polishResult.body && (
-                      <div className="space-y-2.5">
+                    {/* Polish results */}
+                    {polishResult !== null && (
+                      <div className="space-y-3">
                         {polishResult.whatChanged && (
-                          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded p-3">
-                            <p className="text-xs font-medium text-blue-800 dark:text-blue-300 mb-1">What changed</p>
-                            <div className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed">
-                              {polishResult.whatChanged}
+                          <div className="rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3 text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+                            <p className="font-medium mb-1">What changed</p>
+                            <p>{polishResult.whatChanged}</p>
+                          </div>
+                        )}
+
+                        {/* Dek before/after */}
+                        {(polishResult.originalDek || polishResult.dek) && polishResult.dek !== polishResult.originalDek && (
+                          <div className="space-y-1.5">
+                            <p className="text-xs font-medium text-muted-foreground">Dek preview</p>
+                            <div className="rounded-md border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 p-2 text-xs text-red-800 dark:text-red-300 leading-snug line-through opacity-70">
+                              {polishResult.originalDek || "(empty)"}
+                            </div>
+                            <div className="rounded-md border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 p-2 text-xs text-green-800 dark:text-green-300 leading-snug">
+                              {polishResult.dek || "(empty)"}
                             </div>
                           </div>
                         )}
-                        {polishResult.findings.length > 0 && (
-                          <p className="text-xs text-muted-foreground">
-                            {polishResult.findings.length} pattern{polishResult.findings.length !== 1 ? "s" : ""} fixed.
-                          </p>
+
+                        {/* Body before/after (first ~400 chars) */}
+                        {polishResult.body !== polishResult.originalBody && (
+                          <div className="space-y-1.5">
+                            <p className="text-xs font-medium text-muted-foreground">Body preview (opening)</p>
+                            <div className="rounded-md border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 p-2 text-xs text-red-800 dark:text-red-300 leading-snug opacity-70 max-h-28 overflow-y-auto whitespace-pre-wrap">
+                              {(polishResult.originalBody ?? "").slice(0, 400)}{(polishResult.originalBody ?? "").length > 400 ? "…" : ""}
+                            </div>
+                            <div className="rounded-md border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 p-2 text-xs text-green-800 dark:text-green-300 leading-snug max-h-28 overflow-y-auto whitespace-pre-wrap">
+                              {polishResult.body.slice(0, 400)}{polishResult.body.length > 400 ? "…" : ""}
+                            </div>
+                          </div>
                         )}
-                        <Button
-                          type="button"
-                          size="sm"
-                          className="w-full text-xs gap-1.5"
-                          onClick={handleApplyPolish}
-                        >
-                          <Check className="w-3 h-3" />
-                          Apply changes
-                        </Button>
-                        <p className="text-[10px] text-muted-foreground text-center">
-                          Replaces body{polishResult.dek ? " and dek" : ""} in the editor. Save manually to keep.
-                        </p>
+
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="flex-1 gap-1.5 text-xs"
+                            onClick={handleApplyPolish}
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            Apply changes
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            className="text-xs"
+                            onClick={() => setPolishResult(null)}
+                          >
+                            Discard
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
